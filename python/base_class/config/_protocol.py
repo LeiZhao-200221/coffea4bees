@@ -3,7 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Generic, Optional, TypeVar, overload
 
-from typing_extensions import Self
+from typing_extensions import Self  # DEPRECATE
 
 from ._manager import _status, _unset
 
