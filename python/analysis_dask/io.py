@@ -68,6 +68,7 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
             case _:
                 raise ValueError(f"Unknown output type: {type(data)}")
 
+    @delayed()
     def __call__(
         self,
         obj,
@@ -93,4 +94,4 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
     @classmethod
     @borrow_typehints(__call__)
     def dumps(cls, *args, **kwargs):
-        return delayed(cls())(*args, **kwargs)
+        return cls()(*args, **kwargs)

@@ -50,6 +50,16 @@ def _parse_file(url: str) -> Generator[dict[str, Any], None, None]:
             import yaml
 
             data = yaml.safe_load(data)
+        case ".toml":
+            import tomllib
+
+            data = tomllib.loads(data)
+        case ".ini":
+            import configparser
+
+            parser = configparser.ConfigParser()
+            parser.read_string(data)
+            data = {k: dict(v.items()) for k, v in parser.items()}
         case _:
             raise NotImplementedError(f"Unsupported file type: {suffix}")
 
@@ -102,12 +112,18 @@ class Flag:
         return self.flag
 
 
+CustomFlagParser = Callable[[Optional[str], str, Any], tuple[str, Any]]
+
+
 class Flags:
     __match = re.compile(r"(?P<key>[^\>\<]*?)\s*(?P<flags>(\<[^\>\<]*\>\s*)*)\s*")
     __split = re.compile(r"\<(?P<flag>[^\>\<]*)\>")
 
     def __init__(self, flags: dict[str, Optional[str]] = None):
         self.flags = flags or {}
+        self.others = {
+            k: v for k, v in self.flags.items() if k not in FlagKeys.__members__
+        }
 
     def __getitem__(self, flag: str | FlagKeys):
         return Flag(self.flags.get(flag, ...))
@@ -165,23 +181,38 @@ class Extend:
 class Parser:
     __current = getcwd()
 
-    def __init__(self, flat: bool, base: Optional[str] = None):
+    def __init__(
+        self,
+        flat: bool,
+        base: Optional[str] = None,
+        custom_flags: dict[str, CustomFlagParser] = None,
+    ):
         self.flat = flat
         self.base = base or self.__current
+        self.custom_flags = custom_flags or {}
 
-    def instance(self, fullname: str, data):
-        # import module and get class/method/function
+    def instance(self, flag: Flag, data):
+        # import module
         import importlib
 
+        if flag.value is None:
+            if not isinstance(data, str):
+                raise ValueError(f"Type must be a str, got {data}")
+            fullname = data
+        else:
+            fullname = flag.value
         clsname = fullname.rsplit("::", 1)
         if len(clsname) == 1:
             modname = "builtins"
             clsname = clsname[0]
         else:
             modname, clsname = clsname
-        new = importlib.import_module(modname)
+        cls = importlib.import_module(modname)
         for name in clsname.split("."):
-            new = getattr(new, name)
+            cls = getattr(cls, name)
+
+        if flag.value is None:
+            return cls
 
         # parse args and kwargs
         kwargs = {}
@@ -192,7 +223,7 @@ class Parser:
             args = data
         if not isinstance(args, list):
             args = [args]
-        return new(*self.list(args), **kwargs)
+        return cls(*self.list(args), **kwargs)
 
     def dict(self, data: dict[str, Any], singleton: bool = False):
         parsed = {}
@@ -204,13 +235,7 @@ class Parser:
                     continue
                 else:
                     raise ValueError(f"Cannot use include with non-empty key: {key}")
-            if (type_flag := flags[FlagKeys.type]).exist:
-                v = self.instance(type_flag.value, v)
-            elif isinstance(v, dict):
-                v = self.dict(v)
-            elif isinstance(v, list):
-                v = self.list(v)
-            parsed[key] = Extend.merge(flags[FlagKeys.extend], parsed.get(key, ...), v)
+            self.setitem(parsed, flags, key, v)
         if singleton:
             if (
                 len(parsed) == 1
@@ -229,6 +254,26 @@ class Parser:
                 v = self.list(v)
             parsed.append(v)
         return parsed
+
+    def apply_custom(self, flags: Flags):
+        if not flags.others:
+            return
+        for flag, custom in self.custom_flags.items():
+            if (custom_flag := flags[flag]).exist:
+                yield custom_flag.value, custom
+
+    def setitem(self, result: dict[str, Any], flags: Flags, key: str, value: Any):
+        if (type_flag := flags[FlagKeys.type]).exist:
+            value = self.instance(type_flag, value)
+        elif isinstance(value, dict):
+            value = self.dict(value)
+        elif isinstance(value, list):
+            value = self.list(value)
+        if (extend_flag := flags[FlagKeys.extend]).exist and key in result:
+            value = Extend.merge(extend_flag, result[key], value)
+        for flag, custom in self.apply_custom(flags):
+            key, value = custom(flag, key, value)
+        result[key] = value
 
     def eval(self, k: str, v: Any):
         key, flags = Flags.match(k)
@@ -286,6 +331,7 @@ def parse_config(
     flat: bool,
     result: Optional[dict[str, Any]] = None,
     parent: Optional[list[str]] = None,
+    custom_flags: dict[str, CustomFlagParser] = None,
 ) -> dict[str, Any]:
     if result is None:
         result = {}
@@ -298,7 +344,7 @@ def parse_config(
             data = _parse_file(path)
         else:
             data = (data,)
-        parser = Parser(flat, path)
+        parser = Parser(flat, path, custom_flags)
         stack = _to_stack(*data, parent=parent)
         while stack:
             k, v = stack.pop()
@@ -320,16 +366,13 @@ def parse_config(
             ):
                 stack.extend(_to_stack(v, parent=k))
                 continue
-            if (type_flag := flags[FlagKeys.type]).exist:
-                v = parser.instance(type_flag.value, v)
-            elif isinstance(v, dict):
-                v = parser.dict(v)
-            elif isinstance(v, list):
-                v = parser.list(v)
-            key = ".".join(k)
-            result[key] = Extend.merge(flags[FlagKeys.extend], result.get(key, ...), v)
+            parser.setitem(result, flags, ".".join(k), v)
     return result
 
 
-def load_config(*path_or_dict: ConfigSource) -> dict[str, Any]:
-    return parse_config(*path_or_dict, flat=False, result=None, parent=None)
+def load_config(
+    *path_or_dict: ConfigSource, **custom_flags: CustomFlagParser
+) -> dict[str, Any]:
+    return parse_config(
+        *path_or_dict, flat=False, result=None, parent=None, custom_flags=custom_flags
+    )
