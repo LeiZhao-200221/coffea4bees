@@ -1,6 +1,6 @@
 from datetime import datetime
 from os import fspath
-from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any, Callable, Literal, Optional
 from urllib.parse import urlparse
 from uuid import uuid1
@@ -24,6 +24,11 @@ def uuid():
     return uuid1().hex
 
 
+def joinurl(base: str, /, *parts: str):
+    url = urlparse(base)
+    return url._replace(path=fspath(PurePosixPath(url.path).joinpath(*parts))).geturl()
+
+
 class Dumper(Configurable, namespace="analysis.io.dump"):
     compression = config("lz4")
     path_base = config[str]()
@@ -34,10 +39,10 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
         if absolute:
             return path
         parsed = urlparse(self.path_base.format(**self.path_kwargs))
-        return parsed._replace(path=fspath(Path(parsed.path) / path)).geturl()
+        return parsed._replace(path=fspath(PurePosixPath(parsed.path) / path)).geturl()
 
     def infer_serializer(self, path: str):
-        match Path(path).suffixes[0]:
+        match PurePosixPath(path).suffixes[0]:
             case ".json":
                 import json
 
