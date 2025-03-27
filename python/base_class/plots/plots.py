@@ -5,7 +5,6 @@ import yaml
 import copy
 import argparse
 from coffea.util import load
-# from hist.intervals import ratio_uncertainty
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
@@ -57,6 +56,7 @@ def init_arg_parser():
     parser.add_argument('--doTest', action="store_true", help='Metadata file.')
     parser.add_argument('--debug', action="store_true", help='')
     parser.add_argument('--signal', action="store_true", help='')
+    parser.add_argument('--year',   help='')
     parser.add_argument('--combine_input_files', action="store_true", help='')
 
     return parser
@@ -74,16 +74,26 @@ def load_config(metadata):
     """
     plotConfig = yaml.safe_load(open(metadata, 'r'))
 
-    #
-    #  Make two way code mapping:
-    #    ie: 3 mapts to  "threeTag" and "threeTag" maps to 3
-    for k, v in plotConfig["codes"]["tag"].copy().items():
-        plotConfig["codes"]["tag"][v] = k
-
-    for k, v in plotConfig["codes"]["region"].copy().items():
-        if type(v) is list:
-            continue
-        plotConfig["codes"]["region"][v] = k
+    # for backwards compatibility
+    if "codes" not in plotConfig:
+        plotConfig['codes'] = {
+            'region' : {
+                'SR': 2,
+                'SB': 1,
+                'other': 0,
+                2: 'SR',
+                1: 'SB',
+                0: 'other',
+            },
+            'tag' : {
+                'threeTag': 3,
+                'fourTag': 4,
+                'other': 0,
+                3: 'threeTag',
+                4: 'fourTag',
+                0: 'other',
+            },
+        }
 
     return plotConfig
 
@@ -137,37 +147,25 @@ def print_list_debug_info(process, tag, cut, region):
 #
 def get_hist_data(this_process, cfg, config, var, region, cut, rebin, year, file_index=None, debug=False):
 
-    codes = cfg.plotConfig["codes"]
-
-    tag_code = codes["tag"][config["tag"]]
-
     if year in  ["RunII", "Run2", "Run3", "RunIII"]:
         year     = sum
 
-
     if debug:
         print(f" hist process={this_process}, "
-              f"tag={tag_code}, year={year}, var={var}")
-
+              f"tag={config['tag']}, year={year}, var={var}")
 
     hist_opts = {"process": this_process,
                  "year":  year,
-                 "tag":   hist.loc(tag_code),
+                 "tag":   config["tag"],
+                 "region": region
                  }
 
-
-    if (not region  == "sum") and (type(codes["region"][region]) is list):
-        region_dict = {"region":  [hist.loc(r) for r in codes["region"][region]]}
-    else:
-        if region == "sum":
-            region_dict = {"region":  sum}
-        else:
-            region_dict = {"region":  hist.loc(codes["region"][region])}
-
+    if region == "sum":
+        hist_opts["region"] = sum
 
     cut_dict = plot_helpers.get_cut_dict(cut, cfg.cutList)
 
-    hist_opts = hist_opts | region_dict | cut_dict
+    hist_opts = hist_opts | cut_dict
 
     hist_obj = None
     if len(cfg.hists) > 1 and not cfg.combine_input_files:
@@ -175,14 +173,31 @@ def get_hist_data(this_process, cfg, config, var, region, cut, rebin, year, file
             print("ERROR must give file_index if running with more than one input file without using the  --combine_input_files option")
         hist_obj = cfg.hists[file_index]['hists'][var]
 
+        if "variation" in cfg.hists[file_index]["categories"]:
+            hist_opts = hist_opts | {"variation" : "nominal"}
+
     else:
         for _input_data in cfg.hists:
             if var in _input_data['hists'] and this_process in _input_data['hists'][var].axes["process"]:
+
+                if "variation" in _input_data["categories"]:
+                    hist_opts = hist_opts | {"variation" : "nominal"}
+
                 hist_obj = _input_data['hists'][var]
 
     if hist_obj is None:
         raise ValueError(f"ERROR did not find var {var} with process {this_process} in inputs")
 
+    ## for backwards compatibility
+    for axis in hist_obj.axes:
+        if (axis.name == "tag") and isinstance(axis, hist.axis.IntCategory):
+            hist_opts['tag'] = hist.loc(cfg.plotConfig["codes"]["tag"][config["tag"]])
+        if (axis.name == "region") and isinstance(axis, hist.axis.IntCategory):
+            if isinstance(hist_opts['region'], list):
+                hist_opts['region'] = [ hist.loc(cfg.plotConfig["codes"]["region"][i]) for i in hist_dict['region'] ]
+            elif region != "sum":
+                hist_opts['region'] = hist.loc(cfg.plotConfig["codes"]["region"][region])
+    
     #
     #  Add rebin Options
     #
@@ -337,7 +352,7 @@ def _draw_plot_from_dict(plot_data, **kwargs):
                          "label":    hist_data.get("label", ""),
                          "color":    hist_data.get('fillcolor', 'k'),
                          "histtype": kwargs.get("histtype", hist_data.get("histtype", "errorbar")),
-                         "linewidth": kwargs.get("linewidth", hist_data.get("linewidth", 1)),
+                         "linewidth": kwargs.get("linewidth", hist_data.get("linewidth", 2)),
                          "yerr": False,
                          }
 
@@ -436,7 +451,7 @@ def _plot_from_dict(plot_data, **kwargs):
             kwargs.get("ratio_line_value", 1.0),
             color="black",
             linestyle="dashed",
-            linewidth=1.0
+            linewidth=2.0
         )
 
         for ratio_name, ratio_data in plot_data["ratio"].items():
@@ -507,7 +522,7 @@ def plot_border_SR():
     Z3 = func3(X, Y)
 
     # Create the plot
-    plt.contour(X, Y, Z0, levels=[1.90*1.90], colors='orangered', linestyles='dashed', linewidths=5) 
+    plt.contour(X, Y, Z0, levels=[1.90*1.90], colors='orangered', linestyles='dashed', linewidths=5)
     plt.contour(X, Y, Z1, levels=[1.90*1.90], colors='orangered', linestyles='dashed', linewidths=5)
     plt.contour(X, Y, Z2, levels=[1.90*1.90], colors='orangered', linestyles='dashed', linewidths=5)
     plt.contour(X, Y, Z3, levels=[2.60*2.60], colors='orangered', linestyles='dashed', linewidths=5)
@@ -517,7 +532,7 @@ def plot_leadst_lines():
 
     def func4(x):
         return (360/x) - 0.5
-    
+
     def func6(x):
         return max(1.5, (650/x) + 0.5)
 
@@ -528,14 +543,14 @@ def plot_leadst_lines():
 
     # Plot func6 as a line plot
     x_func6 = np.linspace(100, 1100, 50)
-    y_func6 = [func6(x) for x in x_func6] 
+    y_func6 = [func6(x) for x in x_func6]
     plt.plot(x_func6, y_func6, color='red', linestyle='-', linewidth=2)
 
 def plot_sublst_lines():
 
     def func4(x):
         return (235/x)
-    
+
     def func6(x):
         return max(1.5, (650/x) + 0.7)
 
@@ -546,7 +561,7 @@ def plot_sublst_lines():
 
     # Plot func6 as a line plot
     x_func6 = np.linspace(100, 1100, 50)
-    y_func6 = [func6(x) for x in x_func6] 
+    y_func6 = [func6(x) for x in x_func6]
     plt.plot(x_func6, y_func6, color='red', linestyle='-', linewidth=2)
 
 
@@ -834,14 +849,14 @@ def make_plot_from_dict(plot_data):
             tagName = "_vs_".join(plot_data["process"])
         else:
             tagName = plot_helpers.get_value_nested_dict(plot_data,"tag")
+            if isinstance(tagName, hist.loc):
+                tagName = str(tagName.value)
 
         # these get combined with "/"
         output_path = [kwargs.get("outputFolder"), kwargs.get("year","RunII"), plot_data["cut"], tagName, plot_data["region"], plot_data.get("process","")]
         file_name = plot_data.get("file_name",plot_data["var"])
-
         if kwargs.get("yscale", None) == "log":
             file_name += "_logy"
-
         plot_helpers.savefig(fig, file_name, *output_path)
 
         if kwargs.get("write_yaml", False):
@@ -1008,7 +1023,7 @@ def get_plot_dict_from_config(cfg, var='selJets.pt',
     #
     var_over_ride = kwargs.get("var_over_ride", {})
 
-    if cut not in cfg.cutList:
+    if cut and cut not in cfg.cutList:
         raise AttributeError(f"{cut} not in cutList {cfg.cutList}")
 
     #
@@ -1102,6 +1117,10 @@ def makePlot(cfg, var='selJets.pt',
         except ValueError as e:
             raise ValueError(e)
 
+    elif not cut:
+        plot_data = get_plot_dict_from_config(cfg, var, None, None, **kwargs)
+        return make_plot_from_dict(plot_data)
+
     plot_data = get_plot_dict_from_config(cfg, var, cut, region, **kwargs)
     return make_plot_from_dict(plot_data)
 
@@ -1137,7 +1156,7 @@ def make2DPlot(cfg, process, var='selJets.pt',
         process_config = { 'process': "all"}
         input_data = cfg.hists[0]
         hist_to_plot = input_data['hists'][var]
-    
+
     #
     #  Get the year
     #    (Got to be a better way to do this....)
@@ -1159,14 +1178,6 @@ def make2DPlot(cfg, process, var='selJets.pt',
 
         process_config = copy.deepcopy(plot_helpers.get_value_nested_dict(cfg.plotConfig, process))
         tagName = process_config.get("tag", "fourTag")
-        tag = cfg.plotConfig["codes"]["tag"][tagName]
-
-        if region in ["sum", sum]:
-            region_selection = sum
-        elif type(cfg.plotConfig["codes"]["region"][region]) is list:
-            region_selection = [hist.loc(_r) for _r in cfg.plotConfig["codes"]["region"][region]]
-        else:
-            region_selection = hist.loc(cfg.plotConfig["codes"]["region"][region])
 
         if kwargs.get("debug", False):
             print(f" hist process={process}, "
@@ -1175,9 +1186,16 @@ def make2DPlot(cfg, process, var='selJets.pt',
         varName = hist_to_plot.axes[-1].name
         hist_dict = {"process": process_config["process"],
                     "year":    year,
-                    "tag":     hist.loc(tag),
-                    "region":  region_selection,
+                    "tag":     tagName,
+                    "region":  region,
                     varName:   hist.rebin(kwargs.get("rebin", 1))}
+
+        ## for backwards compatibility
+        for axis in hist_to_plot.axes:
+            if (axis.name == "tag") and isinstance(axis, hist.axis.IntCategory):
+                hist_dict['tag'] = hist.loc(cfg.plotConfig["codes"]["tag"][tagName])
+            if (axis.name == "region") and isinstance(axis, hist.axis.IntCategory):
+                hist_dict['region'] = hist.loc(cfg.plotConfig["codes"]["region"][region])
 
         hist_dict = hist_dict | cut_dict
 
@@ -1241,7 +1259,7 @@ def read_axes_and_cuts(hists, plotConfig):
     axisLabels["var"] = hists[0]['hists'].keys()
     var1 = list(hists[0]['hists'].keys())[0]
 
-    for a in hists[0]["hists"][var1].axes:
+    for a in hists[0]['hists'][var1].axes:
         axisName = a.name
         if axisName == var1:
             continue
@@ -1257,12 +1275,7 @@ def read_axes_and_cuts(hists, plotConfig):
 
         for iBin in range(a.extent):
 
-            if axisName in plotConfig["codes"]:
-                if a.value(iBin) not in plotConfig["codes"][axisName]:
-                    continue
-                value = plotConfig["codes"][axisName][a.value(iBin)]
-            else:
-                value = a.value(iBin)
+            value = a.value(iBin)
 
             axisLabels[axisName].append(value)
 

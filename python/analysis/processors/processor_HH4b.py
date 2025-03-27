@@ -447,7 +447,8 @@ class analysis(processor.ProcessorABC):
 
                 event['GenJet', 'selectedBs'] = (np.abs(event.GenJet.partonFlavour)==5)
                 event['selGenBJet'] = event.GenJet[event.GenJet.selectedBs]
-                event['matchedGenBJet'] = event.bfromHorZ.nearest( event.selGenBJet, threshold=0.2 )
+                event['matchedGenBJet'] = event.bfromHorZ.nearest( event.selGenBJet, threshold=10 )
+                event["matchedGenBJet"] = event.matchedGenBJet[~ak.is_none(event.matchedGenBJet, axis=1)]
 
                 event['pass4GenBJets'] = ak.num(event.matchedGenBJet) == 4
                 event["truth_v4b"] = ak.where(  event.pass4GenBJets,
@@ -663,6 +664,8 @@ class analysis(processor.ProcessorABC):
                 self._cutFlow.fill("failSvB", selev[selev.failSvB])
                 self._cutFlow.fill("failSvB_woTrig", selev[selev.failSvB],
                                wOverride=selev['weight_woTrig'][selev.failSvB] )
+            if self.run_dilep_ttbar_crosscheck:
+                self._cutFlow.fill("passDilepTtbar", selev[selev.passDilepTtbar], allTag=True)
 
             self._cutFlow.addOutput(processOutput, event.metadata["dataset"])
 
