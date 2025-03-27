@@ -51,14 +51,20 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
                 import yaml
 
                 return yaml.safe_dump
-            case ".pkl" | ".coffea":
+            case ".pkl":
                 import pickle
 
                 return pickle.dumps
+            case ".coffea":  # backward compatibility
+                import cloudpickle
+
+                return cloudpickle.dumps
             case _:
                 raise NotImplementedError(f"Unknown file format: {path}")
 
     def infer_compression(self, path: str, mode: str):
+        if PurePosixPath(path).suffix == ".coffea":
+            return "lz4"  # backward compatibility
         compression = fsspec.utils.infer_compression(path)
         if compression is None and mode == "b":
             compression = self.compression

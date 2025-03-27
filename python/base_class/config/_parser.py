@@ -7,7 +7,6 @@ import operator as op
 import re
 import sys
 from dataclasses import asdict, dataclass, field
-from enum import StrEnum, auto
 from functools import cache
 from os import PathLike, fspath, getcwd
 from pathlib import PurePosixPath
