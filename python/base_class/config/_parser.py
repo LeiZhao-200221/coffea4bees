@@ -219,8 +219,10 @@ class TypeParser:
             modname = f"{self.base}.{modname}"
 
         cls = importlib.import_module(modname)
-        for name in clsname.split("."):
-            cls = getattr(cls, name)
+        clsname = clsname.split(".")
+        if any(clsname):
+            for name in clsname:
+                cls = getattr(cls, name)
 
         if flag is None:
             return key, cls
@@ -259,7 +261,7 @@ class ExtendRecursive:
 
 class ExtendParser:
     methods = {
-        None: op.add,
+        None: ExtendRecursive(op.add),
         "add": op.add,
         "or": op.or_,
         "and": op.and_,
@@ -376,7 +378,7 @@ class Parser:
     def eval(self, k: str, v: Any):
         key, flags = self.custom.match(k)
         if flags.has(FlagKeys.code):
-            v = eval(v)
+            v = eval(v, None, self.custom.locals)
         return key, flags, v
 
     def setitem(self, local: dict[str, Any], flags: Flags, key: str, value: Any):
@@ -462,20 +464,24 @@ class _ParserInitializer(_ParserCustomization):
     file = FileParser()
 
     def __post_init__(self):
-        local = VariableParser()
+        self.vars = VariableParser()
         self.parsers = self.custom_flags | {
             FlagKeys.file: self.file,
             FlagKeys.type: self.type,
-            FlagKeys.var: local.var,
-            FlagKeys.ref: local.ref,
-            FlagKeys.copy: local.copy,
-            FlagKeys.deepcopy: local.deepcopy,
+            FlagKeys.var: self.vars.var,
+            FlagKeys.ref: self.vars.ref,
+            FlagKeys.copy: self.vars.copy,
+            FlagKeys.deepcopy: self.vars.deepcopy,
             FlagKeys.extend: ExtendParser(self.extend_methods),
         }
 
     @classmethod
     def new(cls, other: _ParserCustomization):
         return cls(**asdict(other))
+
+    @property
+    def locals(self):
+        return self.vars.local
 
     def parse(
         self,
