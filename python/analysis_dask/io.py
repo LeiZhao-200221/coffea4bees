@@ -1,15 +1,17 @@
 from datetime import datetime
+from functools import wraps
 from os import fspath
 from pathlib import PurePosixPath
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Callable, Concatenate, Literal, Optional, ParamSpec, Protocol
 from urllib.parse import urlparse
 from uuid import uuid1
 
 import fsspec
 import fsspec.utils
 from base_class.config import Configurable, config
-from base_class.typetools import borrow_typehints
 from dask import delayed
+
+P = ParamSpec("P")
 
 
 def timestamp(format: Optional[str] = None):
@@ -33,6 +35,23 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
     compression = config("lz4")
     path_base = config[str]()
     path_kwargs = config[dict[str, str]]({})
+
+    def __init__(
+        self,
+        path: str,
+        absolute: bool = False,
+        serializer: Callable[[Any], str | bytes] = ...,
+        mode: Literal["t", "b"] = ...,
+        compression: Optional[str] = ...,
+        **kwargs,
+    ):
+        self.path = self.resolve_path(path, absolute)
+        if serializer is ...:
+            serializer = self.infer_serializer(path)
+        self.serializer = serializer
+        self.mode = mode
+        self.compression = compression
+        self.kwargs = kwargs
 
     def resolve_path(self, path: str, absolute: bool):
         path = path.format(**self.path_kwargs)
@@ -80,29 +99,27 @@ class Dumper(Configurable, namespace="analysis.io.dump"):
                 raise ValueError(f"Unknown output type: {type(data)}")
 
     @delayed()
-    def __call__(
-        self,
-        obj,
-        path: str,
-        absolute: bool = False,
-        serializer: Callable[[Any], str | bytes] = ...,
-        mode: Literal["t", "b"] = ...,
-        compression: Optional[str] = ...,
-        **kwargs,
-    ):
-        path = self.resolve_path(path, absolute)
-        if serializer is ...:
-            serializer = self.infer_serializer(path)
-        data = serializer(obj, **kwargs)
-        if mode is ...:
+    def __call__(self, obj):
+        data = self.serializer(obj, **self.kwargs)
+        if (mode := self.mode) is ...:
             mode = self.infer_mode(data)
-        if compression is ...:
-            compression = self.infer_compression(path, mode)
-        with fsspec.open(path, f"w{mode}", compression=compression) as f:
+        if (compression := self.compression) is ...:
+            compression = self.infer_compression(self.path, mode)
+        with fsspec.open(self.path, f"w{mode}", compression=compression) as f:
             f.write(data)
-        return path
+        return self.path
 
-    @classmethod
-    @borrow_typehints(__call__)
-    def dumps(cls, *args, **kwargs):
-        return cls()(*args, **kwargs)
+
+class _DumpClassmethod(Protocol[P]):
+    def __call__(self, obj: Any, *args: P.args, **kwargs: P.kwargs) -> str: ...
+
+
+def _dump_classmethod(
+    method: Callable[Concatenate[Any, P], Any],
+) -> Callable[[Callable], _DumpClassmethod[P]]:
+    return wraps(method)
+
+
+@_dump_classmethod(Dumper.__init__)
+def dumps(obj, *args, **kwargs):
+    return Dumper(*args, **kwargs)(obj)
