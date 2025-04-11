@@ -19,6 +19,9 @@ P = ParamSpec("P")
 T = TypeVar("T")
 
 ConfigSource = str | PathLike | dict[str, Any]
+"""
+str or ~os.PathLike or dict: A path to the config file or a nested dict.
+"""
 
 
 def _unpack(seq: list):
@@ -75,10 +78,9 @@ def load_file(url: str, parse_query: bool = True):
 
     if parsed.fragment:
         for k in parsed.fragment.split("/"):
-            try:
-                data = data[k]
-            except KeyError:
-                data = data[int(k)]
+            if isinstance(data, list):
+                k = int(k)
+            data = data[k]
     yield data
 
     if parse_query and parsed.query:
@@ -108,6 +110,7 @@ if sys.version_info >= (3, 11):
 
         file = auto()
         type = auto()
+        attr = auto()
         var = auto()
         ref = auto()
         copy = auto()
@@ -128,6 +131,7 @@ else:
 
         file = "file"
         type = "type"
+        attr = "attr"
         var = "var"
         ref = "ref"
         copy = "copy"
@@ -147,7 +151,7 @@ class NoFlag:
         return ...
 
     @staticmethod
-    def apply(key: str, value: str):
+    def apply(*, key: str, value: str, **_):
         return key, value
 
 
@@ -175,6 +179,10 @@ class Flags:
 
 
 class FlagParser(Protocol):
+    """
+    Flag parser protocol
+    """
+
     def __call__(
         self,
         *,
@@ -183,7 +191,27 @@ class FlagParser(Protocol):
         flag: Optional[str],
         parser: Optional[Parser],
         local: Optional[dict[str, Any]],
-    ) -> tuple[str, Any]: ...
+    ) -> tuple[str, Any]:
+        """
+        Parameters
+        ----------
+        key: str, optional
+            The key of the current item.
+        value: Any, optional
+            The value of the current item.
+        flag: str, optional
+            The flags of the current item.
+        parser: Parser, optional
+            The current parser instance.
+        local: dict[str, Any], optional
+            The current parsed result.
+
+        Returns
+        -------
+        tuple[str, Any]
+            The key and value after parsing.
+        """
+        ...
 
 
 class _FlagParser:
@@ -201,10 +229,14 @@ class _FlagParser:
 
 
 def as_flag_parser(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    A decorator to make a function with omitted keyword arguments compatible with :class:`FlagParser` protocol.
+    """
+
     return _FlagParser(func)
 
 
-class TypeParser:
+class TypeParser:  # flag: <type>
     def __init__(self, base: str = None):
         self.base = base
 
@@ -254,7 +286,18 @@ class TypeParser:
         return key, cls(*args, **kwargs)
 
 
+class AttrParser:  # flag: <attr>
+    @as_flag_parser
+    def __call__(self, flag: Optional[str], key: str, value):
+        for attr in flag.split("."):
+            value = getattr(value, attr)
+        return key, value
+
+
 ExtendMethod = Callable[[Any, Any], Any]
+"""
+~typing.Callable[[Any, Any], Any]: A method to merge two values into one.
+"""
 
 
 class ExtendRecursive:
@@ -274,7 +317,7 @@ class ExtendRecursive:
         return new
 
 
-class ExtendParser:
+class ExtendParser:  # flag: <extend>
     methods = {
         None: ExtendRecursive(op.add),
         "add": op.add,
@@ -299,7 +342,7 @@ class ExtendParser:
             )
 
 
-class VariableParser:
+class VariableParser:  # flag: <var> <ref> <copy> <deepcopy>
     def __init__(self):
         self.local = {}
 
@@ -344,7 +387,7 @@ class VariableParser:
         return key, copy.deepcopy(self._get(flag, key, value, FlagKeys.deepcopy))
 
 
-class FileParser:
+class FileParser:  # flag: <file>
     @as_flag_parser
     def __call__(self, parser: Parser, flag: Optional[str], key: str, value):
         return key, copy.deepcopy(
@@ -473,10 +516,11 @@ class _ParserCustomization:
 
 @dataclass
 class _ParserInitializer(_ParserCustomization):
-    _match = re.compile(r"(?P<key>.*?)\s*(?P<flags>(\<[^\>\<]*\>\s*)*)\s*")
+    _match = re.compile(r"(?P<key>(.*?(?=\s))|())\s*(?P<flags>(\<[^\>\<]*\>\s*)*)\s*")
     _split = re.compile(r"\<(?P<flag>[^\>\<]*)\>")
 
     type = TypeParser()
+    attr = AttrParser()
     file = FileParser()
 
     def __post_init__(self):
@@ -488,6 +532,7 @@ class _ParserInitializer(_ParserCustomization):
         self.parsers = self.custom_flags | {
             FlagKeys.file: self.file,
             FlagKeys.type: self.type,
+            FlagKeys.attr: self.attr,
             FlagKeys.var: self.vars.var,
             FlagKeys.ref: self.vars.ref,
             FlagKeys.copy: self.vars.copy,
@@ -555,7 +600,7 @@ class _ParserInitializer(_ParserCustomization):
             return None, NoFlag
         matched = self._match.fullmatch(key)
         if not matched:
-            raise ValueError(f"Invalid key format: {key}")
+            return key, NoFlag
         flags = {}
         for flag in self._split.finditer(matched["flags"]):
             k = flag["flag"].split("=")
@@ -582,13 +627,44 @@ class GlobalConfigParser(_ParserCustomization):
 
 
 class ConfigLoader(_ParserCustomization):
+    """
+    A customizable config loader.
+
+    Parameters
+    ----------
+    custom_flags : dict[str, FlagParser], optional
+        Customized flags and their parsers.
+
+    extend_methods : dict[str, ExtendMethod], optional
+        Customized <extend> methods and their implementations.
+
+    """
+
     def __call__(
         self, *path_or_dict: ConfigSource, result: Optional[dict[str, Any]] = None
     ) -> dict[str, Any]:
+        """
+        Load configs from multiple sources.
+
+        Parameters
+        ----------
+        *path_or_dict : ConfigSource
+            Paths to config files or deserialized configs.
+        result : dict[str, Any], optional
+            If provided, the configs will be loaded into this dict.
+
+        Returns
+        -------
+        dict[str, Any]
+            The loaded configs.
+        """
         return _ParserInitializer.new(self).parse(
             *path_or_dict, flat=False, result=result, parent=None
         )
 
     @staticmethod
     def clear_cache():
+        """
+        Clear all cache.
+        """
         clear_cache()

@@ -16,7 +16,7 @@ physics:
       ggZH4b <code>: 0.1227 * br["Z->bb"] * br["H->bb"]
       # https://arxiv.org/pdf/2009.01186
       ZZ4b <code>: 17.4 * br["Z->bb"]**2
-      #
+      # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
       TTJets <var>: 831.76
       TTToHadronic <code>: TTJets * br["t->hadrons"]**2
       TTToSemiLeptonic <code>: TTJets * 2 * br["t->hadrons"] * (1-br["t->hadrons"])
