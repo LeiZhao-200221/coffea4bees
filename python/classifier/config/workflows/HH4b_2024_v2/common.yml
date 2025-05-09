@@ -1,0 +1,12 @@
+setting:
+  - module: ml.DataLoader
+    option:
+      - optimize_sliceable_dataset: true
+  - module: ROOT
+    option:
+      - friend_allow_missing: false
+  - module: cms.CollisionData
+    option:
+      - eras:
+          UL17: [B, C, D, E, F]
+          UL18: [A, B, C, D]

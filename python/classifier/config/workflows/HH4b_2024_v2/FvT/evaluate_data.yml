@@ -37,6 +37,3 @@ setting:
   - module: ml.DataLoader
     option:
       - num_workers: 8
-  - module: ROOT
-    option:
-      - friend_allow_missing: false

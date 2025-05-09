@@ -16,6 +16,7 @@ fi
 # train
 ./pyml.py \
     template "user: ${LPCUSER}" $WFS/train_data.yml \
+    -from $WFS/../common.yml \
     -setting Monitor "address: :${port}" -flag debug
 
 # plot
@@ -29,6 +30,7 @@ fi
 # evaluate
 ./pyml.py \
     template "user: ${LPCUSER}" $WFS/evaluate_data.yml \
+    -from $WFS/../common.yml \
     -setting Monitor "address: :${port}"
 
 if [ -e "$GMAIL" ]; then

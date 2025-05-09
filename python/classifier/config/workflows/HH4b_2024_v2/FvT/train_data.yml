@@ -33,9 +33,3 @@ setting:
   - module: IO
     option:
       - output: root://cmseos.fnal.gov//store/user/{user}/HH4b/classifier/HH4b_2024_v2/FvT/data/
-  - module: ml.DataLoader
-    option:
-      - optimize_sliceable_dataset: true
-  - module: ROOT
-    option:
-      - friend_allow_missing: false
