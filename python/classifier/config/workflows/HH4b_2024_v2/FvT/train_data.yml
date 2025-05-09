@@ -29,7 +29,6 @@ model:
       - epoch: 1
         bs_init: 16384
 
-
 setting:
   - module: IO
     option:
@@ -37,3 +36,6 @@ setting:
   - module: ml.DataLoader
     option:
       - optimize_sliceable_dataset: true
+  - module: ROOT
+    option:
+      - friend_allow_missing: false
