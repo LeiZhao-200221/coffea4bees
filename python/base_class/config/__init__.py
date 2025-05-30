@@ -1,25 +1,21 @@
 from ._io import FileLoader
 from ._manager import ConfigManager
-from ._parser import (
-    ConfigLoader,
-    ConfigSource,
-    ExtendMethod,
-    FlagParser,
-    GlobalConfigParser,
-    as_flag_parser,
-)
+from ._parser import ConfigParser, ConfigSource, ExtendMethod, TagParser
+from ._patch import PatchAction
 from ._protocol import Configurable, config, const
 
 __all__ = [
+    # global config
     "ConfigManager",
     "Configurable",
     "config",
     "const",
-    "GlobalConfigParser",
-    "ConfigLoader",
-    "as_flag_parser",
+    # config parser
+    "ConfigParser",
     "ConfigSource",
-    "FlagParser",
+    "TagParser",
     "ExtendMethod",
+    "PatchAction",
+    # io
     "FileLoader",
 ]

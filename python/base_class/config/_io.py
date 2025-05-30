@@ -1,11 +1,31 @@
+from __future__ import annotations
+
+import json
+import pickle
+import re
+from collections import defaultdict
+from io import BytesIO
+from os import fspath, getcwd
 from pathlib import PurePosixPath
-from typing import Any, Callable, Generator, Iterable, TypeVar, overload
+from types import MethodType
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    Literal,
+    Optional,
+    TypeVar,
+    overload,
+)
 from urllib.parse import parse_qs, unquote, urlparse
-from warnings import warn
 
 import fsspec
+import fsspec.utils
 
 T = TypeVar("T")
+HandlerT = TypeVar("HandlerT", bound=Callable)
 
 
 def _unpack(seq: list):
@@ -14,160 +34,283 @@ def _unpack(seq: list):
     return seq
 
 
-class FileLoader:
-    """
-    A module to load and deserialize objects from URL.
-    """
-
-    __cache: dict[str, Any] = {}
-    __deserializers: dict[str, Callable[[bytes], Any]] = {}
-
-    @classmethod
-    def __load(cls, url: str):
-        if url in cls.__cache:
-            return cls.__cache[url]
-
-        with fsspec.open(url, mode="rb", compression="infer") as f:
-            data = f.read()
-
-        suffix = PurePosixPath(url).suffixes[0].lstrip(".")
-        if deserializer := cls.__deserializers.get(suffix):
-            data = deserializer(data)
-        else:
-            raise NotImplementedError(f"Unsupported file type: {suffix}")
-
-        cls.__cache[url] = data
+def _maybe_json(data: str):
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
         return data
 
-    @classmethod
-    def clear_cache(cls):
-        """Clear all cache."""
-        cls.__cache.clear()
+
+def _enter_path(data: dict | list, path: Iterable[str]) -> dict | list:
+    for part in path:
+        if isinstance(data, list):
+            part = int(part)
+        data = data[part]
+    return data
+
+
+def _parse_url(url: str):
+    parsed = urlparse(url)
+    return (
+        parsed,
+        parsed._replace(
+            path=unquote(parsed.path), params="", query="", fragment=""
+        ).geturl(),
+    )
+
+
+class _split_path:
+    pattern = r"\"(?P<key1>[^\"]+)\"(\.|$)|(?P<key2>[^.\"]+)(\.|$)"
+    re_match = re.compile(f"({pattern})+")
+    re_split = re.compile(pattern)
+
+    def __new__(cls, path: str):
+        if not path:
+            return
+        if not cls.re_match.fullmatch(path):
+            raise ValueError(f"Invalid path format: {path}")
+        for match in cls.re_split.finditer(path):
+            yield match["key1"] or match["key2"]
+
+
+def resolve_path(
+    base: Optional[str], scheme: Optional[Literal["absolute", "relative"]], *paths: str
+):
+    base = base or getcwd()
+    match scheme:
+        case "absolute":
+            yield from paths
+        case "relative":
+            base_parsed = urlparse(base)
+            base_path = PurePosixPath(base_parsed.path)
+            base_parent = base_path.parent
+            for path in paths:
+                path_parsed = urlparse(path)
+                if path_parsed.path == ".":
+                    path_abs = base_path
+                else:
+                    path_abs = base_parent / path_parsed.path
+                yield path_parsed._replace(
+                    scheme=base_parsed.scheme,
+                    netloc=base_parsed.netloc,
+                    path=fspath(path_abs),
+                ).geturl()
+        case None:
+            absolute = []
+            relative = []
+            order = []
+            for path in paths:
+                path_parsed = urlparse(path)
+                if path_parsed.scheme or PurePosixPath(path).is_absolute():
+                    order.append((absolute, len(absolute)))
+                    absolute.append(path)
+                else:
+                    order.append((relative, len(relative)))
+                    relative.append(path)
+            relative[:] = resolve_path(base, "relative", *relative)
+            for col, idx in order:
+                yield col[idx]
+        case _:
+            raise ValueError(f"Unknown path type: {scheme}")
+
+
+def load_url(
+    loader: Callable[[str], Any], url: str, parse_query: bool = True
+) -> Generator[Any, None, None]:
+    parsed, url = _parse_url(url)
+    data = loader(url)
+
+    if parsed.fragment:
+        data = _enter_path(data, _split_path(parsed.fragment))
+    yield data
+
+    if parse_query and parsed.query:
+        query = parse_qs(parsed.query)
+        if query:
+            yield dict((k, _unpack([*map(_maybe_json, v)])) for k, v in query.items())
+
+
+class _MaybeClassMethod:
+    def __init__(self, func: Callable):
+        self.__func = func
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return MethodType(self.__func, owner)
+        return MethodType(self.__func, instance)
+
+
+def _maybe_classmethod(method: T) -> T:
+    return _MaybeClassMethod(method)
+
+
+class FileIORegistry(Generic[HandlerT]):
+    def __init_subclass__(cls):
+        cls.__handler = {}
+
+    def __init__(self):
+        self.__handler = {}
+
+    def _get_handler(self, ext: str) -> Callable:
+        if handler := self.__handler.get(ext):
+            return handler
+        if handler := type(self).__handler.get(ext):
+            return handler
+        raise NotImplementedError(
+            f'".{ext}" file is not supported, you can register a custom handler.'
+        )
 
     @classmethod
-    @overload
-    def register(cls, extensions: str | Iterable[str], deserializer: T) -> T: ...
+    def __normalize_extensions(cls, exts: Iterable[str]):
+        for ext in exts:
+            yield ext.strip(".").lower()
+
     @classmethod
+    def _get_extensions(cls, url: str) -> tuple[Optional[str], str]:
+        suffixes = [*cls.__normalize_extensions(PurePosixPath(url).suffixes)]
+        compression = None
+        extension = ""
+        if not suffixes:
+            return compression, extension
+        if compression := fsspec.utils.compressions.get(suffixes[-1]):
+            suffixes = suffixes[:-1]
+        if suffixes:
+            extension = suffixes[-1]
+        return compression, extension
+
+    @_maybe_classmethod
+    def _hook_extension(self, _: str): ...
+
     @overload
-    def register(cls, extensions: str | Iterable[str]) -> Callable[[T], T]: ...
     @classmethod
-    def register(cls, extensions: str | Iterable[str], deserializer=None):
+    def register(cls, handler: HandlerT, *extensions: str) -> None: ...
+    @overload
+    @classmethod
+    def register(cls, *extensions: str) -> Callable[[T], T]: ...
+    @_maybe_classmethod
+    def register(this, handler=None, *extensions):
         """
-        Register a deserializer for file extensions.
+        Register a handler for file extensions.
         This method can be used as a decorator.
-        Cache will be cleared after registration.
 
         Parameters
         ----------
-        extensions : str | Iterable[str]
+        handler : Callable, optional
+            Handler function. If not provided, will return a decorator.
+        *extensions : str
             File extensions to register.
-        deserializer : Callable[[bytes], Any], optional
-            Deserializer function. If not provided, will return a decorator.
         """
-        if deserializer is None:
-            return lambda deserializer: cls.register(extensions, deserializer)
-        if isinstance(extensions, str):
-            extensions = (extensions,)
-        for extension in extensions:
-            cls.__deserializers[extension] = deserializer
-        cls.__cache.clear()
-        return deserializer
+        if isinstance(handler, str):
 
-    @classmethod
-    def unregister(cls, extensions: str | Iterable[str]):
+            def wrapper(func):
+                this.register(func, handler, *extensions)
+                return func
+
+            return wrapper
+        for extension in this.__normalize_extensions(extensions):
+            this.__handler[extension] = handler
+            this._hook_extension(extension)
+
+    @_maybe_classmethod
+    def unregister(this, *extensions: str):
         """
-        Unregister deserializers for file extensions.
-        Cache will be cleared after unregistration.
+        Unregister handlers for file extensions.
 
         Parameters
         ----------
-        extensions : str | Iterable[str]
+        *extensions : str
             File extensions to unregister.
         """
-        if isinstance(extensions, str):
-            extensions = (extensions,)
-        for extension in extensions:
-            cls.__deserializers.pop(extension, None)
-        cls.__cache.clear()
+        for extension in this.__normalize_extensions(extensions):
+            this.__handler.pop(extension, None)
+            this._hook_extension(extension)
 
-    @classmethod
-    def registered_extensions(cls):
-        """Get all registered file extensions."""
-        return sorted(cls.__deserializers)
+    @_maybe_classmethod
+    def registered(this) -> list[str]:
+        """List all registered file extensions."""
+        if isinstance(this, type):
+            return sorted(this.__handler)
+        return sorted(type(this).__handler | this.__handler)
 
-    @classmethod
-    def load(cls, url: str, parse_query: bool = True) -> Generator[Any, None, None]:
+
+class FileLoader(FileIORegistry[Callable[[BytesIO], Any]]):
+    """
+    A module to load and deserialize objects from URL.
+
+    Parameters
+    ----------
+    cache : bool, optional, default=True
+        Enable the URL based cache. When an extension is registered or unregistered, the associated cache will be cleared.
+    """
+
+    def __init__(self, cache: bool = True):
+        super().__init__()
+        self.__cache = defaultdict(dict) if cache else None
+
+    @_maybe_classmethod
+    def _hook_extension(self, extension: str):
+        if not isinstance(self, type) and self.__cache is not None:
+            self.__cache.pop(extension, None)
+
+    def load(self, url: str, use_cache: bool = True, use_buffer: bool = True):
         """
-        Load and deserialize an object from a URL.
+        Load objects from URL.
 
         Parameters
         ----------
         url : str
-            A URL to an object.
-        parse_query : bool, optional
-            Whether to parse the query string, by default True
+            URL to an object.
+        use_cache: bool, optional, default=True
+            If True, use the cache if enabled.
+        use_buffer: bool, optional, default=True
+            If True, the whole file will be read into memory before deserialization.
         """
-        parsed = urlparse(url)
-        path = unquote(parsed.path)
-        data = cls.__load(
-            parsed._replace(path=path, params="", query="", fragment="").geturl()
-        )
+        use_cache &= self.__cache is not None
+        compression, extension = self._get_extensions(url)
+        deserializer = self._get_handler(extension)
 
-        if parsed.params:
-            warn(f'When parsing "{url}", params will be ignored.')
+        if use_cache:
+            cache = self.__cache[extension]
+            if url in cache:
+                return cache[url]
 
-        if parsed.fragment:
-            for k in parsed.fragment.split("/"):
-                if isinstance(data, list):
-                    k = int(k)
-                data = data[k]
-        yield data
+        with fsspec.open(url, mode="rb", compression=compression) as f:
+            if use_buffer:
+                data = f.read()
+            else:
+                data = deserializer(f)
+        if use_buffer:
+            data = deserializer(BytesIO(data))
 
-        if parse_query and parsed.query:
-            import json
+        if use_cache:
+            cache[url] = data
+        return data
 
-            query = parse_qs(parsed.query)
-            if (q := query.pop("json", ...)) is not ...:
-                for v in q:
-                    yield json.loads(v)
-            if query:
-                yield dict(
-                    (k, _unpack([*map(json.loads, v)])) for k, v in query.items()
-                )
+    def clear_cache(self):
+        """Clear all cache."""
+        if self.__cache is not None:
+            self.__cache.clear()
 
 
 @FileLoader.register("json")
-def json_deserializer(data: bytes):
-    import json
-
-    return json.loads(data)
+def json_deserializer(data: BytesIO):
+    return json.load(data)
 
 
-@FileLoader.register(("yaml", "yml"))
-def yaml_deserializer(data: bytes):
+@FileLoader.register("yaml", "yml")
+def yaml_deserializer(data: BytesIO):
     import yaml
 
     return yaml.safe_load(data)
 
 
 @FileLoader.register("pkl")
-def pkl_deserializer(data: bytes):
-    import pickle
-
-    return pickle.loads(data)
+def pkl_deserializer(data: BytesIO):
+    return pickle.load(data)
 
 
 @FileLoader.register("toml")
-def toml_deserializer(data: bytes):
+def toml_deserializer(data: BytesIO):
     import tomllib
 
-    return tomllib.loads(data.decode("utf-8"))
-
-
-@FileLoader.register("ini")
-def ini_deserializer(data: bytes):
-    import configparser
-
-    parser = configparser.ConfigParser()
-    parser.read_string(data.decode("utf-8"))
-    return {k: dict(v.items()) for k, v in parser.items()}
+    return tomllib.load(data)
