@@ -240,11 +240,11 @@ def create_cand_jet_dijet_quadjet(
         quadJet["rank"] = ( 10 * quadJet.passDiJetMass + quadJet.lead.passMDR + quadJet.subl.passMDR + quadJet.random )
         quadJet["selected"] = quadJet.rank == np.max(quadJet.rank, axis=1)
 
-        a, b, m, d = -323, -70, 1.2, 2.13
-        passabovecurve = (quadJet.dr - d) * (m4j[:,0]+b) >  m * (m4j[:,0] + a)
+        # a, b, m, d = -323, -70, 1.2, 2.13
+        # passabovecurve = (quadJet.dr - d) * (m4j[:,0]+b) >  m * (m4j[:,0] + a)
 
-        quadJet["SR"] = (quadJet.rank >= 12) & (quadJet.ZZSR | quadJet.ZHSR | quadJet.HHSR) & passabovecurve
-        quadJet["SB"] = quadJet.passDiJetMass & ~quadJet.SR & (quadJet.rank >= 12) & passabovecurve
+        quadJet["SR"] = (quadJet.rank >= 12) & (quadJet.ZZSR | quadJet.ZHSR | quadJet.HHSR) #& passabovecurve
+        quadJet["SB"] = quadJet.passDiJetMass & ~quadJet.SR & (quadJet.rank >= 12) #& passabovecurve
 
 
     if apply_FvT:
@@ -295,6 +295,12 @@ def create_cand_jet_dijet_quadjet(
     selev["m4j_HHSR"] = ak.where(~selev.quadJet_selected.HHSR, -2, selev.m4j)
     selev["m4j_ZHSR"] = ak.where(~selev.quadJet_selected.ZHSR, -2, selev.m4j)
     selev["m4j_ZZSR"] = ak.where(~selev.quadJet_selected.ZZSR, -2, selev.m4j)
+
+    lsdr = (selev.quadJet_selected.lead).delta_r(selev.quadJet_selected.subl)
+    a,b,d,n,k = 59.5, 3.2, 3.6, 3.26, 3.1
+    selev["passLSdr"] = lsdr >= k - (((-d + selev.m4j/a)**n)  * np.exp(d - selev.m4j/a) / b)
+    # selev["passLSdr"] = lsdr >= 2.6
+    selev["failLSdr"] = ~ selev.passLSdr
 
     selev['leadStM_selected'] = selev.quadJet_selected.lead.mass
     selev['sublStM_selected'] = selev.quadJet_selected.subl.mass
