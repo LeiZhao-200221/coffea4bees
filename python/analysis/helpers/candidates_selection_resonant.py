@@ -309,7 +309,34 @@ def create_cand_jet_dijet_quadjet(
                                     "subl_m": ak.where(~selev.quadJet_selected.ZZSR, -2, selev.sublStM_selected),
                                     } )
 
-    
+    selev['v4j_mass_vs_pt_l']  = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.lead.pt } )
+    selev['v4j_mass_vs_pt_s']  = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.subl.pt } )
+    selev['v4j_mass_vs_pt_ll'] = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.lead.lead.pt } )
+    selev['v4j_mass_vs_pt_ls'] = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.lead.subl.pt } )
+    selev['v4j_mass_vs_pt_sl'] = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.subl.lead.pt } )
+    selev['v4j_mass_vs_pt_ss'] = ak.zip( { "m4j": selev.m4j,  "pt": selev.quadJet_selected.subl.subl.pt } )
+
+    selev['v4j_pt_vs_dr_l_s']   = ak.zip( { "pt": selev.v4j.pt, "dr": (selev.quadJet_selected.lead).delta_r(selev.quadJet_selected.subl) } )
+    selev[  'l_pt_vs_dr_l_s']   = ak.zip( { "pt": selev.quadJet_selected.lead.pt, "dr": (selev.quadJet_selected.lead).delta_r(selev.quadJet_selected.subl) } )
+    selev[  's_pt_vs_dr_l_s']   = ak.zip( { "pt": selev.quadJet_selected.subl.pt, "dr": (selev.quadJet_selected.lead).delta_r(selev.quadJet_selected.subl) } )
+
+    selev['v4j_mass_vs_dr_l_s']   = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead).delta_r(selev.quadJet_selected.subl) } )
+    selev['v4j_mass_vs_dr_ll_ls'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead.lead).delta_r(selev.quadJet_selected.lead.subl) } )
+    selev['v4j_mass_vs_dr_ll_sl'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead.lead).delta_r(selev.quadJet_selected.subl.lead) } )
+    selev['v4j_mass_vs_dr_ll_ss'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead.lead).delta_r(selev.quadJet_selected.subl.subl) } )
+    selev['v4j_mass_vs_dr_ls_sl'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead.subl).delta_r(selev.quadJet_selected.subl.lead) } )
+    selev['v4j_mass_vs_dr_ls_ss'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.lead.subl).delta_r(selev.quadJet_selected.subl.subl) } )
+    selev['v4j_mass_vs_dr_sl_ss'] = ak.zip( { "m4j": selev.m4j,  "dr": (selev.quadJet_selected.subl.lead).delta_r(selev.quadJet_selected.subl.subl) } )
+
+    selev['v4j_mass_vs_v4j_pt'] = ak.zip( { "m4j": selev.m4j,  "pt4j": selev.v4j.pt, } )
+    selev['v4j_mass_vs_hT'] = ak.zip( { "m4j": selev.m4j,  "hT": selev.hT, } )
+    selev['v4j_mass_vs_hT_trigger'] = ak.zip( { "m4j": selev.m4j,  "hT": selev.hT_trigger, } )
+    selev['v4j_mass_vs_hT_selected'] = ak.zip( { "m4j": selev.m4j,  "hT": selev.hT_selected, } )
+    selev['v4j_mass_vs_nJetSel'] = ak.zip({"m4j": selev.m4j, "nJetSel": selev.nJet_selected})
+    selev['v4j_pt_vs_nJetSel'] = ak.zip({"pt4j": selev.v4j.pt, "nJetSel": selev.nJet_selected})
+    selev['hT_sel_vs_nJetSel'] = ak.zip({"hT": selev.hT_selected, "nJetSel": selev.nJet_selected})
+    selev['hT_sel_vs_v4j_pt'] = ak.zip( {"hT": selev.hT_selected,  "pt4j": selev.v4j.pt, } )
+
     selev["region"] = ak.zip({
         "SR": selev["quadJet_selected"].SR,
         "SB": selev["quadJet_selected"].SB
