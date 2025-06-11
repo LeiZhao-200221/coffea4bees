@@ -5,8 +5,8 @@ import importlib
 import inspect
 import operator as op
 import re
+import sys
 from dataclasses import dataclass, field
-from enum import StrEnum, auto
 from functools import partial
 from inspect import _ParameterKind as ParKind
 from os import PathLike, fspath, get_terminal_size
@@ -71,26 +71,50 @@ the following exception occurred:
         )
 
 
-class _ReservedTag(StrEnum):
-    def _generate_next_value_(name, *_):
-        return name.lower().replace("_", "-")
+if sys.version_info < (3, 11):
 
-    code = auto()
+    class _ReservedTag:
+        code = "code"
 
-    include = auto()
-    patch = auto()
+        select = "select"
+        case = "case"
+        include = "include"
+        patch = "patch"
 
-    literal = auto()
-    discard = auto()
-    dummy = auto()
+        literal = "literal"
+        discard = "discard"
+        comment = "comment"
 
-    file = auto()
-    type = auto()
-    key_type = auto()
-    attr = auto()
-    extend = auto()
-    var = auto()
-    ref = auto()
+        file = "file"
+        type = "type"
+        attr = "attr"
+        extend = "extend"
+        var = "var"
+        ref = "ref"
+        map = "map"
+
+else:
+    from enum import StrEnum, auto
+
+    class _ReservedTag(StrEnum):
+        code = auto()
+
+        select = auto()
+        case = auto()
+        include = auto()
+        patch = auto()
+
+        literal = auto()
+        discard = auto()
+        comment = auto()
+
+        file = auto()
+        type = auto()
+        attr = auto()
+        extend = auto()
+        var = auto()
+        ref = auto()
+        map = auto()
 
 
 class _NoTag:
@@ -112,6 +136,7 @@ class _NoTag:
 class _MatchedTags:
     flags = frozenset(
         (
+            _ReservedTag.case,
             _ReservedTag.code,
             _ReservedTag.literal,
             _ReservedTag.discard,
@@ -119,6 +144,7 @@ class _MatchedTags:
     )
     uniques = frozenset(
         (
+            _ReservedTag.select,
             _ReservedTag.include,
             _ReservedTag.patch,
         )
@@ -126,7 +152,7 @@ class _MatchedTags:
     skips = frozenset(
         (
             _ReservedTag.code,
-            _ReservedTag.dummy,
+            _ReservedTag.comment,
         )
     )
 
@@ -218,7 +244,7 @@ class _MatchedTags:
                 result=result,
             )
         except RecursionError:
-            raise RecursionError("Recursive include may exist.") from None
+            raise RecursionError("recursive include may exist.") from None
         except Exception:
             raise
 
@@ -241,7 +267,7 @@ class _MatchedTags:
             case "uninstall":
                 patch.uninstall(value)
             case _:
-                raise ValueError(f"Unknown patch flag: {tag}")
+                raise ValueError(f"unknown method: {tag}")
 
 
 class FlagParser:
@@ -277,7 +303,7 @@ class FlagParser:
                 else:
                     parsed[cat] = flag
             else:
-                raise ValueError(f'unknown flag "{flag}".')
+                raise ValueError(f"unknown flag: {flag}.")
         return parsed
 
 
@@ -453,7 +479,7 @@ class ExtendParser:  # tag: <extend>
         if key not in local:
             return key, value
         if tag not in self.methods:
-            raise ValueError(f'unknown extend method "{tag}".')
+            raise ValueError(f"unknown method: {tag}.")
         return key, self.methods[tag](local[key], value)
 
 
@@ -515,15 +541,21 @@ class FileParser:  # tag: <file>
         return key, obj
 
 
+class MapParser:  # tag: <map>
+    @_tag_parser
+    def __call__(self, key, value: list[dict]):
+        return key, {v["key"]: v["val"] for v in value}
+
+
 class _Parser:
-    re_match = re.compile(r"(?P<key>.*?)\s*(?P<tags>(\<[^\>\<]*\>\s*)*)\s*")
-    re_split = re.compile(r"\<(?P<tag>[^\>\<]*)\>")
+    re_match = re.compile(r"(?P<key>.*?)\s*(?P<tags>(\<[^><]*\>\s*)*)\s*")
+    re_split = re.compile(r"\<(?P<tag>[^><]*)\>")
 
     def __init__(self, path: Optional[str], custom: _ParserInitializer):
         self.path = path
         self.custom = custom
 
-    def match(self, raw: Optional[str]) -> tuple[Optional[str], _MatchedTags]:
+    def extract_tags(self, raw: Optional[str]) -> tuple[Optional[str], _MatchedTags]:
         if raw is None:
             return None, _NoTag
         matched = self.re_match.fullmatch(raw)
@@ -540,7 +572,7 @@ class _Parser:
                 v = k[1]
             else:
                 raise _error_msg(
-                    error=ValueError("Invalid tag format."),
+                    error=ValueError("invalid tag format."),
                     path=self.path,
                     key=raw,
                     span=span,
@@ -552,13 +584,26 @@ class _Parser:
             key = None
         return key, _MatchedTags(tags, self, {"key": raw, "spans": spans})
 
-    def dict(self, data: dict, singleton: bool = False, result: dict = None):
+    def dict(
+        self,
+        pairs: dict[str, Any] | list[tuple],
+        singleton: bool = False,
+        result: dict = None,
+    ):
         if result is None:
             result = {}
-        for k, v in data.items():
-            key, tags, value = self.eval(k, v)
+        if isinstance(pairs, dict):
+            pairs = [*pairs.items()]
+        while pairs:
+            k, v = pairs.pop(0)
+            if isinstance(k, str):
+                k = self.extract_tags(k)
+            key, tags = k
+            value = self.eval(tags, v)
             try:
                 match tags.unique:
+                    case (_ReservedTag.select, tag):
+                        pairs = self.select(tag, value) + pairs
                     case (_ReservedTag.include, tag):
                         tags.include(tag, value, result)
                     case (_ReservedTag.patch, tag):
@@ -595,8 +640,7 @@ class _Parser:
             parsed.append(v)
         return parsed
 
-    def eval(self, k: str, v: Any):
-        key, tags = self.match(k)
+    def eval(self, tags: _MatchedTags, v: Any):
         if tags.has(_ReservedTag.code):
             try:
                 v = eval(v, None, self.custom.vars.local)
@@ -608,7 +652,7 @@ class _Parser:
                     span=tags.debug["spans"]["flags"][_ReservedTag.code],
                     value=v,
                 ) from None
-        return key, tags, v
+        return v
 
     def setitem(self, tags: _MatchedTags, key: str, value: Any, local: dict):
         if (
@@ -631,18 +675,56 @@ class _Parser:
         if not tags.has(_ReservedTag.discard):
             local[key] = value
 
+    def select(self, tag: str, cases: list[dict[str]]):
+        match tag:
+            case None | "first":
+                result = None
+            case "all":
+                result = []
+            case _:
+                raise ValueError(f"unknown method: {tag}.")
+        for case in cases:
+            pairs = []
+            decision = False
+            for k, v in case.items():
+                key, tags = self.extract_tags(k)
+                pair = ((key, tags), v)
+                if tags.has(_ReservedTag.case):
+                    value = bool(self.dict([pair])[key])
+                    match operator := tags.get(_ReservedTag.case):
+                        case None:
+                            decision = value
+                        case "or":
+                            decision = decision | value
+                        case "and":
+                            decision = decision & value
+                        case "xor":
+                            decision = decision ^ value
+                        case _:
+                            raise _error_msg(
+                                error=ValueError(f"unknown operator: {operator}."),
+                                path=self.path,
+                                key=tags.debug["key"],
+                                span=tags.debug["spans"]["flags"][_ReservedTag.case],
+                                value=v,
+                            )
+                else:
+                    pairs.append(pair)
+            if decision:
+                if result is None:
+                    return pairs
+                result.extend(pairs)
+        if result is None:
+            return []
+        return result
+
 
 class _ParserInitializer:
     static_parsers = {
-        _ReservedTag.code: None,
-        _ReservedTag.include: None,
-        _ReservedTag.literal: None,
-        _ReservedTag.discard: None,
-        _ReservedTag.dummy: None,
         _ReservedTag.file: FileParser(),
         _ReservedTag.type: TypeParser(),
-        _ReservedTag.key_type: KeyTypeParser(),
         _ReservedTag.attr: AttrParser(),
+        _ReservedTag.map: MapParser(),
     }
 
     def __init__(self, parser: ConfigParser):
@@ -653,6 +735,7 @@ class _ParserInitializer:
             {
                 k: v if v is None else _tag_parser(v)
                 for k, v in parser.custom_tags.items()
+                if k not in _ReservedTag.__members__
             }
             | self.static_parsers
             | {
@@ -698,7 +781,7 @@ class ConfigParser:
     Parameters
     ----------
     nested : bool, optional, default=True
-        Parse dot-separated keys to nested dicts.
+        Parse dot-separated keys into nested dicts.
     custom_tags : dict[str, Optional[TagParser]], optional
         Customized tags.
     extend_methods : dict[str, ExtendMethod], optional

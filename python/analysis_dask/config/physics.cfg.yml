@@ -9,7 +9,7 @@ physics:
       # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWGHH
       GluGluToHHTo4B_cHHH0 <code>: 0.06856 * br["H->bb"]**2
       GluGluToHHTo4B_cHHH1 <code>: 0.03077 * br["H->bb"]**2
-      GluGluToHHTo4B_cHHH2p45 <code>: 0.01347 * br["H->bb"]**2 
+      GluGluToHHTo4B_cHHH2p45 <code>: 0.01347 * br["H->bb"]**2
       GluGluToHHTo4B_cHHH5 <code>: 0.09082 * br["H->bb"]**2
       # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV
       ZH4b <code>: 0.7612 * br["Z->bb"] * br["H->bb"]
@@ -26,4 +26,3 @@ physics:
     UL16_preVFP: 19.5e+3
     UL17: 41.5e+3
     UL18: 59.8e+3
-
