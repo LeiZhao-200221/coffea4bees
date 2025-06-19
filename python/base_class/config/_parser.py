@@ -6,6 +6,7 @@ import inspect
 import operator as op
 import re
 import sys
+import traceback
 from dataclasses import dataclass, field
 from functools import partial
 from inspect import _ParameterKind as ParKind
@@ -67,7 +68,12 @@ class _error_msg:
 {info}{block_end}
 the following exception occurred:
   {type(error).__name__}:
-{block_indent(error_msg, "    ")}"""
+{block_indent(error_msg, "    ")}
+{block_start}
+Traceback:
+{block_indent("".join(traceback.format_tb(error.__traceback__)), "    ")}
+{block_end} 
+"""
         )
 
 
@@ -362,7 +368,10 @@ class _TagParserWrapper:
 
 def _tag_parser(func: Callable[P, T]) -> Callable[P, T]:
     kwargs = set()
-    sig = inspect.signature(func)
+    try:
+        sig = inspect.signature(func)
+    except ValueError:
+        return func
     for k, v in sig.parameters.items():
         match v.kind:
             case ParKind.POSITIONAL_OR_KEYWORD | ParKind.KEYWORD_ONLY:
