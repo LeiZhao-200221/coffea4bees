@@ -141,6 +141,10 @@ rule run_postfit:
             source stats_analysis/run_combine.sh {params.output_dir} --postfit --unblind
         source workflows/helpers/shell_combine.sh {params.container} \
             python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t prefit
+        source workflows/helpers/shell_combine.sh {params.container} \
+            python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t fit_b
+        source workflows/helpers/shell_combine.sh {params.container} \
+            python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t fit_s
         """
 
 rule make_syst_plots:
