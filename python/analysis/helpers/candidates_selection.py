@@ -265,17 +265,20 @@ def create_cand_jet_dijet_quadjet(
         quadJet["rank"] = ( 10 * quadJet.passDiJetMass + quadJet.lead.passMDR + quadJet.subl.passMDR + quadJet.random )
         quadJet["selected"] = quadJet.rank == np.max(quadJet.rank, axis=1)
 
-    if apply_FvT:
-        if classifier_FvT is not None:
-            logging.info("Computing FvT scores with classifier")
+    if classifier_FvT is not None:
+        logging.info("Computing FvT scores with classifier")
 
-            compute_FvT(selev, selev[label3b], FvT=classifier_FvT)
-            weight_FvT = np.copy(weights.partial_weight(include=['no_FvT']))
-            weight_FvT[analysis_selections] *= ak.to_numpy(selev.FvT.FvT)
-            weights.add("FvT", weight_FvT)
-            list_weight_names.remove("no_FvT")
-            list_weight_names.append("FvT")
-            logging.debug( f"FvT {weights.partial_weight(include=['FvT'])[:10]}\n" )
+        compute_FvT(selev, selev[label3b], FvT=classifier_FvT)
+        # compute_FvT(selev, np.full(len(selev), True), FvT=classifier_FvT)
+        # weight_FvT = np.copy(weights.partial_weight(include=['no_FvT']))
+        weight_FvT = np.ones(len(weights.weight()), dtype=float)
+        weight_FvT[analysis_selections] *= ak.to_numpy(selev.FvT.FvT)
+        weights.add("FvT", weight_FvT)
+        list_weight_names.append("FvT")
+        logging.debug( f"FvT {weights.partial_weight(include=['FvT'])[:10]}\n" )
+        apply_FvT = True
+
+    if apply_FvT:
 
         quadJet["FvT_q_score"] = np.concatenate( [
             selev.FvT.q_1234[:, np.newaxis],

@@ -683,6 +683,7 @@ class analysis(processor.ProcessorABC):
         #
         # Hists
         #
+        if self.classifier_FvT: self.apply_FvT = True
         hist = {}
         if self.fill_histograms:
             if not self.run_systematics:
