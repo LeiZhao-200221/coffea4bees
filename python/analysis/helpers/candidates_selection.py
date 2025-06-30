@@ -269,8 +269,6 @@ def create_cand_jet_dijet_quadjet(
         logging.info("Computing FvT scores with classifier")
 
         compute_FvT(selev, selev[label3b], FvT=classifier_FvT)
-        # compute_FvT(selev, np.full(len(selev), True), FvT=classifier_FvT)
-        # weight_FvT = np.copy(weights.partial_weight(include=['no_FvT']))
         weight_FvT = np.ones(len(weights.weight()), dtype=float)
         weight_FvT[analysis_selections] *= ak.to_numpy(selev.FvT.FvT)
         weights.add("FvT", weight_FvT)
@@ -278,7 +276,7 @@ def create_cand_jet_dijet_quadjet(
         logging.debug( f"FvT {weights.partial_weight(include=['FvT'])[:10]}\n" )
         apply_FvT = True
 
-    if apply_FvT:
+    if apply_FvT and ("FvT" in selev.fields):
 
         quadJet["FvT_q_score"] = np.concatenate( [
             selev.FvT.q_1234[:, np.newaxis],
