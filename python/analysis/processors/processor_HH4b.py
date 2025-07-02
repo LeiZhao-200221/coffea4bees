@@ -50,7 +50,6 @@ from ..helpers.load_friend import (
 if TYPE_CHECKING:
     from ..helpers.classifier.HCR import HCRModelMetadata
 from analysis.helpers.truth_tools import find_genpart
-from ..helpers.classifier.HCR import Legacy_HCREnsemble_FvT
 
 #
 # Setup
@@ -683,7 +682,8 @@ class analysis(processor.ProcessorABC):
         #
         # Hists
         #
-        if self.classifier_FvT: self.apply_FvT = True
+        if self.classifier_FvT: apply_FvT = True
+        else: apply_FvT = self.apply_FvT
         hist = {}
         if self.fill_histograms:
             if not self.run_systematics:
@@ -695,7 +695,7 @@ class analysis(processor.ProcessorABC):
                     year=self.year,
                     isMC=self.config["isMC"],
                     histCuts=self.histCuts,
-                    apply_FvT=self.apply_FvT,
+                    apply_FvT=apply_FvT,
                     run_SvB=self.run_SvB,
                     run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
                     top_reconstruction=self.top_reconstruction,
