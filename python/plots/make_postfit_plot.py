@@ -149,7 +149,6 @@ if __name__ == '__main__':
         ih.ResetStats()
     print(f"NUmber of bkg events in last bin: {hists['TotalBkg'].GetBinContent(hists['TotalBkg'].GetNbinsX())}")
     #print(hists['TotalBkg'].GetNbinsX())
-    sys.exit(0)
     
     # Remove data points in hists['data'] that are higher than 0.5 in X
     # for bin_idx in range(1, hists['data'].GetNbinsX() + 1):

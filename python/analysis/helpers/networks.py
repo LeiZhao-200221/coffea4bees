@@ -1649,19 +1649,22 @@ class HCREnsemble(nn.Module):
         self.HCRs = []
         for path in HCR_paths:
             logging.info(path)
-            # 'ZZ4b/nTupleAnalysis/pytorchModels/SvB_HCR_8_np753_seed0_lr0.01_epochs20_offset*_epoch20.pkl'
             pkl = path.split('/')[-1]
             architecture = 'HCR'
             useOthJets = ''
             features_index = 2
-            if '_MA' in pkl:
+            if 'attention' in pkl:
                 architecture += '_MA'
                 useOthJets = 'attention'
-                features_index = 3
+                features_index = 3 if '_MA_' in pkl else 2
             features = int(pkl.split('_')[features_index])
             ancillaryFeatures = ['year', 'nSelJets', 'xW', 'xbW']
-            self.HCRs.append( HCR(features, features, ancillaryFeatures, useOthJets=useOthJets, device='cpu', nClasses=5, architecture=architecture) )
-            self.HCRs[-1].load_state_dict(torch.load(path, map_location=torch.device('cpu'))['model'])
+            state_dict = torch.load(path, map_location=torch.device('cpu'))
+            nClasses = state_dict['model']['out.conv.module.weight'].shape[0]
+            self.HCRs.append(
+                HCR(features, features, ancillaryFeatures, useOthJets=useOthJets, device='cpu', nClasses=nClasses, architecture=architecture)
+            )
+            self.HCRs[-1].load_state_dict(state_dict['model'])
             self.HCRs[-1].eval()
 
     @timefunc
