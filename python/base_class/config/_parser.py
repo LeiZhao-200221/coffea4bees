@@ -99,6 +99,11 @@ if sys.version_info < (3, 11):
         ref = "ref"
         map = "map"
 
+    _ReservedTag.__members__ = list(
+        k for k in vars(_ReservedTag) if not k.startswith("_")
+    )
+
+
 else:
     from enum import StrEnum, auto
 
