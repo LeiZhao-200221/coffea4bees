@@ -1,27 +1,27 @@
 HH4b_ggF:
-  process <code><extend>: '[f"GluGluToHHTo4B_cHHH{kl}" for kl in [0, 1, "2p45", 5]]'
+  processes <code><extend>: '[f"GluGluToHHTo4B_cHHH{kl}" for kl in [0, 1, "2p45", 5]]'
 
 ttbar:
-  process <extend>:
+  processes <extend>:
     - TTToHadronic
     - TTToSemiLeptonic
     - TTTo2L2Nu
 
 ZX4b:
-  process <extend>:
+  processes <extend>:
     - ZH4b
     - ggZH4b
     - ZZ4b
 
 Run2_mc:
-  year <extend>:
+  years <extend>:
     - UL16_preVFP
     - UL16_postVFP
     - UL17
     - UL18
 
 Run2_data:
-  year <extend>:
+  years <extend>:
     UL16_preVFP: [B, C, D, E, F]
     UL16_postVFP: [F, G, H]
     UL17: [B, C, D, E, F]

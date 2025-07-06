@@ -1,0 +1,38 @@
+2024_v2:
+  <include>:
+    - classifier_plot_vars.cfg.yml
+    - userdata.cfg.yml
+
+  <discard>:
+    timestamp <task=start_time><var>:
+    taskname <code><var>: f"classifier_plot_2024_v2_{timestamp}"
+    _scratch <code><type=base_class.system.eos::EOS><var>: f"{scratch_dir}/{taskname}/tmp/"
+    _output <code><type=base_class.system.eos::EOS><var>: f"{output_dir}/{taskname}/"
+
+  tasks <extend>:
+    - <task=dump_hists>:
+        outputs:
+          - <task=apply>:
+              processor <task>: processors.classifier::basic
+              fileset <task=picoAOD>:
+                metadata <file=absolute>: metadata/datasets_HH4b_2024_v2.yml#datasets
+                datasets:
+                  - <include>:
+                      - dataset.cfg.yml#HH4b_ggF
+                      - dataset.cfg.yml#ttbar
+                      - dataset.cfg.yml#ZX4b
+                    years:
+                      - UL18
+                  - processes: data
+                    years:
+                      UL18: [A, B, C, D]
+              friend_trees:
+                HCR_input <file=absolute>: metadata/datasets_HH4b_2024_v2_classifier_input.json#HCR_input
+              friend_trees <ref><extend>: classifier_outputs
+        dumper <task=dumper>:
+          url <output=hists/basic_plots.coffea> <code>: _scratch / "classifier_plot_basic.coffea"
+
+  post_tasks:
+    - <task=Outputs.collect>:
+        base <ref>: _output
+        clean: True
