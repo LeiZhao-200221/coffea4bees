@@ -25,7 +25,7 @@ dataset:
       - --norm 3
       - --JCM-weight "" analysis/weights/JCM/2024_v2/jetCombinatoricModel_SB_2024_v2.yml@@JCM_weights
       - --friends "" metadata/datasets_HH4b_2024_v2_classifier_input.json@@HCR_input
-      - --friends label:data root://cmseos.fnal.gov//store/user/{user}/HH4b/friend/HH4b_2024_v2/FvT/data/result.json@@analysis.0.merged
+      - --friends label:data root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/friend/FvT/data/result.json@@analysis.0.merged
 
   - module: HCR.SvB.Signal
     option:
@@ -35,4 +35,4 @@ dataset:
 setting:
   - module: IO
     option:
-      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b/classifier/HH4b_2024_v2/SvB/ggF_baseline/
+      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/classifier/SvB/ggF_baseline/

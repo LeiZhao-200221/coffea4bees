@@ -8,5 +8,7 @@ setting:
   - module: cms.CollisionData
     option:
       - eras:
-          UL17: [B, C, D, E, F]
           UL18: [A, B, C, D]
+  - module: HCR.InputBranch
+    option:
+      - feature_ancillary: [xW, nSelJets, xbW]

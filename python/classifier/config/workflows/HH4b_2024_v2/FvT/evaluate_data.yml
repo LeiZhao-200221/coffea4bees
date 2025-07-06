@@ -11,7 +11,6 @@ dataset:
     option:
       - --metadata datasets_HH4b_2024_v2
       - --max-workers 8
-      - --metadata datasets_HH4b
       - --data-source detector # only evaluate on data
       - --friends "" metadata/datasets_HH4b_2024_v2_classifier_input.json@@HCR_input
 
@@ -20,7 +19,7 @@ model:
     option:
       - --models
       - Final
-      - root://cmseos.fnal.gov//store/user/{user}/HH4b/classifier/HH4b_2024_v2/FvT/data/result.json
+      - root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/classifier/FvT/data/result.json
 
 analysis:
   - module: kfold.Merge
@@ -33,7 +32,7 @@ analysis:
 setting:
   - module: IO
     option:
-      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b/friend/HH4b_2024_v2/FvT/data/
+      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/friend/FvT/data/
   - module: ml.DataLoader
     option:
       - num_workers: 8

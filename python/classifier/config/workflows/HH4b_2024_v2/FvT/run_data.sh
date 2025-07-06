@@ -1,8 +1,8 @@
 export LPCUSER="chuyuanl"
 export CERNUSER="c/chuyuan"
 export WFS="classifier/config/workflows/HH4b_2024_v2/FvT"
-export BASE="root://cmseos.fnal.gov//store/user/${LPCUSER}/HH4b"
-export MODEL="${BASE}/classifier/HH4b_2024_v2/FvT/"
+export BASE="root://cmseos.fnal.gov//store/user/${LPCUSER}/HH4b_2024_v2"
+export MODEL="${BASE}/classifier/FvT/"
 export WEB="root://eosuser.cern.ch//eos/user/${CERNUSER}/www/HH4b/classifier/HH4b_2024_v2/FvT/"
 export GMAIL=~/gmail.yml
 
