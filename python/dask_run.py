@@ -5,16 +5,18 @@ import warnings
 
 import dask
 import dask_awkward as dak
+from base_class.system.eos import EOS
 from distributed import Client, LocalCluster
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
 
-from base_class.system.eos import EOS
-
-warnings.filterwarnings("ignore", module="coffea.*")
+warnings.filterwarnings("ignore")
 
 from analysis_dask import load_configs
 from analysis_dask._io import _FileDumper, write_string
+from analysis_dask.setup import setup
+
+setup()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -92,3 +94,5 @@ if __name__ == "__main__":
     logging.info("Running post-tasks locally...")
     for task in post_tasks:
         task(results)
+
+    client.shutdown()

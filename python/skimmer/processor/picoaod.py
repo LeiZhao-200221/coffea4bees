@@ -3,6 +3,7 @@ from __future__ import annotations
 import gc
 import logging
 import re
+import uuid
 from abc import abstractmethod
 from concurrent.futures import Future, ProcessPoolExecutor
 from itertools import chain
@@ -56,11 +57,15 @@ class PicoAOD(ProcessorABC):
         skip_collections: Iterable[str] = None,
         skip_branches: Iterable[str] = None,
         pico_base_name: str = _PICOAOD,
-        campaign: str = None,
+        campaign: str = ...,
     ):
         self._base = EOS(base_path)
         self._step = step
         self._pico_base_name = pico_base_name
+        if campaign is ...:
+            campaign = f"skim-{uuid.uuid4().hex[:8]}"
+        if campaign is not None:
+            logging.info(f"Using campaign name: {campaign}")
         self._campaign = campaign
 
         self._branch_filter = re.compile(

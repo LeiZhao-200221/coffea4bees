@@ -27,5 +27,5 @@ rogue_local_huge:
         null:
           - <ref>: _cluster
         minimum: 0
-        maximum: 100
+        maximum: 64
         maximum_memory: 200GB

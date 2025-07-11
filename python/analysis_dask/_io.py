@@ -1,4 +1,5 @@
 import json
+import os
 import pickle
 from dataclasses import dataclass
 from datetime import datetime
@@ -10,8 +11,8 @@ from typing import Any, Callable, Optional
 import fsspec
 import psutil
 import yaml
-
 from base_class.config._io import FileIORegistry
+from base_class.system.eos import EOS
 
 _DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
 
@@ -32,6 +33,10 @@ def start_time(format: str = _DEFAULT_TIME_FORMAT):
 
 def current_time(format: str = _DEFAULT_TIME_FORMAT):
     return datetime.now().strftime(format)
+
+
+def join_path(base: os.PathLike, *parts: str):
+    return EOS(base).join(*parts)
 
 
 @dataclass

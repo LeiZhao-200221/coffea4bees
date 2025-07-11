@@ -181,6 +181,7 @@ def apply(
     result = {}
     report = {}
     for name, dataset in available.items():
+        dataset = dataset | others[name]
         metadata = copy.deepcopy(dataset.get("metadata")) or {}
         metadata.setdefault("dataset", name)
         dataset_out = apply_to_dataset(

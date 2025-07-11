@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, NotRequired, Optional, TypedDict
 
 import cloudpickle
 import lz4.frame
-
 from base_class.config import ConfigParser, parsers
 from base_class.system.eos import EOS
 
@@ -36,11 +35,17 @@ class Outputs:
 
     @classmethod
     def _collect(
-        cls, _, files: dict[str, Optional[str]], base: os.PathLike, clean: bool
+        cls,
+        _,
+        files: dict[str, Optional[str]],
+        base: Optional[os.PathLike],
+        clean: bool,
     ):
+        base = EOS(base)
+        if base.is_null:
+            return
         kwargs = dict(parents=True, overwrite=True, recursive=True)
         op = EOS.move_to if clean else EOS.copy_to
-        base = EOS(base)
         threads = list[Thread]()
         for src, dst in files.items():
             src = EOS(src)
