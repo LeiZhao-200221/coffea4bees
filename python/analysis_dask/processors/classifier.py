@@ -31,6 +31,13 @@ class BasicPlot:
     def __call__(self, events: dak.Array):
         process = events.metadata["process"]
         year = events.metadata["year"]
+        SvBs = [k for k in events.fields if k.startswith("SvB")]
+        FvTs = [k for k in events.fields if k.startswith("FvT")]
+        if SvBs:
+            categories = [*self.signals, "failed"]
+        else:
+            SvBs = [None]
+            categories = ["uncategorized"]
 
         inputs = events.HCR_input
         selection = (inputs.SR | inputs.SB) & (inputs.threeTag | inputs.fourTag)
@@ -44,11 +51,9 @@ class BasicPlot:
             year=[year],
             tag=list(self.tags),
             region=list(self.regions),
-            category=[*self.signals, "failed"],
+            SvB_category=categories,
             **{cut: ... for cut in self.cutflows},
         )
-        SvBs = [k for k in events.fields if k.startswith("SvB")]
-        FvTs = [k for k in events.fields if k.startswith("FvT")]
 
         inputs = events.HCR_input  # need to reassign
         if process == "data":
@@ -69,27 +74,40 @@ class BasicPlot:
             weights = dak.zip({"weight": inputs.weight})
 
         for SvB in SvBs:
-            SvB_score = self.category_SvB(events[SvB])
-            SvB_name = SvB.replace("_", " ")
             fill = Fill(year=year)
-            fill += hists.add(f"{SvB}.score", (100, 0, 1, ("svb_score", SvB_name)))
-            fill += BasicHists((SvB, f"Categorized by {SvB_name}, "), ())
+            if SvB is not None:
+                SvB_score = self.category_SvB(events[SvB])
+                SvB_name = SvB.replace("_", " ")
+                fill += hists.add(f"{SvB}.score", (100, 0, 1, ("SvB_score", SvB_name)))
+                fill += BasicHists((SvB, f"Categorized by {SvB_name}, "), ())
+                SvB_category_axis = SvB_score.category
+                SvB_score_axis = SvB_score.score
+            else:
+                fill += BasicHists(("all", ""), ())
+                SvB_category_axis = "uncategorized"
+                SvB_score_axis = 1
             fill(
                 events,
                 process=process,
-                category=SvB_score.category,
-                svb_score=SvB_score.score,
+                SvB_category=SvB_category_axis,
+                SvB_score=SvB_score_axis,
                 weight=weights.weight,
             )
             if process == "data":
-                SvB_score_3b = SvB_score[inputs.threeTag]
+                if SvB is not None:
+                    SvB_score_3b = SvB_score[inputs.threeTag]
+                    SvB_category_3b_axis = SvB_score_3b.category
+                    SvB_score_3b_axis = SvB_score_3b.score
+                else:
+                    SvB_category_3b_axis = "uncategorized"
+                    SvB_score_3b_axis = 1
                 for multijet_field, multijet_process in multijets.items():
                     fill(
                         events_3b,
                         tag="fourTag",  # interpret reweighted 3b-data as 4b-multijet
                         process=multijet_process,
-                        category=SvB_score_3b.category,
-                        svb_score=SvB_score_3b.score,
+                        SvB_category=SvB_category_3b_axis,
+                        SvB_score=SvB_score_3b_axis,
                         weight=weights_3b[multijet_field],
                     )
         return {"hists": hists.to_dict(True)}
