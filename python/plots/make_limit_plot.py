@@ -35,14 +35,13 @@ if __name__ == '__main__':
         limit = json.load(open(ifile, 'rb'))['120.0']
         label= args.labels[i] if args.labels[i] else ifile
 
-        plt.vlines( 1, i, i+1, color='tab:gray', linestyle='dashed' )
-        #plt.plot( [i+.5], [limit[obs]], color='k', marker='o', zorder=10, label=('observed' if i==0 else '')  )
+        ax.vlines( 1, i, i+1, color='tab:gray', linestyle='dashed' )
+        ax.plot([limit['obs']], [i+.5], color='k', marker='o', zorder=10, label=('observed' if i==0 else ''))
         ticks.append( i+.5 )
-        ticks_labels.append(label)
-        plt.vlines( limit['exp0'], i, i+0.98, color='k', linestyle='dashed', label=('expected' if i==0 else '') )
-        plt.text( limit['exp0']+1.5, i+0.5, np.around(limit['exp0'], decimals=2), ha = 'center')
-        plt.fill_betweenx( [ i, i+0.98], 2*[limit['exp+2']], 2*[limit['exp-2']], color = '#FFDF7Fff', label=('68% expected' if i==0 else '' ) )
-        plt.fill_betweenx( [ i, i+0.98], 2*[limit['exp+1']], 2*[limit['exp-1']], color = '#85D1FBff', label=('95% expected' if i==0 else '' )  )
+        ticks_labels.append(f"$\\bf{{{label}}}$\nObs:{limit['obs']:.2f}\nExp:{limit['exp0']:.2f}")
+        ax.vlines( limit['exp0'], i, i+0.98, color='k', linestyle='dashed', label=('expected' if i==0 else '') )
+        ax.fill_betweenx( [ i, i+0.98], 2*[limit['exp+2']], 2*[limit['exp-2']], color = '#FFDF7Fff', label=('68% expected' if i==0 else '' ) )
+        ax.fill_betweenx( [ i, i+0.98], 2*[limit['exp+1']], 2*[limit['exp-1']], color = '#85D1FBff', label=('95% expected' if i==0 else '' )  )
 
     ax.set_yticks( ticks )
     ax.set_yticklabels( ticks_labels )
