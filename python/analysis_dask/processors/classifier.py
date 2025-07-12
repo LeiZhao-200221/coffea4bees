@@ -76,7 +76,7 @@ class BasicPlot:
         for SvB in SvBs:
             fill = Fill(year=year)
             if SvB is not None:
-                SvB_score = self.category_SvB(events[SvB])
+                SvB_score = self.categorize_SvB(events[SvB])
                 SvB_name = SvB.replace("_", " ")
                 fill += hists.add(f"{SvB}.score", (100, 0, 1, ("SvB_score", SvB_name)))
                 fill += BasicHists((SvB, f"Categorized by {SvB_name}, "), ())
@@ -174,7 +174,7 @@ class BasicPlot:
         return ak.zip(weights)
 
     @dakext.partition_mapping
-    def category_SvB(self, scores: ak.Array):
+    def categorize_SvB(self, scores: ak.Array):
         stacked = np.stack(list(scores[f"p_{k}"].to_numpy() for k in self.signals))
         max_idx = np.argmax(stacked, axis=0)
         max_val = np.take_along_axis(stacked, max_idx[None, :], axis=0).squeeze()
@@ -182,8 +182,8 @@ class BasicPlot:
         category = np.array([*self.signals, "failed"])[max_idx]
         return ak.zip({"category": category, "score": scores.p_sig})
 
-    @category_SvB.typetracer
-    def __category_SvB_typetracer(self, scores):
+    @categorize_SvB.typetracer
+    def __categorize_SvB_typetracer(self, scores):
         for k in (*(f"p_{k}" for k in self.signals), "p_sig"):
             dakext.safe.to_numpy(scores[k])  # touch buffers
         return ak.zip({"category": ["failed"], "score": [0.0]})

@@ -27,7 +27,7 @@ def group_by_categories(
 
 
 def group_to_str(group: tuple) -> str:
-    underflow, overflow, *bins = group
+    (underflow, overflow), *bins = group
     lines = []
     if underflow:
         lines.append("[underflow]")
