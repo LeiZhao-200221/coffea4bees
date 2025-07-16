@@ -1,11 +1,11 @@
 processes:
   signal:
-    GluGluToHHTo4B_cHHH1:
-      label: HH4b
-      process: 2
-    ZH4b:
-      label: ZH4b
-      process: 1
+    # GluGluToHHTo4B_cHHH1:
+    #   label: HH4b
+    #   process: 2
+    # ZH4b:
+    #   label: ZH4b
+    #   process: 1
     ZZ4b:
       label: ZZ4b
       process: 0
@@ -51,20 +51,13 @@ uncertainty:
     years:
       *18: 1.015
 
-  BR_hbb:
+  xs_zbbzbb:
     type: 'lnN'
     years:
-      *16: 1.025
-      *17: 1.025
-      *18: 1.025
+      *16: 1.002
+      *17: 1.002
+      *18: 1.002
 
-  xs_hbbhbb:
-    type: 'lnN'
-    years:
-      *16: [0.942, 1.037]
-      *17: [0.942, 1.037]
-      *18: [0.942, 1.037]
-  
   # mtop_gHH:
   #   type: 'lnN'
   #   years:
