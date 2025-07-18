@@ -215,12 +215,8 @@ def compute_decluster_variables(clustered_splittings):
     #
     #  Clustering (calc variables to histogram)
     #
-    print("pz0 dot partA_pz",clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0)[11:16])
-    print("splitting pz0\n\t pt:",clustered_splittings_pz0.pt[11:16], "\n\t eta:", clustered_splittings_pz0.eta[11:16], "\n\t phi:", clustered_splittings_pz0.phi[11:16],"\n")
-    print("part A pz0\n\t pt:",clustered_splittings_part_A_pz0.pt[11:16], "\n\t eta:", clustered_splittings_part_A_pz0.eta[11:16], "\n\t phi:", clustered_splittings_part_A_pz0.phi[11:16],"\n", clustered_splittings.part_A.btag_string[11:16], "\n")
-    print("part B pz0\n\t pt:",clustered_splittings_part_B_pz0.pt[11:16], "\n\t eta:", clustered_splittings_part_B_pz0.eta[11:16], "\n\t phi:", clustered_splittings_part_B_pz0.phi[11:16],"\n")
 
-    clustered_splittings["zA_num"]        = clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0)
+    clustered_splittings["zA_num"]    = clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0)
     clustered_splittings["zA"]        = clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0) / (clustered_splittings_pz0.pt**2)
     clustered_splittings["mA"]        = clustered_splittings.part_A.mass
     clustered_splittings["rhoA"]      = clustered_splittings.part_A.mass / clustered_splittings.part_A.pt
@@ -234,6 +230,8 @@ def compute_decluster_variables(clustered_splittings):
     clustered_splittings["decay_phi"] = np.arccos(decay_plane_hat.dot(comb_z_plane_hat))
     clustered_splittings["dr_AB"]     = clustered_splittings.part_A.delta_r(clustered_splittings.part_B)
     clustered_splittings["dpt_AB"]    = clustered_splittings.part_A.pt - (clustered_splittings.pt * clustered_splittings.zA)
+    clustered_splittings["rpt_AB"]    = clustered_splittings.part_B.pt / clustered_splittings.part_A.pt
+    clustered_splittings["mass_AB"]     = (clustered_splittings.part_A + clustered_splittings.part_B).mass
 
     #
     #  The rest of the code Updates the mass in the rotated rest frame
@@ -457,9 +455,9 @@ def decluster_combined_jets(input_jet, debug=False):
     pt_A_flat = ak.flatten(pA.pt)
     mass_A_flat = ak.flatten(pA.mass)
     rho_A_flat = ak.flatten(input_jet.rhoA)
-    single_jet_mass_new = pt_A_flat[single_jet_mask_A] * rho_A_flat[single_jet_mask_A]
+    jet_mass_A_new = pt_A_flat[single_jet_mask_A] * rho_A_flat[single_jet_mask_A]
     mass_A_flat_np  = mass_A_flat.to_numpy()
-    mass_A_flat_np[single_jet_mask_A] = single_jet_mass_new
+    mass_A_flat_np[single_jet_mask_A] = jet_mass_A_new
     pA_mass = ak.unflatten(mass_A_flat_np, ak.num(input_jet))
 
     pA = ak.zip(
@@ -483,9 +481,9 @@ def decluster_combined_jets(input_jet, debug=False):
     pt_B_flat = ak.flatten(pB.pt)
     mass_B_flat = ak.flatten(pB.mass)
     rho_B_flat = ak.flatten(input_jet.rhoB)
-    single_jet_mass_new = pt_B_flat[single_jet_mask_B] * rho_B_flat[single_jet_mask_B]
+    jet_mass_B_new = pt_B_flat[single_jet_mask_B] * rho_B_flat[single_jet_mask_B]
     mass_B_flat_np  = mass_B_flat.to_numpy()
-    mass_B_flat_np[single_jet_mask_B] = single_jet_mass_new
+    mass_B_flat_np[single_jet_mask_B] = jet_mass_B_new
     pB_mass = ak.unflatten(mass_B_flat_np, ak.num(input_jet))
 
 

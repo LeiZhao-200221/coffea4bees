@@ -73,9 +73,12 @@ class DeClustererBoosted(PicoAOD):
                                        cut_on_lumimask = (not isMC),
                                       )
 
-        selFatJet = event.FatJet[event.FatJet.pt > 300]
+        selFatJet = event.FatJet
         selFatJet = selFatJet[selFatJet.subJetIdx1 >= 0]
         selFatJet = selFatJet[selFatJet.subJetIdx2 >= 0]
+
+        selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).pt > 300]
+        selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).mass > 50]
 
 
         event["selFatJet"] = selFatJet
@@ -123,16 +126,22 @@ class DeClustererBoosted(PicoAOD):
         #
         # Adding btag and jet flavor to fat jets
         #
+        subjetIdx1_flat = ak.flatten(selev.selFatJet.subJetIdx1)
+        subjetIdx2_flat = ak.flatten(selev.selFatJet.subJetIdx2)
+        # print(f"subjetIdx1_flat: {subjetIdx1_flat}\n")
+        # print(f"subjetIdx2_flat: {subjetIdx2_flat}\n")
+
         particleNet_HbbvsQCD_flat = ak.flatten(selev.selFatJet.particleNet_HbbvsQCD)
-        particleNet_HbbvsQCD_flat_str = [ f"({round(v,3)},{round(v,3)})" for v in particleNet_HbbvsQCD_flat ]
+        # particleNet_HbbvsQCD_flat_str = [ f"({round(v,3)},{round(v,3)})" for v in particleNet_HbbvsQCD_flat ]
         # selev["selFatJet", "btag_string"] = ak.unflatten(particleNet_HbbvsQCD_flat_str, ak.num(selev.selFatJet))
 
-        indices = []
-        indices_str = []
-        for arr in selev.selFatJet.pt:
-            indices_str.append( [f"({i},{i})" for i in range(len(arr))] )
-            indices.append(list(range(len(arr))))
 
+        indices_str_flat = []
+        for subJetIdxes in zip(subjetIdx1_flat, subjetIdx2_flat):
+            indices_str_flat.append( f"({subJetIdxes[0]},{subJetIdxes[1]})" )
+
+
+        indices_str = ak.unflatten(indices_str_flat, ak.num(selev.selFatJet))
         selev["selFatJet", "btag_string"] = indices_str
 
         fatjet_flavor_flat = np.array(["bb"] * len(particleNet_HbbvsQCD_flat))
@@ -140,13 +149,20 @@ class DeClustererBoosted(PicoAOD):
 
 
 
+
+
+
         # Create the PtEtaPhiMLorentzVectorArray
         clustered_jets = ak.zip(
             {
-                "pt":   ak.values_astype(selev.selFatJet.pt,   np.float64),
-                "eta":  ak.values_astype(selev.selFatJet.eta,  np.float64),
-                "phi":  ak.values_astype(selev.selFatJet.phi,  np.float64),
-                "mass": ak.values_astype(selev.selFatJet.mass, np.float64),
+                "pt":   ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).pt  , np.float64),
+                "eta":  ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).eta , np.float64),
+                "phi":  ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).phi , np.float64),
+                "mass": ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).mass, np.float64),
+                #"pt":   ak.values_astype(selev.selFatJet.pt,   np.float64),
+                #"eta":  ak.values_astype(selev.selFatJet.eta,  np.float64),
+                #"phi":  ak.values_astype(selev.selFatJet.phi,  np.float64),
+                #"mass": ak.values_astype(selev.selFatJet.mass, np.float64),
                 "jet_flavor": selev.selFatJet.jet_flavor,
                 "btag_string": selev.selFatJet.btag_string,
             },
@@ -183,8 +199,7 @@ class DeClustererBoosted(PicoAOD):
         n_jet = ak.num(declustered_jets)
         total_jet = int(ak.sum(n_jet))
 
-        print(f"Declustered jets: {declustered_jets.btagScore}\n")
-        print(f"Declustered jets: {declustered_.btagScore}\n")
+        #print(f"Declustered jets: {declustered_jets.btagScore}\n")
 
         # These need to change
         out_branches = {
