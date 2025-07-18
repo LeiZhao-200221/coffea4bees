@@ -15,7 +15,7 @@ from coffea.analysis_tools import Weights, PackedSelection
 from analysis.helpers.processor_config import processor_config
 
 from base_class.hist import Collection, Fill
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
+from base_class.hist.object import LorentzVector, Jet, Muon, Elec
 #from analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
 from jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
 from jet_clustering.clustering   import cluster_bs, cluster_bs_fast

@@ -17,7 +17,7 @@ from coffea import processor
 
 from base_class.hist import Collection, Fill
 from base_class.hist import H, Template
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
+from base_class.hist.object import LorentzVector, Jet, Muon, Elec
 
 from analysis.helpers.processor_config import processor_config
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema

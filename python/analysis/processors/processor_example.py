@@ -10,7 +10,7 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 
 from base_class.hist import Collection, Fill
-from base_class.physics.object import Jet
+from base_class.hist.object import Jet
 
 from analysis.helpers.correctionFunctions import btagVariations
 from analysis.helpers.correctionFunctions import btagSF_norm as btagSF_norm_file

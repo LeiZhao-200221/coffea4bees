@@ -15,7 +15,7 @@ from coffea import processor
 from coffea.analysis_tools import Weights, PackedSelection
 
 from base_class.hist import Collection, Fill
-from base_class.physics.object import LorentzVector, Jet
+from base_class.hist.object import LorentzVector, Jet
 
 from analysis.helpers.cutflow import cutFlow
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
