@@ -24,8 +24,8 @@ from typing import Dict, Tuple, List, Optional, Union, Any
 sys.path.insert(0, os.getcwd())
 
 import base_class.plots.iPlot_config as cfg
-from base_class.jcm_tools.jcm_model import jetCombinatoricModel
-from base_class.jcm_tools.helpers import (
+from analysis.jcm_tools.jcm_model import jetCombinatoricModel
+from analysis.jcm_tools.helpers import (
     loadHistograms, 
     data_from_Hist, 
     prepHists
