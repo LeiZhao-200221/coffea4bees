@@ -104,7 +104,7 @@ def apply_jerc_corrections( event,
     extract.finalize()
     evaluator = extract.make_evaluator()
 
-    from base_class.jetmet_tools import CorrectedJetsFactory
+    from base_class.physics.objects.jetmet_tools import CorrectedJetsFactory
     from coffea.jetmet_tools import JECStack
     jec_stack_names = []
     for key in evaluator.keys():
