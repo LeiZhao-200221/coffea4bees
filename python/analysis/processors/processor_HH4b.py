@@ -16,7 +16,8 @@ from analysis.helpers.event_weights import (
     add_pseudotagweights,
     add_weights,
 )
-from analysis.helpers.event_selection import apply_event_selection, apply_dilep_ttbar_selection, apply_4b_selection
+from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_dilep_ttbar_selection, apply_4b_selection
 from analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,

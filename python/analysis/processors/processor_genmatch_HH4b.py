@@ -23,7 +23,8 @@ from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from analysis.helpers.common import apply_btag_sf, update_events
 from analysis.helpers.truth_tools import find_genpart
 
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_4b_selection
 
 import logging
 

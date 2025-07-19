@@ -5,7 +5,8 @@ import yaml
 import numpy as np
 from analysis.helpers.common import apply_jerc_corrections
 from base_class.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_4b_selection
 from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
