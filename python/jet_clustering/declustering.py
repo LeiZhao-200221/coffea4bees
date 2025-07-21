@@ -28,7 +28,6 @@ def extract_all_parentheses_substrings(s):
 
     return substrings
 
-
 def extract_outermost_pair(s):
     # Trim leading and trailing whitespaces and ensure it starts with '(' and ends with ')'
     s = s.strip()
@@ -217,7 +216,7 @@ def compute_decluster_variables(clustered_splittings):
     #
     print("pz0 dot partA_pz",clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0)[11:16])
     print("splitting pz0\n\t pt:",clustered_splittings_pz0.pt[11:16], "\n\t eta:", clustered_splittings_pz0.eta[11:16], "\n\t phi:", clustered_splittings_pz0.phi[11:16],"\n")
-    print("part A pz0\n\t pt:",clustered_splittings_part_A_pz0.pt[11:16], "\n\t eta:", clustered_splittings_part_A_pz0.eta[11:16], "\n\t phi:", clustered_splittings_part_A_pz0.phi[11:16],"\n", clustered_splittings.part_A.btag_string[11:16], "\n")
+    print("part A pz0\n\t pt:", clustered_splittings_part_A_pz0.pt[11:16], "\n\t eta:", clustered_splittings_part_A_pz0.eta[11:16], "\n\t phi:", clustered_splittings_part_A_pz0.phi[11:16]); print("btag_string:", clustered_splittings.part_A.btag_string[11:16]) if hasattr(clustered_splittings.part_A, "btag_string") else print("btag_string field not found, skipping")
     print("part B pz0\n\t pt:",clustered_splittings_part_B_pz0.pt[11:16], "\n\t eta:", clustered_splittings_part_B_pz0.eta[11:16], "\n\t phi:", clustered_splittings_part_B_pz0.phi[11:16],"\n")
 
     clustered_splittings["zA_num"]        = clustered_splittings_pz0.dot(clustered_splittings_part_A_pz0)
@@ -262,15 +261,12 @@ def compute_decluster_variables(clustered_splittings):
     #
     # Get the pts in the frame we will do de-clustering
     #
-    rotated_pt_A_flat = ak.flatten(clustered_splittings_part_A_pz0_phi0_dphi0.pt).to_numpy()
-    rotated_pt_A_pos_dphi = ak.flatten(clustered_splittings_part_A_pz0_phi0_pdphi0.pt)
-    rotated_pt_A_flat[pos_decay_phi_mask_flat] = rotated_pt_A_pos_dphi[pos_decay_phi_mask_flat]
+    rotated_pt_A_flat = ak.where(pos_decay_phi_mask_flat, ak.flatten(clustered_splittings_part_A_pz0_phi0_pdphi0.pt), ak.flatten(clustered_splittings_part_A_pz0_phi0_dphi0.pt))
     rotated_pt_A = ak.unflatten(rotated_pt_A_flat, ak.num(clustered_splittings))
 
-    rotated_pt_B_flat = ak.flatten(clustered_splittings_part_B_pz0_phi0_dphi0.pt).to_numpy()
-    rotated_pt_B_pos_dphi = ak.flatten(clustered_splittings_part_B_pz0_phi0_pdphi0.pt)
-    rotated_pt_B_flat[pos_decay_phi_mask_flat] = rotated_pt_B_pos_dphi[pos_decay_phi_mask_flat]
+    rotated_pt_B_flat = ak.where(pos_decay_phi_mask_flat, ak.flatten(clustered_splittings_part_B_pz0_phi0_pdphi0.pt), ak.flatten(clustered_splittings_part_B_pz0_phi0_dphi0.pt))
     rotated_pt_B = ak.unflatten(rotated_pt_B_flat, ak.num(clustered_splittings))
+
 
     #
     #  Update the mass with rho and pt from the rotated frame
@@ -278,7 +274,7 @@ def compute_decluster_variables(clustered_splittings):
     clustered_splittings["mA_rotated"]        = clustered_splittings.rhoA * rotated_pt_A
     clustered_splittings["mB_rotated"]        = clustered_splittings.rhoB * rotated_pt_B
 
-    return
+    return clustered_splittings
 
 
 def rotateZ(particles, angle):

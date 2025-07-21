@@ -279,6 +279,8 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
                         fill = ak.flatten(fill)
                     elif check_type(fill, self.__backend__.anyarray):
                         fill = self.__backend__.repeat(fill, shape)
+                    if self.allow_missing and isinstance(fill, ak.Array):
+                       fill = ak.fill_none(fill, np.nan)
                     hist_args[k] = fill
                 # https://github.com/scikit-hep/boost-histogram/issues/452 #
                 if (self.__backend__.broadcast is not None) and all(
