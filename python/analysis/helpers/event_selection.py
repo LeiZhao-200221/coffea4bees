@@ -8,6 +8,7 @@ from analysis.helpers.object_selection import (
 )
 from analysis.helpers.common import drClean
 
+
 def apply_dilep_ttbar_selection(event: ak.Array, isRun3: bool = False) -> ak.Array:
     """
     Applies dilepton ttbar selection criteria to the event data.
