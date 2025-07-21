@@ -31,7 +31,8 @@ from analysis.helpers.common import apply_jerc_corrections, apply_btag_sf, updat
 from analysis.helpers.event_weights import add_weights
 
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from analysis.helpers.event_selection import apply_4b_selection
+from base_class.physics.event_selection import apply_event_selection
 
 import logging
 

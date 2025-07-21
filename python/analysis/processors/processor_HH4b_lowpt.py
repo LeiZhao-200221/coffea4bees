@@ -31,7 +31,8 @@ from analysis.helpers.topCandReconstruction import (
     find_tops,
     find_tops_slow,
 )
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_lowpt_selection
+from analysis.helpers.event_selection import apply_4b_lowpt_selection
+from base_class.physics.event_selection import apply_event_selection
 from base_class.hist import Fill
 from base_class.root import Chunk, TreeReader
 from coffea import processor

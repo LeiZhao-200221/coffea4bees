@@ -6,7 +6,8 @@ from jet_clustering.declustering import make_synthetic_event
 
 from base_class.math.random import Squares
 from analysis.helpers.event_weights import add_weights, add_btagweights
-from analysis.helpers.event_selection import apply_event_selection
+from base_class.physics.event_selection import apply_event_selection
+
 
 from base_class.root import Chunk, TreeReader
 from analysis.helpers.load_friend import (
