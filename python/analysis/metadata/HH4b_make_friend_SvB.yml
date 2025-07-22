@@ -2,7 +2,7 @@ runner:
   workers: 4
   condor_memory: 2GB
   friend_metafile: make_friend_SvB
-  # friend_base: &friend_base root://cmseos.fnal.gov//store/user/algomez/XX4b/2024_v1p1/
+  # friend_base: &friend_base root://cmseos.fnal.gov//store/user/algomez/XX4b/2024_v1p2/
   friend_base: &friend_base /srv/output/tmp/ 
   chunksize: 10000
 
@@ -23,8 +23,8 @@ config:
   fill_histograms: false
   make_friend_SvB: *friend_base
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
-    # SvB: "metadata/datasets_HH4b_2024_v1p1_friend_SvB.json@@SvB"
-    # SvB_MA: "metadata/datasets_HH4b_2024_v1p1_friend_SvB.json@@SvB_MA"
+    trigWeight: "metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"
+    # SvB: "metadata/datasets_HH4b_2024_v1p2_friend_SvB.json@@SvB"
+    # SvB_MA: "metadata/datasets_HH4b_2024_v1p2_friend_SvB.json@@SvB_MA"
 
   
