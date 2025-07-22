@@ -2,4 +2,4 @@ config:
   apply_trigWeight: true
   apply_btagSF: true
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
+    trigWeight: "metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"

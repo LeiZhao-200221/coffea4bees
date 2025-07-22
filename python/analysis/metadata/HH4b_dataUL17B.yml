@@ -18,4 +18,4 @@ config:
   FvT: "analysis/weights/pytorch_models/2023/FvT_HCR+attention_8_np1052_seed0_lr0.01_epochs20_offset*_epoch20.pkl"
   top_reconstruction_override: fast
   # friends:
-  #   trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
+  #   trigWeight: "metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"
