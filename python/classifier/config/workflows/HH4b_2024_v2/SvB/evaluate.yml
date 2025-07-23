@@ -1,5 +1,6 @@
 # template:
-# - user: lpc username
+# - model: path to model
+# - SvB: path to friend tree
 
 main:
   module: evaluate
@@ -11,7 +12,7 @@ model:
     option:
       - --models
       - Final
-      - root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/classifier/SvB/ggF_baseline/result.json
+      - "{model}/result.json"
 
 dataset:
   - module: HCR.SvB.Eval
@@ -31,7 +32,7 @@ analysis:
 setting:
   - module: IO
     option:
-      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/friend/SvB/ggF_baseline/
+      - output: "{SvB}"
   - module: ml.DataLoader
     option:
       - num_workers: 8

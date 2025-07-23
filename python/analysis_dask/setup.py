@@ -12,6 +12,10 @@ def _extended_delayed_optimize(dsk, keys, **_):
 
 
 def setup():
+    """
+    - setup dask logging levels
+    - add dask-awkward optimizations to delayed
+    """
     dask.config.set(delayed_optimize=_extended_delayed_optimize)
     for level, loggers in {
         "ERROR": (

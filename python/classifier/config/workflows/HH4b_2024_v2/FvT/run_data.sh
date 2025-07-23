@@ -1,10 +1,11 @@
 export LPCUSER="chuyuanl"
 export CERNUSER="c/chuyuan"
-export WFS="classifier/config/workflows/HH4b_2024_v2/FvT"
 export BASE="root://cmseos.fnal.gov//store/user/${LPCUSER}/HH4b_2024_v2"
 export MODEL="${BASE}/classifier/FvT/"
-export WEB="root://eosuser.cern.ch//eos/user/${CERNUSER}/www/HH4b/classifier/HH4b_2024_v2/FvT/"
-export GMAIL=~/gmail.yml
+export FvT="${BASE}/friend/FvT/"
+export PLOT="root://eosuser.cern.ch//eos/user/${CERNUSER}/www/HH4b/classifier/HH4b_2024_v2/"
+
+export WFS="classifier/config/workflows/HH4b_2024_v2/FvT"
 
 # check port
 if [ -z "$1" ]; then
@@ -15,30 +16,20 @@ fi
 
 # train
 ./pyml.py \
-    template "user: ${LPCUSER}" $WFS/train_data.yml \
+    template "model: ${MODEL}" $WFS/train_data.yml \
     -from $WFS/../common.yml \
     -setting Monitor "address: :${port}" -flag debug
 
 # plot
 ./pyml.py analyze \
-    --results ${MODEL}/data/result.json \
+    --results ${MODEL}/result.json \
     -analysis HCR.LossROC \
-    -setting IO "output: ${WEB}" \
-    -setting IO "report: data" \
+    -setting IO "output: ${PLOT}" \
+    -setting IO "report: FvT" \
     -setting Monitor "address: :${port}"
 
 # evaluate
 ./pyml.py \
-    template "user: ${LPCUSER}" $WFS/evaluate_data.yml \
+    template "{model: ${MODEL}, FvT: ${FvT}}" $WFS/evaluate_data.yml \
     -from $WFS/../common.yml \
     -setting Monitor "address: :${port}"
-
-if [ -e "$GMAIL" ]; then
-    ./pyml.py analyze \
-        -analysis notify.Gmail \
-        --title "FvT done" \
-        --body "All jobs done at $(date)" \
-        --labels HH4b AN_v4 \
-        -from $GMAIL \
-        -setting Monitor "address: :${port}"
-fi

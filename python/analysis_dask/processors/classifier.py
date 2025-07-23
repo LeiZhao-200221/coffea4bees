@@ -13,10 +13,10 @@ from base_class.physics.object import Jet
 from ._utils import selection_to_label
 
 
-# NOTE: add plots here
 class BasicHists(Template):
     canjets = Jet.plot(("canjets", "Boson Candidate Jets"), "CanJets")
     othjets = Jet.plot(("othjets", "Other Jets"), "NotCanJets")
+    # NOTE: add plots here
 
 
 @dataclass
@@ -45,6 +45,8 @@ class BasicPlot:
             selection = selection & (inputs.SB | inputs.threeTag)
         events = events[selection]
         events = self.rename(events, "HCR_input")
+
+        # NOTE: add reconstructions here
 
         hists = Collection(
             process=[process],

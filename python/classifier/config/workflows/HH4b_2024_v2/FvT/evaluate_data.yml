@@ -1,5 +1,6 @@
 # template:
-# - user: lpc username
+# - model: path to model
+# - FvT: path to friend tree
 
 main:
   module: evaluate
@@ -19,7 +20,7 @@ model:
     option:
       - --models
       - Final
-      - root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/classifier/FvT/data/result.json
+      - "{FvT}/result.json"
 
 analysis:
   - module: kfold.Merge
@@ -32,7 +33,7 @@ analysis:
 setting:
   - module: IO
     option:
-      - output: root://cmseos.fnal.gov//store/user/{user}/HH4b_2024_v2/friend/FvT/data/
+      - output: "{friend}"
   - module: ml.DataLoader
     option:
       - num_workers: 8
