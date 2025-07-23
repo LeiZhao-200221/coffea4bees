@@ -5,30 +5,30 @@
 main:
   module: evaluate
   option:
-    - --max-evaluators 3
+    - --max-evaluators 3 # use 3 workers to evaluate
 
 dataset:
   - module: HCR.FvT.Eval
     option:
       - --metadata datasets_HH4b_2024_v2
-      - --max-workers 8
-      - --data-source detector # only evaluate on data
+      - --max-workers 8 # use 8 workers to fetch metadatas for ROOT files
+      - --data-source detector
       - --friends "" metadata/datasets_HH4b_2024_v2_classifier_input.json@@HCR_input
 
 model:
   - module: HCR.FvT.baseline.Eval
     option:
       - --models
-      - Final
-      - "{FvT}/result.json"
+      - Final # choose name of the model to evaluate, for now only Final is available
+      - "{FvT}/result.json" # setup the path to the training result
 
 analysis:
-  - module: kfold.Merge
+  - module: kfold.Merge # merge different k-folds
     option:
-      - --name SvB
-      - --step 100000
+      - --name FvT # set the name of friend tree
+      - --step 100000 # set the step to read ROOT files
       - --workers 5
-      - --clean
+      - --clean # remove the original files
 
 setting:
   - module: IO
