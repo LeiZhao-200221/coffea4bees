@@ -67,19 +67,19 @@ rule analysis_all:
 
 
 rule merging_coffea_files:
-    input: expand([f"{config['output_path']}/singlefiles/histNoJCM__{{sample}}-{{year}}.coffea"], sample=config['dataset'], year=config['year']) 
-    output: f"{config['output_path']}/histNoJCM.coffea"
+    input: "{input_files}"
+    output: "{output_file}"
     container: config["analysis_container"]
     params:
-        output = "histNoJCM.coffea",
-        logname = "histNoJCM",
-        output_path = config['output_path'],
-        run_performance = True
-    log: "logs/merging_coffea_files.log"
+        output = "{output_file}",
+        logname = "merge_log",
+        output_path = "output/",
+        run_performance = False
+    log: "logs/merging_{params.logname}.log"
     shell:
         """
         echo "Merging all the coffea files" 2>&1 | tee -a {log}
-        cmd="mprof run -C -o /tmp/mprofile_merge_{params.logname}.dat python analysis/tools/merge_coffea_files.py -f {input} -o {output}"
+        cmd="mprof run -C -o /tmp/mprofile_merge_{params.logname}.dat python analysis/tools/merge_coffea_files.py -f {input} -o {params.output_path}/{params.output}"
         echo $cmd 2>&1 | tee -a {log}
         $cmd 2>&1 | tee -a {log}
         if [ "{params.run_performance}" = "True" ]; then

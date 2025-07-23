@@ -7,7 +7,7 @@ processes:
     #   label: ZZ4b
     #   process: 1
     ZH4b:
-      label: ZH4b
+      label: ZH_bbbb
       process: 0
   background:
     multijet:
@@ -17,9 +17,9 @@ processes:
       label: 'tt'
       process: 2
 bin:
-  - &16 ZHbb_2016
-  - &17 ZHbb_2017
-  - &18 ZHbb_2018
+  - &16 ZH4b_2016
+  - &17 ZH4b_2017
+  - &18 ZH4b_2018
 
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM?rev=167#LumiComb  # https://gitlab.cern.ch/hh/naming-conventions
 uncertainty:
