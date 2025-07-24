@@ -20,7 +20,7 @@ class System(GlobalState):
             cls.user_name = "unknown"
         cls.main_task = main_task
         cls.startup_time = datetime.now()
-        cls.in_singularity = os.path.exists("/.singularity")
+        cls.in_singularity = os.path.exists("/.singularity.d")
 
     @classmethod
     def run_time(cls):

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import fsspec
 from classifier.task import ArgParser, EntryPoint, converter
 
+from ...utils import MemoryViewIO
 from ..setting import IO as IOSetting
 from ..setting import ResultKey
 from ._utils import LoadTrainingSets, progress_advance
@@ -138,4 +139,4 @@ class _save_cache:
         with fsspec.open(
             self.path / f"chunk{chunk}.pt", "wb", compression=self.compression
         ) as f:
-            torch.save(data, f)
+            torch.save(data, MemoryViewIO(f))

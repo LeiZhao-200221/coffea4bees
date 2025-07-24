@@ -181,8 +181,6 @@ def _synthetic(self: Data, metadata: str):
             )
             urls = []
             for template in templates:
-                if "data" not in EOS(template).parent.name:
-                    continue  # HACK: remove TTbar files, may need to change in the future
                 template = template.replace("XXX", "{sample}").format
                 for i in samples:
                     urls.append(template(sample=i))
