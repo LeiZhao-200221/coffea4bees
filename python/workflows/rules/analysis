@@ -1,3 +1,6 @@
+import os
+username = os.getenv("USER")
+
 rule analysis_singlefile:
     output: "output/singlefiles/histNoJCM__{sample}-{year}.coffea"
     container: config["analysis_container"]
