@@ -99,7 +99,7 @@ The configurations are defined in different levels:
 For example, if you run the workflow for `datasets_HH4b_2024_v2` on rogue, you can use:
 
 ```bash
-export BASE=classifier/config # optional
+export BASE=analysis_dask/config # optional
 python dask_run.py \
     ${BASE}/userdata.local.cfg.yml \
     ${BASE}/cluster.cfg.yml#rogue_local_huge \ 
