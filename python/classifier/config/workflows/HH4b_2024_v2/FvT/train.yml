@@ -2,7 +2,7 @@
 # - model: path to model
 
 # when run with
-#   template/-template "{model: path/to/model}" path/to/this/file.yml
+#   template/-template "model: path/to/model" path/to/this/file.yml
 # the {model} will be replaced by path/to/model
 
 main:
