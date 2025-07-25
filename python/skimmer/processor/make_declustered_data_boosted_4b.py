@@ -74,11 +74,12 @@ class DeClustererBoosted(PicoAOD):
                                       )
 
         selFatJet = event.FatJet
+        selFatJet = selFatJet[selFatJet.particleNetMD_Xbb > 0.8]
         selFatJet = selFatJet[selFatJet.subJetIdx1 >= 0]
         selFatJet = selFatJet[selFatJet.subJetIdx2 >= 0]
 
         selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).pt > 300]
-        selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).mass > 50]
+        selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).mass > 40]
 
 
         event["selFatJet"] = selFatJet

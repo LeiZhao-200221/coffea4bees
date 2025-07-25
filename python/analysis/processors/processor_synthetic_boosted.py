@@ -65,6 +65,7 @@ class analysis(processor.ProcessorABC):
                                         )
 
         selFatJet = event.FatJet
+        selFatJet = selFatJet[selFatJet.particleNetMD_Xbb > 0.8]
         selFatJet = selFatJet[selFatJet.subJetIdx1 >= 0]
         selFatJet = selFatJet[selFatJet.subJetIdx2 >= 0]
 
@@ -188,6 +189,8 @@ class analysis(processor.ProcessorABC):
             indices.append(list(range(len(arr))))
 
         selev["selFatJet", "btag_string"] = indices_str
+
+        selev["selFatJet", "btagScore"] = selev.selFatJet.particleNetMD_Xbb
 
 
         fatjet_flavor_flat = np.array(['b'] * len(particleNet_HbbvsQCD_flat))

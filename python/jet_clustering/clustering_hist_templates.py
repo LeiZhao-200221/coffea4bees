@@ -89,7 +89,7 @@ class ClusterHistsBoosted(Template):
     mB_vl     = H((100, 0, 600,  ('mB', "mB [GeV]")))
 
     zA        = H((100,  0.5, 1.3, ('zA', "z fraction")))
-    zA_l      = H((100,  0.2, 1.0, ('zA', "z fraction")))
+    zA_l      = H((100,  0.45, 1.0, ('zA', "z fraction")))
     zA_vl      = H((100,  -3, 3, ('zA', "z fraction")))
 
     decay_phi = H((100, -0.1, 3.2, ('decay_phi', "decay angle")))
@@ -159,6 +159,9 @@ class ClusterHistsBoosted(Template):
 
 class ClusterHistsDetailed(ClusterHists):
     dpt_AB        = H((50,  -50, 50, ('dpt_AB',    "pt [GeV]")))
+    rpt_A         = H((50,  -0.1, 1.1, ('rpt_A',    "ptA / pt")))
+    rpt_B         = H((50,  -0.1, 1.1, ('rpt_B',    "ptB / pt")))
+
     rpt_AB        = H((50,  -0.1, 1.1, ('rpt_AB',    "ptB / ptA")))
     rpt_AB_l      = H((50,  -0.1, 3.1, ('rpt_AB',    "ptB / ptA")))
 
@@ -204,6 +207,21 @@ class ClusterHistsDetailed(ClusterHists):
 
     drAB      = H((100, 0, 5,   ('dr_AB', "$\Delta$ R AB")))
     tan_thetaA    = H((100,  0, 10, ('tan_thetaA',    "tan (theta angle)")))
+
+
+    mA_vs_thetaA = H((50,  0, 100, ('mA', "mA [GeV]")),
+                     (50,  0, 0.5, ('thetaA',    "theta angle")))
+
+    mB_vs_thetaA = H((50,  0, 50, ('mB', "mB [GeV]")),
+                     (50,  0, 0.5, ('thetaA',    "theta angle")))
+
+    rhoA_vs_thetaA = H((50,  0, 0.5, ('rhoA', "rhoA")),
+                       (50,  0, 0.5, ('thetaA',    "theta angle")))
+
+    rhoB_vs_thetaA = H((50,  0, 0.5, ('rhoB', "rhoB ")),
+                       (50,  0, 0.5, ('thetaA',    "theta angle")))
+
+
 
 
     zA_vs_thetaA = H((50,  0.5, 1.5, ('zA', "z fraction")),
@@ -253,5 +271,6 @@ def ClusterHistsDetailedBoosted( config_pair, name ):
                                                           "part_A.pt": (50,   0, 1000),
                                                           "dr_AB": (100,   0, 1),
                                                           "rhoB": (100,   0, 0.5),
+                                                          "zA_l": (100,   0.45, 1.0),
                                                           }
                                 )

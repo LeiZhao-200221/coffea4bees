@@ -230,6 +230,8 @@ def compute_decluster_variables(clustered_splittings):
     clustered_splittings["decay_phi"] = np.arccos(decay_plane_hat.dot(comb_z_plane_hat))
     clustered_splittings["dr_AB"]     = clustered_splittings.part_A.delta_r(clustered_splittings.part_B)
     clustered_splittings["dpt_AB"]    = clustered_splittings.part_A.pt - (clustered_splittings.pt * clustered_splittings.zA)
+    clustered_splittings["rpt_A"]    = clustered_splittings.part_A.pt / clustered_splittings.pt
+    clustered_splittings["rpt_B"]    = clustered_splittings.part_B.pt / clustered_splittings.pt
     clustered_splittings["rpt_AB"]    = clustered_splittings.part_B.pt / clustered_splittings.part_A.pt
     clustered_splittings["mass_AB"]     = (clustered_splittings.part_A + clustered_splittings.part_B).mass
 
