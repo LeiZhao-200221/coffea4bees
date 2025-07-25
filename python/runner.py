@@ -652,13 +652,19 @@ if __name__ == '__main__':
             )
             friends: dict[str, Friend] = output.get("friends", None)
             if friend_base is not None and friends is not None:
+                from base_class.awkward.zip import NanoAOD
+
+                merge_kw = dict(
+                    step=config_runner["friend_merge_step"],
+                    base_path=friend_base,
+                    naming=_friend_merge_name,
+                    transform=NanoAOD(regular=False, jagged=True),
+                )
                 if args.run_dask:
                     merged_friends = client.compute(
                         {
                             k: friends[k].merge(
-                                step=config_runner["friend_merge_step"],
-                                base_path=friend_base,
-                                naming=_friend_merge_name,
+                                **merge_kw,
                                 clean=False,
                                 dask=True,
                             )
@@ -671,14 +677,12 @@ if __name__ == '__main__':
                     friends = merged_friends
                 else:
                     for k, v in friends.items():
-                        friends[k] = v.merge(
-                            step=config_runner["friend_merge_step"],
-                            base_path=friend_base,
-                            naming=_friend_merge_name,
-                        )
+                        friends[k] = v.merge(**merge_kw)
+
                 from base_class.system.eos import EOS
                 from base_class.utils.json import DefaultEncoder
-                metafile = f'{args.output_path}/{args.output_file.replace("coffea", "json")}'
+
+                metafile = (EOS(args.output_path) / str(args.output_file)).with_suffix(".json")
                 # metafile = EOS(friend_base) / f'{config_runner["friend_metafile"]}.json'
                 with fsspec.open(metafile, "wt") as f:
                     json.dump(friends, f, cls=DefaultEncoder)

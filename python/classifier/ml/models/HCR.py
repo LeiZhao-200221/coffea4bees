@@ -18,6 +18,7 @@ from torch import Tensor
 from ...algorithm.utils import Selector, map_batch, to_num
 from ...nn.blocks.HCR import HCR
 from ...nn.schedule import MilestoneStep, Schedule
+from ...utils import MemoryViewIO
 from .. import BatchType
 from ..benchmarks.multiclass import ROC
 from ..evaluation import Evaluation, EvaluationStage
@@ -287,7 +288,7 @@ class HCRTraining(MultiStageTraining):
                             )
                         },
                     },
-                    f,
+                    MemoryViewIO(f),
                 )
             yield output_stage
 

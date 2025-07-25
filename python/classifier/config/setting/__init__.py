@@ -211,3 +211,17 @@ class ResultKey(GlobalSetting):
     # train
     models: str = "models"
     "metadata of the trained models"
+
+
+class ROOT(GlobalSetting):
+    "ROOT related settings."
+
+    friend_allow_missing: bool = True
+    "allow missing friend tree chunks"
+
+    @classmethod
+    def set__friend_allow_missing(cls, value: bool):
+        from base_class.root import Friend
+
+        Friend.allow_missing.set(value)
+        return NotImplemented

@@ -1,3 +1,6 @@
+# local configs
+/python/analysis_dask/config/**/*.local.cfg.yml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -157,7 +157,7 @@ class CommonTrain(Common):
                 ).set(name=_Derived.ntag_index),
                 drop_columns(
                     "ZZSR", "ZHSR", "HHSR", "SR", "SB",
-                    "fourTag", "threeTag", "pseudoTagWeight",
+                    "fourTag", "threeTag",
                 ),
             ]
         )
