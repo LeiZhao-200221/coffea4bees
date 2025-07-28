@@ -14,7 +14,6 @@ from analysis.helpers.cutflow import cutFlow
 from analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
-    add_weights,
 )
 from base_class.physics.event_selection import apply_event_selection
 from base_class.physics.event_weights import add_weights
