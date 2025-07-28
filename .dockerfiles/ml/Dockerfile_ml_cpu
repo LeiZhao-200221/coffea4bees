@@ -1,7 +1,6 @@
-FROM condaforge/mambaforge:22.11.1-4
+FROM docker.io/condaforge/mambaforge:22.11.1-4
 
 # python
-# TODO the env.yml files should be copied to somewhere in this repo
 COPY env_ml_cpu.yml /tmp/env.yml
 RUN mamba env create -f /tmp/env.yml && mamba clean --all --yes && rm -f /tmp/env.yml
 # environment

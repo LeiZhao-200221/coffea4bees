@@ -1,0 +1,215 @@
+rule all:
+    input:
+        expand(
+            "{workspace}limits_{datacard}__{signallabel}.txt",
+            workspace=[case["workspace"] for case in config["cases"]],
+            datacard=[case["datacard"] for case in config["cases"]],
+            signallabel=[case["signallabel"] for case in config["cases"]]
+        ),
+        expand(
+            "{workspace}significance_expected_{datacard}__{signallabel}.txt",
+            workspace=[case["workspace"] for case in config["cases"]],
+            datacard=[case["datacard"] for case in config["cases"]],
+            signallabel=[case["signallabel"] for case in config["cases"]]
+        ),
+        expand(
+            "{workspace}impacts_combine_{datacard}__{signallabel}_observed.pdf",
+            workspace=[case["workspace"] for case in config["cases"]],
+            datacard=[case["datacard"] for case in config["cases"]],
+            signallabel=[case["signallabel"] for case in config["cases"]]
+        ),
+        expand(
+            "{workspace}gof_{datacard}__{signallabel}.pdf",
+            workspace=[case["workspace"] for case in config["cases"]],
+            datacard=[case["datacard"] for case in config["cases"]],
+            signallabel=[case["signallabel"] for case in config["cases"]]
+        ),
+        expand(
+            "{workspace}likelihood_scan_{datacard}__{signallabel}.pdf",
+            workspace=[case["workspace"] for case in config["cases"]],
+            datacard=[case["datacard"] for case in config["cases"]],
+            signallabel=[case["signallabel"] for case in config["cases"]]
+        )
+
+rule workspace:
+    output:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    shell:
+        """
+        ./run_container combine "cd {wildcards.workspace} &&\
+            text2workspace.py {wildcards.datacard}.txt \
+            -P HiggsAnalysis.CombinedLimit.PhysicsModel:multiSignalModel --PO verbose \
+            --PO 'map=.*/{params.signallabel}:r{params.signallabel}[1,-10,10]' \
+            --PO 'map=.*/{params.othersignal}:r{params.othersignal}[1,-10,10]' \
+            -o {wildcards.datacard}__{wildcards.signallabel}.root"
+        """
+
+rule limits:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    output:
+        txt="{workspace}limits_{datacard}__{signallabel}.txt",
+        json="{workspace}limits_{datacard}__{signallabel}.json"
+    shell:
+        """
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M AsymptoticLimits {wildcards.datacard}__{params.signallabel}.root \
+            --redefineSignalPOIs r{params.signallabel} \
+            -n _{params.signallabel} \
+            --setParameters r{params.othersignal}=0 \
+            --freezeParameters r{params.othersignal}" \
+            2>&1 | tee -a {output.txt}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combineTool.py -M CollectLimits \
+            higgsCombine_{params.signallabel}.AsymptoticLimits.mH120.root \
+            -o limits_{wildcards.datacard}__{params.signallabel}.json"
+        """
+
+rule significance:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    output:
+        observed="{workspace}significance_observed_{datacard}__{signallabel}.txt",
+        expected="{workspace}significance_expected_{datacard}__{signallabel}.txt"
+    shell:
+        """
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M Significance {wildcards.datacard}__{params.signallabel}.root \
+            --redefineSignalPOIs r{params.signallabel} \
+            -n _{params.signallabel} \
+            --setParameters r{params.othersignal}=0 \
+            --freezeParameters r{params.othersignal}" \
+            2>&1 | tee -a {output.observed}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M Significance {wildcards.datacard}__{params.signallabel}.root \
+            --redefineSignalPOIs r{params.signallabel} \
+            -n _{params.signallabel} \
+            -t -1 --expectSignal=1 \
+            --setParameters r{params.othersignal}=0 \
+            --freezeParameters r{params.othersignal} \
+            2>&1 | tee -a {output.expected}
+        """
+
+rule likelihood_scan:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    output:
+        "{workspace}likelihood_scan_{datacard}__{signallabel}.pdf"
+    shell:
+        """
+        echo "|---- Running initial fit"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M MultiDimFit -d {wildcards.datacard}__{params.signallabel}.root \
+            -n _{wildcards.datacard}_{params.signallabel} \
+            --saveWorkspace --robustFit 1 \
+            --setParameters r{params.othersignal}=0 \
+            --freezeParameters r{params.othersignal}"
+        echo "|---- Running MultiDimFit"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M MultiDimFit \
+            -d higgsCombine_{wildcards.datacard}_{params.signallabel}.MultiDimFit.mH120.root \
+            -n _{wildcards.datacard}_{params.signallabel}_final \
+            -P r{params.signallabel} \
+            --snapshotName MultiDimFit --rMin -10 --rMax 10 --algo grid --points 50 --alignEdges 1 \
+            --setParameters r{params.othersignal}=0 \
+            --freezeParameters r{params.othersignal}"
+        echo "|---- Plotting likelihood scan"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            plot1DScan.py higgsCombine_{wildcards.datacard}_{params.signallabel}_final.MultiDimFit.mH120.root \
+            --POI r{params.signallabel} -o likelihood_scan_{wildcards.datacard}__{params.signallabel}"
+        """
+
+rule impacts:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    output:
+        "{workspace}impacts_combine_{datacard}__{signallabel}_observed.pdf"
+    shell:
+        """
+        echo "|---- Running initial fit"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combineTool.py -M Impacts -d {wildcards.datacard}__{params.signallabel}.root \
+            --doInitialFit --robustFit 1 -m 125 \
+            -n {wildcards.datacard}_{params.signallabel} \
+            --setParameterRanges r{params.signallabel}=-10,10:{params.othersignal}=0,0 \
+            --setParameters r{params.othersignal}=0"
+        echo "|---- Running fits per systematic"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combineTool.py -M Impacts -d {wildcards.datacard}__{params.signallabel}.root \
+            --doFits --robustFit 1 -m 125 --parallel 4 \
+            -n {wildcards.datacard}_{params.signallabel} \
+            --setParameterRanges r{params.signallabel}=-10,10:{params.othersignal}=0,0 \
+            --setParameters r{params.othersignal}=0"
+        echo "|---- Running merging results"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combineTool.py -M Impacts \
+            -m 125 -n {wildcards.datacard}_{params.signallabel} \
+            -d {wildcards.datacard}__{params.signallabel}.root \
+            -o impacts_combine_{wildcards.datacard}_{params.signallabel}_exp.json"
+        echo "|---- Running creating pdf"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            plotImpacts.py -i impacts_combine_{wildcards.datacard}_{params.signallabel}_exp.json \
+            -o impacts_combine_{wildcards.datacard}_{params.signallabel}_observed \
+            --POI r{params.signallabel} \
+            --per-page 20 --left-margin 0.3 --height 400 --label-size 0.04"
+        rm {wildcards.workspace}/higgsCombine_*Fit*
+        """
+
+rule gof:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal")
+    output:
+        "{workspace}gof_{datacard}__{signallabel}.pdf"
+    shell:
+        """
+        echo "|---- Running Goodness of Fit tests data"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M GoodnessOfFit {wildcards.datacard}__{params.signallabel}.root \
+            --algo saturated \
+            -n _{wildcards.datacard}_{params.signallabel}_gof_data \
+            --setParameters {params.othersignal}=0" \
+            > gof_data_{wildcards.datacard}_{params.signallabel}.txt
+        echo "|---- Running Goodness of Fit tests toys"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M GoodnessOfFit {wildcards.datacard}__{params.signallabel}.root \
+            --toysFrequentist -t 500 --algo saturated  \
+            -n _{wildcards.datacard}_{params.signallabel}_gof_toys \
+            --setParameters {params.othersignal}=0" \
+            > gof_toys_{wildcards.datacard}_{params.signallabel}.txt
+        echo "|---- Collecting Goodness of Fit results"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combineTool.py -M CollectGoodnessOfFit \
+            --input higgsCombine_{wildcards.datacard}_{params.signallabel}_gof_data.GoodnessOfFit.mH120.root \
+            higgsCombine_{wildcards.datacard}_{params.signallabel}_gof_toys.GoodnessOfFit.mH120.123456.root" \
+            -o gof_{wildcards.datacard}_{params.signallabel}.json
+        echo "|---- Plotting Goodness of Fit results"
+        ./run_container combine "cd {wildcards.workspace} &&\
+            plotGof.py gof_{wildcards.datacard}_{params.signallabel}.json \
+            --statistic staturated --mass 120.0 \
+            --output gof_{wildcards.datacard}_{params.signallabel}"
+        """
+
+def get_case_param(wildcards, key):
+    # Find the index of the current datacard in the config["cases"] list
+    for case in config["cases"]:
+        if case["datacard"] == wildcards.datacard and case["workspace"] == wildcards.workspace:
+            return case[key]
+    raise ValueError(f"No matching case for datacard={wildcards.datacard}, workspace={wildcards.workspace}")

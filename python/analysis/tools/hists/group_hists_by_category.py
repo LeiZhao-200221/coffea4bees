@@ -29,12 +29,12 @@ def group_hists(in_path: str, out_path: str):
         for k, v in axis.items():
             logging.info(f"{k}: {group_to_str(v)}")
         logging.info("histograms: " + ", ".join(group))
-        data = {
+        categoried = {
             "hists": {k: data["hists"][k] for k in group},
             "categories": data["categories"],
         }
         with fsspec.open(file, "wb", compression="lz4") as f:
-            cloudpickle.dump(data, f)
+            cloudpickle.dump(categoried, f)
 
 
 if __name__ == "__main__":

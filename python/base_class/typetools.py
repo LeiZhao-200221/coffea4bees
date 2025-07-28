@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from functools import reduce
+from functools import reduce, wraps
 from inspect import getmro
 from operator import add
 from types import UnionType
@@ -14,6 +14,7 @@ from typing import (
     get_origin,
     get_type_hints,
     runtime_checkable,
+    ParamSpec,
 )
 
 from .utils import count, unique
@@ -239,3 +240,13 @@ def accumulated_mro(
             if name in vars(base)
         ),
     )
+
+
+# typehints
+
+T = TypeVar("T")
+P = ParamSpec("P")
+
+
+def borrow_typehints(func: Callable[P, T]) -> Callable[[Callable], Callable[P, T]]:
+    return wraps(func)

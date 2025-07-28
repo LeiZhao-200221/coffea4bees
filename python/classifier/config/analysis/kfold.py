@@ -51,8 +51,8 @@ class Merge(Analysis):
     argparser.add_argument(
         "--optimize-step",
         type=converter.int_pos,
-        default=None,
-        help="the number of entries to load for each step when optimizing the merged friend tree. If not specified, the optimization will be skipped.",
+        default=10_000,
+        help="the number of entries to load for each step when optimizing the merged friend tree.",
     )
     argparser.add_argument(
         "--std",
