@@ -14,9 +14,9 @@ from analysis.helpers.cutflow import cutFlow
 from analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
-    add_weights,
 )
 from base_class.physics.event_selection import apply_event_selection
+from base_class.physics.event_weights import add_weights
 from analysis.helpers.event_selection import apply_dilep_ttbar_selection, apply_4b_selection
 from analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
@@ -301,8 +301,6 @@ class analysis(processor.ProcessorABC):
             do_MC_weights=self.config["do_MC_weights"],
             dataset=self.dataset,
             year_label=self.year_label,
-            estart=self.estart,
-            estop=self.estop,
             friend_trigWeight=self.friends.get("trigWeight"),
             corrections_metadata=self.corrections_metadata[self.year],
             apply_trigWeight=self.apply_trigWeight,
