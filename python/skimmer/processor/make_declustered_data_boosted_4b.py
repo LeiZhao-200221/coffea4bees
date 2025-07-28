@@ -5,7 +5,6 @@ from coffea.nanoevents import NanoEventsFactory
 from jet_clustering.declustering import make_synthetic_event
 
 from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
 from base_class.physics.event_selection import apply_event_selection
 
 

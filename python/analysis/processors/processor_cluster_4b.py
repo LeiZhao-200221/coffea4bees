@@ -28,7 +28,7 @@ from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from analysis.helpers.common import apply_jerc_corrections, apply_btag_sf, update_events
-from analysis.helpers.event_weights import add_weights
+from base_class.physics.event_weights import add_weights
 
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
 from analysis.helpers.event_selection import apply_4b_selection
@@ -148,8 +148,6 @@ class analysis(processor.ProcessorABC):
                                                   do_MC_weights=config["do_MC_weights"],
                                                   dataset=dataset,
                                                   year_label=year_label,
-                                                  estart=estart,
-                                                  estop=estop,
                                                   friend_trigWeight=None,
                                                   corrections_metadata=self.corrections_metadata[year],
                                                   apply_trigWeight=True,

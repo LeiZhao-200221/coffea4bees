@@ -6,8 +6,9 @@ from coffea.nanoevents import NanoEventsFactory
 
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
+from analysis.helpers.event_weights import add_btagweights
 from analysis.helpers.processor_config import processor_config
+from base_class.physics.event_weights import add_weights
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
@@ -54,7 +55,6 @@ class SubSampler(PicoAOD):
 
         ## adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights( event, config["do_MC_weights"], dataset, year_label,
-                                                  estart, estop,
                                                   self.corrections_metadata[year],
                                                   apply_trigWeight = True,
                                                   isTTForMixed = False,

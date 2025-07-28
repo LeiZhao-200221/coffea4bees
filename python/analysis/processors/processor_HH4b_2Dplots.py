@@ -27,9 +27,7 @@ from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
 from memory_profiler import profile
 import hist
 from base_class.math.random import Squares
-from analysis.helpers.event_weights import (
-    add_weights,
-)
+from base_class.physics.event_weights import add_weights
 
 from ..helpers.load_friend import (
     FriendTemplate,
@@ -102,15 +100,13 @@ class analysis(processor.ProcessorABC):
         ### target is for new friend trees
         target = Chunk.from_coffea_events(event)
 
-        ### adds all the event mc weights and 1 for data
+        ### adds all the event mc weights and 1 for data 
         event["passHLT"] = np.full(len(event), True)
         weights, list_weight_names = add_weights(
             event, target=target,
             do_MC_weights=True,
             dataset=self.dataset,
             year_label=self.year_label,
-            estart=self.estart,
-            estop=self.estop,
             friend_trigWeight=self.friends.get("trigWeight"),
             corrections_metadata=self.corrections_metadata[self.year],
             apply_trigWeight=self.apply_trigWeight,
