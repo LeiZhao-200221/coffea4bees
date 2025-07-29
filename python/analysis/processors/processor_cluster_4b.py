@@ -27,7 +27,8 @@ from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_jerc_corrections, apply_btag_sf, update_events
+from base_class.physics.objects.jet_corrections import apply_jerc_corrections
+from analysis.helpers.common import apply_btag_sf, update_events
 from base_class.physics.event_weights import add_weights
 
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB

@@ -16,7 +16,8 @@ from analysis.helpers.load_friend import (
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from base_class.physics.objects.jet_corrections import apply_jerc_corrections
+from analysis.helpers.common import update_events
 from copy import copy
 import logging
 import awkward as ak

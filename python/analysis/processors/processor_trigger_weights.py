@@ -3,7 +3,7 @@ import warnings
 import awkward as ak
 import yaml
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections
+from base_class.physics.objects.jet_corrections import apply_jerc_corrections
 from analysis.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
 from base_class.physics.event_selection import apply_event_selection
 from analysis.helpers.event_selection import apply_4b_selection
