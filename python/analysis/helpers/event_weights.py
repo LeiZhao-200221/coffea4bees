@@ -1,4 +1,4 @@
-from analysis.helpers.common import apply_btag_sf
+from base_class.physics.common import apply_btag_sf
 import correctionlib
 import awkward as ak
 import numpy as np

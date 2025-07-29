@@ -18,7 +18,7 @@ from analysis.helpers.cutflow import cutFlow
 
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_btag_sf
+from base_class.physics.common import apply_btag_sf
 from analysis.helpers.event_selection import apply_4b_selection
 from base_class.physics.event_selection import apply_event_selection
 import logging

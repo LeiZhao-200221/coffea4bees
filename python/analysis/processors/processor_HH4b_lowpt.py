@@ -10,7 +10,7 @@ import awkward as ak
 import numpy as np
 import yaml
 from base_class.physics.objects.jet_corrections import apply_jerc_corrections
-from analysis.helpers.common import update_events
+from base_class.physics.common import update_events
 from analysis.helpers.cutflow import cutFlow
 from analysis.helpers.event_weights import (
     add_btagweights,

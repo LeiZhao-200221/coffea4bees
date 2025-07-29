@@ -1,7 +1,7 @@
 import numpy as np
 import awkward as ak
 from coffea.lumi_tools import LumiMask
-from analysis.helpers.common import mask_event_decision
+from base_class.physics.common import mask_event_decision
 
 def apply_event_selection(
     event: ak.Array, 

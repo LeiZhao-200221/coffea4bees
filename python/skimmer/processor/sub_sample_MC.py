@@ -13,7 +13,7 @@ from base_class.physics.event_weights import add_weights
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
 from base_class.physics.objects.jet_corrections import apply_jerc_corrections
-from analysis.helpers.common import update_events
+from base_class.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak

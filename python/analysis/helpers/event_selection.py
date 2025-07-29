@@ -6,7 +6,7 @@ from analysis.helpers.object_selection import (
     jet_selection,
     lowpt_jet_selection
 )
-from analysis.helpers.common import drClean
+from base_class.physics.common import drClean
 
 
 def apply_dilep_ttbar_selection(event: ak.Array, isRun3: bool = False) -> ak.Array:
