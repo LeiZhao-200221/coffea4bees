@@ -5,7 +5,7 @@ import yaml
 from analysis.helpers.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
 from coffea.analysis_tools import PackedSelection, Weights
-from skimmer.processor.picoaod import PicoAOD
+from base_class.skimmer.picoaod import PicoAOD
 import awkward as ak
 from analysis.helpers.truth_tools import find_genpart
 

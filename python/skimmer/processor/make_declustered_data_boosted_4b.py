@@ -1,5 +1,5 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD, fetch_metadata, resize
+from base_class.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 
 from jet_clustering.declustering import make_synthetic_event

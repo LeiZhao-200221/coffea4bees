@@ -3,7 +3,7 @@ import logging
 import awkward as ak
 import numpy as np
 from coffea.util import load
-from skimmer.processor.picoaod import PicoAOD #, fetch_metadata, resize
+from base_class.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
 from base_class.physics.event_selection import apply_event_selection
 
 

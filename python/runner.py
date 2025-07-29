@@ -27,7 +27,7 @@ from dask.distributed import performance_report
 from distributed.diagnostics.plugin import WorkerPlugin
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
-from skimmer.processor.picoaod import fetch_metadata, integrity_check, resize
+from base_class.skimmer.picoaod import fetch_metadata, integrity_check, resize
 
 if TYPE_CHECKING:
     from base_class.root import Friend
