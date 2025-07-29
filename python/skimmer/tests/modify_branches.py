@@ -5,7 +5,7 @@ import awkward as ak
 import numpy as np
 from base_class.system.eos import PathLike
 
-from ..processor.picoaod import PicoAOD, _branch_filter
+from base_class.skimmer.picoaod import PicoAOD, _branch_filter
 
 warnings.filterwarnings(
     "ignore", category=RuntimeWarning, message="Missing cross-reference .*"
