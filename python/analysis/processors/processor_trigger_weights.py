@@ -15,7 +15,7 @@ from analysis.helpers.dump_friendtrees import dump_trigger_weight
 from analysis.helpers.processor_config import processor_config
 
 #
-# Setup
+#  Setup
 #
 NanoAODSchema.warn_missing_crossrefs = False
 warnings.filterwarnings("ignore")
