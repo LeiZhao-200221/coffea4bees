@@ -28,16 +28,13 @@ hists:
                 scalefactor: 100
 
 
-
-
-stack:
         data:
                 process: data
                 tag: fourTag
                 year: RunII
                 label: Data
                 fillcolor: "#FFDF7Fff"
-                edgecolor: k
+                edgecolor: "#FFDF7Fff"
 
 ratios:
         dataToBkg:
