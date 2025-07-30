@@ -100,8 +100,12 @@ class ClusterHistsBoosted(Template):
     mA_rot    = H((100, 0, 100,  ('mA_rotated', "mA [GeV]")))
     mB_rot    = H((100, 0, 60,   ('mB_rotated', "mB [GeV]")))
 
-    tau21_A     = H((100, -0.2, 1.2, ('part_A.tau21', "tau21 A")))
-    tau21_B     = H((100, -0.2, 1.2, ('part_B.tau21', "tau21 B")))
+    tau21_A     = H((100, 0, 1.0, ('part_A.tau21', "tau21 A")))
+    tau21_B     = H((100, 0, 1.0, ('part_B.tau21', "tau21 B")))
+
+    tau32_A     = H((100, 0, 1.0, ('part_A.tau32', "tau32 A")))
+    tau32_B     = H((100, 0, 1.0, ('part_B.tau32', "tau32 B")))
+
 
 
     #
