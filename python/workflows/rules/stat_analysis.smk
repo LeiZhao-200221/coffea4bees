@@ -32,7 +32,6 @@ rule convert_json_to_root:
     input: "output/histMixedBkg_TT.json"
     output: "output/histMixedBkg_TT.root"
     params:
-        container = config["combine_container"],
         output_dir = config["output_path"]
     log:
         "logs/convert_json_to_root.log"
@@ -40,8 +39,11 @@ rule convert_json_to_root:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting convert_json_to_root for {input}" > {log}
-        source workflows/helpers/shell_combine.sh {params.container} python3 stats_analysis/convert_json_to_root.py -f {input} --output {params.output_dir} 2>&1 | tee -a {log}
-        ls {output} 2>&1 | tee -a {log}
+        ./run_container combine \
+            "python3 stats_analysis/convert_json_to_root.py \
+            -f {input} \
+            --output {params.output_dir}" 2>&1 | tee -a {log}
+
         echo "[$(date)] Completed convert_json_to_root for {input}" >> {log}
         """
 
@@ -122,69 +124,23 @@ rule make_combine_inputs:
         echo "[$(date)] Completed make_combine_inputs for signal {params.signal}" >> {log}
         """
 
-# rule run_combine:
-#     input: "output/datacards/datacard_HHbb_2018.txt"
-#     output: 
-#         "output/datacards/datacard.root",
-#         "output/datacards/datacard.txt"
-#     params:
-#         container=config['combine_container'],
-#         output_dir="output/datacards/"
-#     shell:
-#         """
-#         echo "RUNNING COMBINE"
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             source stats_analysis/run_combine.sh {params.output_dir} --limits --unblind
-#         echo "RUNNING COMBINE STAT ONLY"
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             source stats_analysis/run_combine.sh {params.output_dir}/stat_only --limits --unblind
-#         """
-
-# rule run_impacts:
-#     input: "output/datacards/datacard.root"
-#     output: "output/datacards/impacts_combine_SvB_MA_exp_HH.pdf"
-#     params:
-#         container = config["combine_container"]
-#     shell:
-#         """
-#         echo "RUNNING COMBINE"
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             source stats_analysis/run_combine.sh output/datacards/ --impacts --unblind
-#         """
-
-# rule run_postfit:
-#     input: "output/datacards/datacard.root"
-#     output: "output/datacards/SvB_MA_postfitplots_prefit.pdf"
-#     params:
-#         container = config["combine_container"],
-#         output_dir = "output/datacards/"
-#     shell:
-#         """
-#         echo "RUNNING COMBINE"
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             source stats_analysis/run_combine.sh {params.output_dir} --postfit --unblind
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t prefit
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t fit_b
-#         source workflows/helpers/shell_combine.sh {params.container} \
-#             python3 plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_unblinded_prefit_sb.root -o {params.output_dir} -t fit_s
-#         """
-
-# rule make_syst_plots:
-#     input: 
-#         root="output/datacards/shapes.root",
-#         datacard="output/datacards/datacard.txt"
-#     output: "output/datacards/systs/SvB_MA_ps_hh_fine_nominal.pdf"
-#     params:
-#         container = config["combine_container"],
-#         output_dir = "output/datacards/systs/"
-#     shell:
-#         """
-#         echo "Making syst plots"
-#         ./run_container.sh combine {params.container} \
-#             python3 plots/make_syst_plots.py -i {input.root} -o {params.output_dir} -d {input.datacard}
-#         """
+rule make_syst_plots:
+    input: "{datacard_file}"
+    output: "{output_dir}/{variable}_nominal.pdf"
+    params:
+        variable="{variable}",
+        output_dir="{output_dir}"
+    log: "logs/make_syst_plots_{variable}.log"
+    shell:
+        """
+        mkdir -p $(dirname {log})
+        echo "[$(date)] Starting make_syst_plots for {params.variable}" > {log}
+        echo "Making syst plots" 2>&1 | tee -a ../{log}
+        ./run_container combine \
+        "python3 plots/make_syst_plots.py -\
+        i {params.output_dir}/shapes.root -o {params.output_dir}/systs/ -d {input} --variable {params.variable} 2>&1 | tee -a ../{log}
+        echo "[$(date)] Completed make_syst_plots for {params.variable}" >> ../{log}
+        """
 
 # rule kappa_scan:
 #     input: "output/datacards/datacard.root"

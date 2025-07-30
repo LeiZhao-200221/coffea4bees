@@ -21,9 +21,9 @@ processes:
       label: 'tt'
       process: 2
 bin:
-  - &16 HHbb_2016
-  - &17 HHbb_2017
-  - &18 HHbb_2018
+  - &16 HH4b_2016
+  - &17 HH4b_2017
+  - &18 HH4b_2018
 
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM?rev=167#LumiComb  # https://gitlab.cern.ch/hh/naming-conventions
 uncertainty:

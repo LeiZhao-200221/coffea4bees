@@ -1,67 +1,57 @@
 import os
 username = os.getenv("USER")
 
-rule analysis_singlefile:
-    output: "output/singlefiles/histNoJCM__{sample}-{year}.coffea"
+rule analysis_processor:
+    output: "{output_file}"
     container: config["analysis_container"]
     params:
-        isam="{sample}",
-        iy="{year}",
-        output="histNoJCM__{sample}-{year}.coffea",
-        output_path="output/singlefiles/",
-        logname="histNoJCM__{sample}-{year}",
-        metadata="analysis/metadata/HH4b_noJCM.yml",
-        datasets=config['dataset_location'],
-        user="username",
-        run_performance=True
-    log: "logs/analysis_singlefile_{sample}_{year}.log"
+        datasets = "",
+        years = "",
+        metadata = "analysis/metadata/HH4b_noJCM.yml",
+        processor = "analysis/processors/processor_HH4b.py",
+        datasets_file = config.get("datasets", "datasets/"),
+        blind = False,
+        run_performance = False,
+        hash = "",
+        diff = "",
+        username = username
+    log: "logs/analysis_processor.log"
     shell:
         """
-        mkdir -p /tmp/{params.user}/
-        echo "Blinding SR region"
-        sed 's/blind.*/blind: false/' {params.metadata} > /tmp/{params.user}/HH4b_noJCM.yml 
-        echo "Running with this metadata file" 2>&1 | tee {log}
-        cat /tmp/{params.user}/HH4b_noJCM.yml 2>&1 | tee -a {log}
-        echo "Running {params.isam} {params.iy} - output {output}" 2>&1 | tee -a {log}
-        cmd=mprof run -C -o /tmp/{params.user}/mprofile_{params.logname}.dat python runner.py -d {params.isam} -p analysis/processors/processor_HH4b.py -y {params.iy} -o {params.output} -op {params.output_path} -m {params.datasets} -c /tmp/{params.user}/HH4b_noJCM.yml
-        echo $cmd 2>&1 | tee -a {log}
-        $cmd 2>&1 | tee -a {log}
-        if [ '{params.run_performance}' = "True" ]; then
-            echo "Running performance analysis" 2>&1 | tee -a {log}
-            mkdir -p {params.output_path}/performance/
-            mprof plot -o {params.output_path}/performance/mprofile_{params.logname}.png /tmp/{params.user}/mprofile_{params.logname}.dat 2>&1 | tee -a {log}
+        mkdir -p $(dirname {output})/logs
+        mkdir -p /tmp/{params.username}/
+        
+        # Prepare metadata file
+        meta_tmp="/tmp/{params.username}/metadata_$(basename {output} .coffea).yml"
+        if [ "{params.blind}" = "True" ]; then
+            echo "Blinding SR region"
+            sed 's/blind.*/blind: true/' {params.metadata} > $meta_tmp
+        else
+            cp {params.metadata} $meta_tmp
         fi
-        """
-
-rule analysis_all:
-    output: "output/histAll_NoJCM.coffea"
-    container: config["analysis_container"]
-    params:
-        isam=config['dataset'],
-        iy=config['year'],
-        output="histAll_NoJCM.coffea",
-        output_path="output/",
-        logname="histAll_NoJCM",
-        metadata="analysis/metadata/HH4b_noJCM.yml",
-        datasets=config['dataset_location'],
-        user=username,
-        run_performance=True
-    log: "logs/analysis_all.log"
-    shell:
-        """
-        mkdir -p /tmp/{params.user}/
-        echo "Blinding SR region"
-        sed 's/blind.*/blind: false/' {params.metadata} > /tmp/{params.user}/HH4b_noJCM.yml 
+        
         echo "Running with this metadata file" 2>&1 | tee {log}
-        cat /tmp/{params.user}/HH4b_noJCM.yml 2>&1 | tee -a {log}
-        echo "Running {params.isam} {params.iy} - output {output}" 2>&1 | tee -a {log}
-        cmd="mprof run -C -o /tmp/{params.user}/mprofile_{params.logname}.dat python runner.py -d {params.isam} -p analysis/processors/processor_HH4b.py -y {params.iy} -o {params.output} -op {params.output_path} -m {params.datasets} -c /tmp/{params.user}/HH4b_noJCM.yml"
+        cat $meta_tmp 2>&1 | tee -a {log}
+        echo "Running {params.datasets} {params.years} - output {output}" 2>&1 | tee -a {log}
+        
+        # Set up performance monitoring
+        mprofile_dat="/tmp/{params.username}/mprofile_$(basename {log} .log).dat"
+        mprofile_png="$(dirname {output})/performance/mprofile_$(basename {log} .log).png"
+        
+        # Run analysis with optional performance monitoring
+        cmd="python runner.py -d {params.datasets} -p {params.processor} -y {params.years} -o $(basename {output}) -op $(dirname {output})/ -m {params.datasets_file} -c $meta_tmp {params.hash} {params.diff}"
+        if [ "{params.run_performance}" = "True" ]; then
+            cmd="mprof run -C -o $mprofile_dat $cmd"
+        fi
+        
         echo $cmd 2>&1 | tee -a {log}
-        $cmd 2>&1 | tee -a {log}
-        if [ '{params.run_performance}' = "True" ]; then
+        eval $cmd 2>&1 | tee -a {log}
+        
+        # Generate performance plot if requested
+        if [ "{params.run_performance}" = "True" ]; then
             echo "Running performance analysis" 2>&1 | tee -a {log}
-            mkdir -p {params.output_path}/performance/
-            mprof plot -o {params.output_path}/performance/mprofile_{params.logname}.png /tmp/{params.user}/mprofile_{params.logname}.dat 2>&1 | tee -a {log}
+            mkdir -p $(dirname {output})/performance/
+            mprof plot -o $mprofile_png $mprofile_dat 2>&1 | tee -a {log}
         fi
         """
 
@@ -71,7 +61,7 @@ rule merging_coffea_files:
     output: "{output_file}"
     container: config["analysis_container"]
     params:
-        output = "{output_file}",
+        output = lambda wildcards, output: output[0],
         logname = "merge_log",
         output_path = "output/",
         run_performance = False
