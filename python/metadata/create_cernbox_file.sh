@@ -1,1 +1,0 @@
-sed -e "s#cmseos.*algomez#eosuser.cern.ch\/\/eos\/user\/a\/algomez\/tmpFiles#" -e "s#cmseos.*ULTrig#eosuser.cern.ch\/\/eos\/user\/a\/algomez\/tmpFiles\/XX4b\/20231115#" datasets_HH4b.yml > datasets_HH4b_cernbox.yml

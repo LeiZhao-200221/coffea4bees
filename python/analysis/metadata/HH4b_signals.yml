@@ -16,7 +16,7 @@ config:
   # SvB_MA:
   #   - path: 'analysis/weights/pytorch_models/2024_HHUL_all_kl/result.json'
   #     name: Final
-  top_reconstruction_override: fast
+  top_reconstruction_override: false
   friends:
     trigWeight: "metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"
     # SvB: "metadata/datasets_HH4b_2024_v1p2_friend_SvB.json@@SvB"
