@@ -130,8 +130,8 @@ if __name__ == '__main__':
                         default="metadata/datasets_HH4b.yml", help='Metadata datasets file.')
     parser.add_argument('--triggers', dest="triggers",
                         default="metadata/triggers_HH4b.yml", help='Metadata triggers file.')
-    parser.add_argument('-l', '--luminosity', dest="luminosity",
-                        default="metadata/luminosity_HH4b.yml", help='Metadata luminosity file.')
+    parser.add_argument('-l', '--luminosities', dest="luminosities",
+                        default="metadata/luminosities_HH4b.yml", help='Metadata luminosities file.')
     parser.add_argument('-op', '--outputPath', dest="output_path", default="hists/",
                         help='Output path, if you want to save file somewhere else.')
     parser.add_argument('-y', '--year', nargs='+', dest='years', default=['UL18'], choices=[
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     configs = yaml.safe_load(open(args.configs, 'r'))
     datasets = yaml.safe_load(open(args.metadata, 'r'))
     triggers = yaml.safe_load(open(args.triggers, 'r'))
-    luminosities = yaml.safe_load(open(args.luminosity, 'r'))
+    luminosities = yaml.safe_load(open(args.luminosities, 'r'))
     metadata = {**datasets, **triggers, **luminosities}
 
     config_runner = configs['runner'] if 'runner' in configs.keys() else {}
