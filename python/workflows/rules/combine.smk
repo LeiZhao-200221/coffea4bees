@@ -35,8 +35,12 @@ rule limits:
         othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
         # Freeze and set parameters string handling both single value and list
         freeze_set_params = lambda wildcards: (
-            " ".join([f"--setParameters r{sig}=0 --freezeParameters r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
+            " --freezeParameters " +
+            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
         )
     output:
         txt="{workspace}limits_{datacard}__{signallabel}.txt",
@@ -73,8 +77,12 @@ rule significance:
         othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
         # Freeze and set parameters string handling both single value and list
         freeze_set_params = lambda wildcards: (
-            " ".join([f"--setParameters r{sig}=0 --freezeParameters r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
+            " --freezeParameters " +
+            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
         )
     output:
         observed="{workspace}significance_observed_{datacard}__{signallabel}.txt",
@@ -114,8 +122,12 @@ rule likelihood_scan:
         othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
         # Freeze and set parameters string handling both single value and list
         freeze_set_params = lambda wildcards: (
-            " ".join([f"--setParameters r{sig}=0 --freezeParameters r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
+            " --freezeParameters " +
+            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
         )
     output:
         "{workspace}likelihood_scan_{datacard}__{signallabel}.pdf"
@@ -162,13 +174,17 @@ rule impacts:
         # Parameter range string conditionally handling both single value and list
         param_range = lambda wildcards: (
             f"r{get_case_param(wildcards, 'signallabel')}=-10,10" + 
-            (":" + ":".join([f"r{sig}=0,0" for sig in get_case_param(wildcards, "othersignal").split(",")]) 
+            ("," + ",".join([f"r{sig}=0,0" for sig in get_case_param(wildcards, "othersignal").split(",")]) 
              if get_case_param(wildcards, "othersignal") else "")
         ),
         # Freeze and set parameters string handling both single value and list
         freeze_set_params = lambda wildcards: (
-            " ".join([f"--setParameters r{sig}=0 --freezeParameters r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
+            " --freezeParameters " +
+            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
         )
     output:
         "{workspace}impacts_combine_{datacard}__{signallabel}_observed.pdf"
@@ -227,8 +243,10 @@ rule gof:
         othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
         # Freeze and set parameters string handling both single value and list
         set_params = lambda wildcards: (
-            " ".join([f"--setParameters r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
         )
     output:
         "{workspace}gof_{datacard}__{signallabel}.pdf"
@@ -271,4 +289,90 @@ rule gof:
             --output gof_{wildcards.datacard}__{params.signallabel}" 2>&1 | tee -a {log}
             
         echo "[$(date)] Completed gof rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        """
+
+rule postfit:
+    input:
+        "{workspace}{datacard}__{signallabel}.root"
+    params:
+        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
+        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
+        signal=lambda wildcards: f"{get_key_for_datacard(wildcards.datacard).upper()}4b",
+        # Freeze and set parameters string handling both single value and list
+        freeze_set_params = lambda wildcards: (
+            (
+            "--setParameters " +
+            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
+            " --freezeParameters " +
+            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
+            ) if get_case_param(wildcards, "othersignal") else ""
+        )
+    output:
+        "{workspace}postfit_{datacard}__{signallabel}.pdf"
+    log:
+        "{workspace}logs/postfit_{datacard}__{signallabel}.log"
+    shell:
+        """
+        mkdir -p $(dirname {log})
+        echo "[$(date)] Starting postfit rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        
+        echo "[$(date)] Running postfit b-only" >> {log}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M FitDiagnostics {wildcards.datacard}__{params.signallabel}.root \
+            --redefineSignalPOIs r{params.signallabel} \
+            -n _{wildcards.datacard}_{params.signallabel}_prefit_bonly \
+            {params.freeze_set_params} \
+            --saveShapes --saveWithUncertainties --plots" 2>&1 | tee -a {log}
+        
+        echo "[$(date)] Running diffNuisances for b-only" >> {log}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            python /home/cmsusr/CMSSW_11_3_4/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
+            -p r{params.signallabel} \
+            -a fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_bonly.root \
+            -g diffNuisances_{wildcards.datacard}_{params.signallabel}_prefit_bonly.root" 2>&1 | tee -a {log}
+
+        echo "[$(date)] Running postfit s+b" >> {log}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            combine -M FitDiagnostics {wildcards.datacard}__{params.signallabel}.root \
+            --redefineSignalPOIs r{params.signallabel} \
+            -n _{wildcards.datacard}_{params.signallabel}_prefit_sb \
+            {params.freeze_set_params} \
+            --saveShapes --saveWithUncertainties --plots" 2>&1 | tee -a {log}
+
+        mkdir -p {wildcards.workspace}/fitDiagnostics_sb/
+        mv {wildcards.workspace}/*th1x* {wildcards.workspace}/fitDiagnostics_sb/ 2>/dev/null || true
+        mv {wildcards.workspace}/covariance* {wildcards.workspace}/fitDiagnostics_sb/ 2>/dev/null || true
+
+        echo "[$(date)] Running diffNuisances for s+b" >> {log}
+        ./run_container combine "cd {wildcards.workspace} &&\
+            python /home/cmsusr/CMSSW_11_3_4/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
+            -p r{params.signallabel} \
+            -a fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
+            -g diffNuisances_{wildcards.datacard}_{params.signallabel}_prefit_sb.root" 2>&1 | tee -a {log}
+            
+        echo "[$(date)] Creating prefit plot for b-only" >> {log}
+        ./run_container combine \
+            "python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
+            -o {wildcards.workspace}/plots/ \
+            -m stats_analysis/metadata/{params.signal}.yml \
+            -t prefit" 2>&1 | tee -a {log}
+
+        echo "[$(date)] Creating postfit plot for s+b" >> {log}
+        ./run_container combine \
+            "python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
+            -o {wildcards.workspace}/plots/ \
+            -m stats_analysis/metadata/{params.signal}.yml \
+            -t fit_s" 2>&1 | tee -a {log}
+
+        echo "[$(date)] Creating postfit plot for b-only" >> {log}
+        ./run_container combine \
+            "python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
+            -o {wildcards.workspace}/plots/ \
+            -m stats_analysis/metadata/{params.signal}.yml \
+            -t fit_b" 2>&1 | tee -a {log} 
+
+        echo "[$(date)] Completed postfit rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
         """
