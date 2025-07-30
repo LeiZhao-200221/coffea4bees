@@ -176,8 +176,6 @@ if __name__ == '__main__':
     datasets = yaml.safe_load(open(args.metadata, 'r'))
     triggers = yaml.safe_load(open(args.triggers, 'r'))
     luminosities = yaml.safe_load(open(args.luminosity, 'r'))
-    
-    # Simple dictionary merge
     metadata = {**datasets, **triggers, **luminosities}
 
     config_runner = configs['runner'] if 'runner' in configs.keys() else {}
