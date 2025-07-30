@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import io
 import logging
 from fractions import Fraction
 from typing import TypeVar
@@ -93,3 +94,16 @@ class YamlIndentSequence(yaml.Dumper):
 
 def not_none(*values):
     return next((v for v in values if v is not None), None)
+
+
+class MemoryViewIO:
+    def __init__(self, file: io.BytesIO):
+        self.file = file
+
+    def write(self, data):
+        if isinstance(data, memoryview):
+            data = data.tobytes()
+        self.file.write(data)
+
+    def flush(self):
+        self.file.flush()
