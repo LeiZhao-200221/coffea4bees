@@ -1,4 +1,4 @@
-from base_class.hist.object import LorentzVector, Jet
+from base_class.physics.object import LorentzVector, Jet
 from base_class.hist import H, Template
 import numpy as np
 

@@ -2,14 +2,13 @@ import logging
 
 import numpy as np
 import yaml
-from base_class.physics.objects.jet_corrections import apply_jerc_corrections
+from analysis.helpers.common import apply_jerc_corrections
 from analysis.helpers.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_boosted_4b_selection
-from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_event_selection, apply_boosted_4b_selection
 
 from coffea.analysis_tools import PackedSelection, Weights
-from base_class.skimmer.picoaod import PicoAOD
+from skimmer.processor.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):

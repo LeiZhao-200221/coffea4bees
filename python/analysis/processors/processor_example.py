@@ -10,7 +10,7 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 
 from base_class.hist import Collection, Fill
-from base_class.hist.object import Jet
+from base_class.physics.object import Jet
 
 from analysis.helpers.correctionFunctions import btagVariations
 from analysis.helpers.correctionFunctions import btagSF_norm as btagSF_norm_file
@@ -18,9 +18,8 @@ from analysis.helpers.cutflow import cutFlow
 
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from base_class.physics.common import apply_btag_sf
-from analysis.helpers.event_selection import apply_4b_selection
-from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.common import apply_btag_sf
+from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
 import logging
 
 

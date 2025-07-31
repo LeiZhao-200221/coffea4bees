@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
-from base_class.physics.objects.jet_corrections import apply_jerc_corrections
-from base_class.physics.common import update_events
+from analysis.helpers.common import apply_jerc_corrections, update_events
 from analysis.helpers.cutflow import cutFlow
 from analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
@@ -18,8 +17,7 @@ from analysis.helpers.filling_histograms import (
 )
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_4b_selection
-from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
 from base_class.hist import Fill
 from base_class.root import Chunk, TreeReader
 from coffea import processor
@@ -28,7 +26,9 @@ from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
 from memory_profiler import profile
 import hist
 from base_class.math.random import Squares
-from base_class.physics.event_weights import add_weights
+from analysis.helpers.event_weights import (
+    add_weights,
+)
 
 from ..helpers.load_friend import (
     FriendTemplate,
@@ -101,13 +101,15 @@ class analysis(processor.ProcessorABC):
         ### target is for new friend trees
         target = Chunk.from_coffea_events(event)
 
-        ### adds all the event mc weights and 1 for data 
+        ### adds all the event mc weights and 1 for data
         event["passHLT"] = np.full(len(event), True)
         weights, list_weight_names = add_weights(
             event, target=target,
             do_MC_weights=True,
             dataset=self.dataset,
             year_label=self.year_label,
+            estart=self.estart,
+            estop=self.estop,
             friend_trigWeight=self.friends.get("trigWeight"),
             corrections_metadata=self.corrections_metadata[self.year],
             apply_trigWeight=self.apply_trigWeight,

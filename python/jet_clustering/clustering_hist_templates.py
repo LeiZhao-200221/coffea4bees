@@ -1,5 +1,5 @@
 import awkward as ak
-from base_class.hist.object import LorentzVector, Jet
+from base_class.physics.object import LorentzVector, Jet
 from base_class.hist import H, Template
 
 class ClusterHists(Template):

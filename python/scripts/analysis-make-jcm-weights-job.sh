@@ -9,8 +9,8 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running JCM weights test"
-python analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i analysis/tests/HistsFromROOTFile.coffea
-python analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
+python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i analysis/tests/HistsFromROOTFile.coffea
+python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
 python analysis/tests/make_weights_test.py --path $OUTPUT_DIR
 
 if [ "$return_to_base" = true ]; then
