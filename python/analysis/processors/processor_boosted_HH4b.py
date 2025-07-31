@@ -9,8 +9,7 @@ from coffea import processor
 from coffea.analysis_tools import PackedSelection
 
 from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.event_selection import apply_boosted_4b_selection, apply_4b_selection
-from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_event_selection, apply_boosted_4b_selection, apply_4b_selection
 
 import logging
 

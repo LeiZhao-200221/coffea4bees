@@ -15,7 +15,7 @@ from coffea.analysis_tools import Weights, PackedSelection
 from analysis.helpers.processor_config import processor_config
 
 from base_class.hist import Collection, Fill
-from base_class.hist.object import LorentzVector, Jet, Muon, Elec
+from base_class.physics.object import LorentzVector, Jet, Muon, Elec
 #from analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
 from jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
 from jet_clustering.clustering   import cluster_bs, cluster_bs_fast
@@ -27,13 +27,11 @@ from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from base_class.physics.objects.jet_corrections import apply_jerc_corrections
-from base_class.physics.common import apply_btag_sf, update_events
-from base_class.physics.event_weights import add_weights
+from analysis.helpers.common import apply_jerc_corrections, apply_btag_sf, update_events
+from analysis.helpers.event_weights import add_weights
 
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.event_selection import apply_4b_selection
-from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
 
 import logging
 
@@ -149,6 +147,8 @@ class analysis(processor.ProcessorABC):
                                                   do_MC_weights=config["do_MC_weights"],
                                                   dataset=dataset,
                                                   year_label=year_label,
+                                                  estart=estart,
+                                                  estop=estop,
                                                   friend_trigWeight=None,
                                                   corrections_metadata=self.corrections_metadata[year],
                                                   apply_trigWeight=True,

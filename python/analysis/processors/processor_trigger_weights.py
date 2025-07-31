@@ -3,10 +3,9 @@ import warnings
 import awkward as ak
 import yaml
 import numpy as np
-from base_class.physics.objects.jet_corrections import apply_jerc_corrections
-from analysis.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
-from base_class.physics.event_selection import apply_event_selection
-from analysis.helpers.event_selection import apply_4b_selection
+from analysis.helpers.common import apply_jerc_corrections
+from base_class.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
+from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
 from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
@@ -15,7 +14,7 @@ from analysis.helpers.dump_friendtrees import dump_trigger_weight
 from analysis.helpers.processor_config import processor_config
 
 #
-#  Setup
+# Setup
 #
 NanoAODSchema.warn_missing_crossrefs = False
 warnings.filterwarnings("ignore")

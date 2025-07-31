@@ -40,10 +40,8 @@ if [[ $(hostname) == *"cmslpc"* ]]; then
     export APPTAINER_BINDPATH=/uscmst1b_scratch,/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security,/uscms_data/
 elif [[ $(hostname) == *"rogue"* ]]; then
     export APPTAINER_BINDPATH=/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security,/home/export/,/mnt/scratch/
-elif [[ $(hostname) == *"lxplus"* ]]; then
-    export APPTAINER_BINDPATH=/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
 else
-    echo "Warning: Unknown hostname. Setting APPTAINER_BINDPATH to default."
+    export APPTAINER_BINDPATH=/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
 fi
 
 # Check if apptainer is installed

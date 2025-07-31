@@ -1,33 +1,18 @@
 workflow:
   rules:
-    # This rule explicitly allows manual triggers (from the web UI)
-    # as long as they are not on a tag or a 'test' branch.
-    - if: $CI_PIPELINE_SOURCE == 'web' && $CI_COMMIT_TAG == null && $CI_COMMIT_BRANCH !~ /test/
-      when: always
-
-    # Do not run for tags (this will catch both push and manual if not already excluded)
-    - if: $CI_COMMIT_TAG
-      when: never
-
-    # Do not run for branches with 'test' in the name (likewise)
-    - if: $CI_COMMIT_BRANCH =~ /test/
-      when: never
-
-    # Do not run if only markdown files changed (for pushes/MRs, not typically for manual)
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'    
+    # Do not run if only markdown files changed
     - changes:
         - "**/*.md"
       when: never
-
-    # Run for merge request events
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: always
-
-    # Run for all other branch pushes (the default push behavior)
+      # Do not run for tags
+    - if: $CI_COMMIT_TAG
+      when: never
+    # Do not run for branches with 'test' in the name
+    - if: $CI_COMMIT_BRANCH =~ /test/
+      when: never
+    # Run for all other branch pushes (including after MR is accepted)
     - if: $CI_COMMIT_BRANCH
-      when: always
-
-    # Default to never if no other rule matches
-    - when: never
 
 variables:
   CONTAINER_HOST: cms-cmu

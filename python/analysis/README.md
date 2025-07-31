@@ -16,7 +16,6 @@ Each folder contains:
  - [metadata](./metadata/): yml files with the metadata for each analysis. In these files you can find input files, datasets, cross sections, etc.  
  - [processors](./processors/): python files with the processors for each analysis.
  - [pytorchModels](./pytorchModels/): training models
- - [jcm_tools](./jcm_tools/): python files to compute JCM weights and to apply them.
  - weights: JCM txt files with weights
  - tests: python scripts for testing the code.
  - hists (optional): if you run the `runner.py` without a name of the output folder, this folder will be created to store the pickle files.
