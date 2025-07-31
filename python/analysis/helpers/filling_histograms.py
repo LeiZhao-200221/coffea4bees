@@ -8,7 +8,7 @@ from analysis.helpers.hist_templates import (
     WCandHists,
 )
 from base_class.hist import Collection, Fill
-from base_class.physics.object import Elec, Jet, LorentzVector, Muon
+from base_class.hist.object import Elec, Jet, LorentzVector, Muon
 import logging
 from memory_profiler import profile
 

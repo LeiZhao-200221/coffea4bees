@@ -1,7 +1,6 @@
 datasets:
   data:
     2022_EE:
-      lumi: 26.77e3
       nanoAOD:
         E: /JetMET/Run2022E-22Sep2023-v1/NANOAOD
         F: /JetMET/Run2022F-22Sep2023-v2/NANOAOD
@@ -482,12 +481,7 @@ datasets:
           - root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v1/data_2022_EEG/picoAOD_fourTag.root
           saved_events: 57071
           total_events: 5219885
-      trigger:
-      - QuadPFJet70_50_40_35_PFBTagParticleNet_2BTagSum0p65
-      - PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5
-      - PFHT1050
     2022_preEE:
-      lumi: 7.98e3
       nanoAOD:
         B: /JetHT/Run2022C-22Sep2023-v1/NANOAOD
         C: /JetMET/Run2022C-22Sep2023-v1/NANOAOD
@@ -630,12 +624,7 @@ datasets:
           - root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v1/data_2022_preEED/picoAOD_fourTag.root
           saved_events: 49790
           total_events: 4204623
-      trigger:
-      - QuadPFJet70_50_40_35_PFBTagParticleNet_2BTagSum0p65
-      - PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5
-      - PFHT1050
     2023_BPix:
-      lumi: 9.451e3
       nanoAOD:
         D: /ParkingHH/Run2023D-22Sep2023_v1-v1/NANOAOD
         E: /ParkingHH/Run2023D-22Sep2023_v2-v1/NANOAOD
@@ -904,12 +893,7 @@ datasets:
           - root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v1/data_2023_BPixE/picoAOD_fourTag.root
           saved_events: 51026
           total_events: 4334157
-      trigger:
-      - QuadPFJet70_50_40_35_PNet2BTagMean0p65
-      - PFHT280_QuadPFJet30_PNet2BTagMean0p55
-      - PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5
     2023_preBPix:
-      lumi: 17.794e3
       nanoAOD:
         A: /JetMET0/Run2023C-22Sep2023_v1-v1/NANOAOD
         B: /JetMET0/Run2023C-22Sep2023_v2-v1/NANOAOD
@@ -1419,10 +1403,6 @@ datasets:
           missing: {}
           saved_events: 369105
           total_events: 29358743
-      trigger:
-      - QuadPFJet70_50_40_35_PNet2BTagMean0p65
-      - PFHT280_QuadPFJet30_PNet2BTagMean0p55
-      - PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5
 
   synthetic_data:
     nSamples: 1

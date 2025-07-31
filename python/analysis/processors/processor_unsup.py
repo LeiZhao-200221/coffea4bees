@@ -17,7 +17,7 @@ from coffea import processor
 
 from base_class.hist import Collection, Fill
 from base_class.hist import H, Template
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
+from base_class.hist.object import LorentzVector, Jet, Muon, Elec
 
 from analysis.helpers.processor_config import processor_config
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
@@ -29,8 +29,9 @@ from functools import partial
 from multiprocessing import Pool
 
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_btag_sf, update_events
-from analysis.helpers.event_selection import apply_4b_selection, apply_event_selection
+from base_class.physics.common import apply_btag_sf, update_events
+from base_class.physics.event_selection import apply_event_selection
+from analysis.helpers.event_selection import apply_4b_selection
 import logging
 
 

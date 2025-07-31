@@ -11,10 +11,10 @@ from coffea.analysis_tools import PackedSelection
 import hist
 from analysis.helpers.cutflow import cutFlow
 
-from analysis.helpers.event_selection import apply_event_selection
+from base_class.physics.event_selection import apply_event_selection
 from base_class.hist import Collection, Fill
-from jet_clustering.clustering_hist_templates import ClusterHistsBoosted, ClusterHistsDetailedBoosted
-from base_class.physics.object import Jet
+from jet_clustering.clustering_hist_templates import ClusterHistsBoosted
+from base_class.hist.object import Jet
 
 from jet_clustering.declustering import compute_decluster_variables
 

@@ -1,16 +1,19 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD #, fetch_metadata, resize
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from base_class.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
+from analysis.helpers.event_selection import apply_4b_selection
+from base_class.physics.event_selection import apply_event_selection
 from coffea.nanoevents import NanoEventsFactory
 
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
+from analysis.helpers.event_weights import add_btagweights
 from analysis.helpers.processor_config import processor_config
+from base_class.physics.event_weights import add_weights
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from base_class.physics.objects.jet_corrections import apply_jerc_corrections
+from base_class.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak
@@ -53,7 +56,6 @@ class SubSampler(PicoAOD):
 
         ## adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights( event, config["do_MC_weights"], dataset, year_label,
-                                                  estart, estop,
                                                   self.corrections_metadata[year],
                                                   apply_trigWeight = True,
                                                   isTTForMixed = False,

@@ -27,7 +27,7 @@ from dask.distributed import performance_report
 from distributed.diagnostics.plugin import WorkerPlugin
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
-from skimmer.processor.picoaod import fetch_metadata, integrity_check, resize
+from base_class.skimmer.picoaod import fetch_metadata, integrity_check, resize
 
 if TYPE_CHECKING:
     from base_class.root import Friend
@@ -128,6 +128,10 @@ if __name__ == '__main__':
                         default="analysis/metadata/HH4b.yml", help='Config file.')
     parser.add_argument('-m', '--metadata', dest="metadata",
                         default="metadata/datasets_HH4b.yml", help='Metadata datasets file.')
+    parser.add_argument('--triggers', dest="triggers",
+                        default="metadata/triggers_HH4b.yml", help='Metadata triggers file.')
+    parser.add_argument('-l', '--luminosities', dest="luminosities",
+                        default="metadata/luminosities_HH4b.yml", help='Metadata luminosities file.')
     parser.add_argument('-op', '--outputPath', dest="output_path", default="hists/",
                         help='Output path, if you want to save file somewhere else.')
     parser.add_argument('-y', '--year', nargs='+', dest='years', default=['UL18'], choices=[
@@ -169,7 +173,10 @@ if __name__ == '__main__':
     # Metadata
     #
     configs = yaml.safe_load(open(args.configs, 'r'))
-    metadata = yaml.safe_load(open(args.metadata, 'r'))
+    datasets = yaml.safe_load(open(args.metadata, 'r'))
+    triggers = yaml.safe_load(open(args.triggers, 'r'))
+    luminosities = yaml.safe_load(open(args.luminosities, 'r'))
+    metadata = {**datasets, **triggers, **luminosities}
 
     config_runner = configs['runner'] if 'runner' in configs.keys() else {}
     config_runner.setdefault('data_tier', 'picoAOD')
@@ -244,8 +251,8 @@ if __name__ == '__main__':
             metadata_dataset[dataset] = {'year': year,
                                          'processName': dataset,
                                          'xs': xsec,
-                                         'lumi': float(metadata['datasets']['data'][year]['lumi']),
-                                         'trigger':  metadata['datasets']['data'][year]['trigger'],
+                                         'lumi': float(metadata['luminosities'][year]),
+                                         'trigger':  metadata['triggers'][year],
                                          'top_reconstruction':  top_reconstruction
                                          }
             isData = (dataset == 'data')

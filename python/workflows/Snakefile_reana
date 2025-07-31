@@ -24,7 +24,7 @@ rule final_rule:
         """
         cp gitdiff.txt output/
         echo "Copying output to cernbox"
-        python python/base_class/php_plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
+        python python/base_class/plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
         mkdir -p {EOS_OUTPUT}
         cp -r output/* {EOS_OUTPUT}
         """

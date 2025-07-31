@@ -1,5 +1,5 @@
 #
-# python base_class/trigger_emulator/convertROOTtoDict.py
+# python analysis/trigger_emulator/convertROOTtoDict.py
 #
 
 import ROOT
@@ -115,7 +115,7 @@ def convert_ROOT_file_to_dict(input_file_name, base_dir="../src/TriggerEmulator/
 
     return result
 
-def convert_ROOT_file_to_yaml(input_file_name, out_dir="base_class/trigger_emulator/data"):
+def convert_ROOT_file_to_yaml(input_file_name, out_dir="analysis/trigger_emulator/data"):
     data_dict = convert_ROOT_file_to_dict(input_file_name)
 
     save_to_yaml(data_dict, f'{out_dir}/{input_file_name.replace("root","yaml")}')

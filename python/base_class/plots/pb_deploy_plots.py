@@ -79,7 +79,7 @@ def deploy_plots(
 
     # convert pdf files
     if convert_pdf:
-        from pb_pdf_to_png import convert_pdfs
+        from .pb_pdf_to_png import convert_pdfs
         convert_pdfs(
             [(path, f"{os.path.splitext(path)[0]}.png") for path in pdf_paths],
             n_cores=n_cores,
@@ -144,3 +144,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

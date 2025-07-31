@@ -1,5 +1,5 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD, fetch_metadata, resize
+from base_class.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 from collections import OrderedDict
 from analysis.helpers.cutflow import cutFlow
@@ -7,8 +7,8 @@ from analysis.helpers.cutflow import cutFlow
 from jet_clustering.declustering import make_synthetic_event
 
 from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
-from analysis.helpers.event_selection import apply_event_selection
+from base_class.physics.event_selection import apply_event_selection
+
 
 from base_class.root import Chunk, TreeReader
 from analysis.helpers.load_friend import (
@@ -18,7 +18,8 @@ from analysis.helpers.load_friend import (
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from base_class.physics.objects.jet_corrections import apply_jerc_corrections
+from base_class.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak
