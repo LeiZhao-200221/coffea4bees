@@ -1,378 +1,313 @@
+import os
+
 include: "../helpers/common.smk"
 
 rule workspace:
-    input: "{workspace}{datacard}.txt"
-    output:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}.txt"
+    output: "{path}.root"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Generate the map options for the othersignal(s)
-        othersignal_maps = lambda wildcards: (
-            " ".join([f"--PO 'map=.*/{sig}:r{sig}[1,-10,10]'" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            if get_case_param(wildcards, "othersignal") else ""
-        )
-    log:
-        "{workspace}logs/workspace_{datacard}__{signallabel}.log"
+        signallabel = "",
+        othersignal_maps = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/workspace_{path}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting workspace rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            text2workspace.py {wildcards.datacard}.txt \
+        echo "[$(date)] Starting workspace rule with signal {params.signallabel}" > {log}
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            text2workspace.py $(basename {input}) \
             -P HiggsAnalysis.CombinedLimit.PhysicsModel:multiSignalModel --PO verbose \
             --PO 'map=.*/{params.signallabel}:r{params.signallabel}[1,-10,10]' \
             {params.othersignal_maps} \
-            -o {wildcards.datacard}__{wildcards.signallabel}.root" 2>&1 | tee -a {log}
-        echo "[$(date)] Completed workspace rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+            -o $(basename {output})" 2>&1 | tee -a {log}
+        echo "[$(date)] Completed workspace rule with signal {params.signallabel}" >> {log}
         """
 
 rule limits:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}__{signallabel}.root"
+    output: 
+        txt="{path}_limits__{signallabel}.txt",
+        json="{path}_limits__{signallabel}.json"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Freeze and set parameters string handling both single value and list
-        freeze_set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
-            " --freezeParameters " +
-            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
-    output:
-        txt="{workspace}limits_{datacard}__{signallabel}.txt",
-        json="{workspace}limits_{datacard}__{signallabel}.json"
-    log:
-        "{workspace}logs/limits_{datacard}__{signallabel}.log"
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        freeze_parameters = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/limits_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting limits rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        echo "[$(date)] Starting limits rule with signal {params.signallabel}" > {log}
         
         echo "[$(date)] Running AsymptoticLimits" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M AsymptoticLimits {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M AsymptoticLimits $(basename {input}) \
             --redefineSignalPOIs r{params.signallabel} \
-            -n _{params.signallabel} \
-            {params.freeze_set_params}" \
-            2>&1 | tee -a {log} {output.txt}
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
+            -n _{params.signallabel}" \
+            2>&1 | tee -a {log} $(basename {output.txt})
             
         echo "[$(date)] Running CollectLimits" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M CollectLimits \
             higgsCombine_{params.signallabel}.AsymptoticLimits.mH120.root \
-            -o limits_{wildcards.datacard}__{params.signallabel}.json" 2>&1 | tee -a {log}
+            -o $(basename {output.json})" 2>&1 | tee -a {log}
             
-        echo "[$(date)] Completed limits rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        echo "[$(date)] Completed limits rule with signal {params.signallabel}" >> {log}
         """
 
 rule significance:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
-    params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Freeze and set parameters string handling both single value and list
-        freeze_set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
-            " --freezeParameters " +
-            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
+    input: "{path}__{signallabel}.root"
     output:
-        observed="{workspace}significance_observed_{datacard}__{signallabel}.txt",
-        expected="{workspace}significance_expected_{datacard}__{signallabel}.txt"
-    log:
-        "{workspace}logs/significance_{datacard}__{signallabel}.log"
+        observed="{path}_significance_observed__{signallabel}.txt",
+        expected="{path}_significance_expected__{signallabel}.txt"
+    params:
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        freeze_parameters = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/significance_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting significance rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
-        
+        echo "[$(date)] Starting significance rule with signal {params.signallabel}" > {log}
+
         echo "[$(date)] Running observed significance" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M Significance {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M Significance $(basename {input}) \
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
             --redefineSignalPOIs r{params.signallabel} \
-            -n _{params.signallabel} \
-            {params.freeze_set_params}" \
-            2>&1 | tee -a {log} {output.observed}
+            -n _{params.signallabel}" \
+            2>&1 | tee -a {log} $(basename {output.observed})
             
         echo "[$(date)] Running expected significance" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M Significance {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M Significance $(basename {input}) \
             --redefineSignalPOIs r{params.signallabel} \
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
             -n _{params.signallabel} \
-            -t -1 --expectSignal=1 \
-            {params.freeze_set_params}" \
-            2>&1 | tee -a {log} {output.expected}
-            
-        echo "[$(date)] Completed significance rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+            -t -1 --expectSignal=1" \
+            2>&1 | tee -a {log} $(basename {output.expected})
+
+        echo "[$(date)] Completed significance rule with signal {params.signallabel}" >> {log}
         """
 
 rule likelihood_scan:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}__{signallabel}.root"
+    output: "{path}_likelihood_scan__{signallabel}.pdf"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Freeze and set parameters string handling both single value and list
-        freeze_set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
-            " --freezeParameters " +
-            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
-    output:
-        "{workspace}likelihood_scan_{datacard}__{signallabel}.pdf"
-    log:
-        "{workspace}logs/likelihood_scan_{datacard}__{signallabel}.log"
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        freeze_parameters = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/likelihood_scan_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting likelihood_scan rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        echo "[$(date)] Starting likelihood_scan rule with signal {params.signallabel}" > {log}
         
         echo "|---- Running initial fit"
         echo "[$(date)] Running initial fit" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M MultiDimFit -d {wildcards.datacard}__{params.signallabel}.root \
-            -n _{wildcards.datacard}_{params.signallabel} \
-            --saveWorkspace --robustFit 1 \
-            {params.freeze_set_params}" 2>&1 | tee -a {log}
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M MultiDimFit -d $(basename {input}) \
+            -n _$(basename {input} .root)_{params.signallabel} \
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
+            --saveWorkspace --robustFit 1" 2>&1 | tee -a {log}
             
         echo "|---- Running MultiDimFit"
         echo "[$(date)] Running MultiDimFit" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             combine -M MultiDimFit \
-            -d higgsCombine_{wildcards.datacard}_{params.signallabel}.MultiDimFit.mH120.root \
-            -n _{wildcards.datacard}_{params.signallabel}_final \
+            -d higgsCombine_$(basename {input} .root)_{params.signallabel}.MultiDimFit.mH120.root \
+            -n _$(basename {input} .root)_{params.signallabel}_final \
             -P r{params.signallabel} \
-            --snapshotName MultiDimFit --rMin -10 --rMax 10 --algo grid --points 50 --alignEdges 1 \
-            {params.freeze_set_params}" 2>&1 | tee -a {log}
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
+            --snapshotName MultiDimFit --rMin -10 --rMax 10 --algo grid --points 50 --alignEdges 1" 2>&1 | tee -a {log}
             
         echo "|---- Plotting likelihood scan"
         echo "[$(date)] Plotting likelihood scan" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            plot1DScan.py higgsCombine_{wildcards.datacard}_{params.signallabel}_final.MultiDimFit.mH120.root \
-            --POI r{params.signallabel} -o likelihood_scan_{wildcards.datacard}__{params.signallabel}" 2>&1 | tee -a {log}
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            plot1DScan.py higgsCombine_$(basename {input} .root)_{params.signallabel}_final.MultiDimFit.mH120.root \
+            --POI r{params.signallabel} -o $(basename {output} .pdf)" 2>&1 | tee -a {log}
             
-        echo "[$(date)] Completed likelihood_scan rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        echo "[$(date)] Completed likelihood_scan rule with signal {params.signallabel}" >> {log}
         """
 
 rule impacts:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}__{signallabel}.root"
+    output: "{path}_impacts__{signallabel}.pdf"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Parameter range string conditionally handling both single value and list
-        param_range = lambda wildcards: (
-            f"r{get_case_param(wildcards, 'signallabel')}=-10,10" + 
-            ("," + ",".join([f"r{sig}=0,0" for sig in get_case_param(wildcards, "othersignal").split(",")]) 
-             if get_case_param(wildcards, "othersignal") else "")
-        ),
-        # Freeze and set parameters string handling both single value and list
-        freeze_set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
-            " --freezeParameters " +
-            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
-    output:
-        "{workspace}impacts_combine_{datacard}__{signallabel}_observed.pdf"
-    log:
-        "{workspace}logs/impacts_{datacard}__{signallabel}.log"
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        set_parameters_ranges = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/impacts_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting impacts rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        echo "[$(date)] Starting impacts rule with signal {params.signallabel}" > {log}
         
         echo "|---- Running initial fit"
         echo "[$(date)] Running initial fit" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combineTool.py -M Impacts -d {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combineTool.py -M Impacts -d $(basename {input}) \
             --doInitialFit --robustFit 1 -m 125 \
-            -n {wildcards.datacard}_{params.signallabel} \
-            --setParameterRanges {params.param_range} \
-            {params.freeze_set_params}" 2>&1 | tee -a {log}
+            --setParametersRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
+            {params.set_parameters_zero} \
+            -n $(basename {input} .root)_{params.signallabel}" 2>&1 | tee -a {log}
             
         echo "|---- Running fits per systematic"
         echo "[$(date)] Running fits per systematic" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combineTool.py -M Impacts -d {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combineTool.py -M Impacts -d $(basename {input}) \
             --doFits --robustFit 1 -m 125 --parallel 4 \
-            -n {wildcards.datacard}_{params.signallabel} \
-            --setParameterRanges {params.param_range} \
-            {params.freeze_set_params}" 2>&1 | tee -a {log}
+            --setParametersRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
+            {params.set_parameters_zero} \
+            -n $(basename {input} .root)_{params.signallabel}" 2>&1 | tee -a {log}
             
         echo "|---- Running merging results"
         echo "[$(date)] Running merging results" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M Impacts \
-            -m 125 -n {wildcards.datacard}_{params.signallabel} \
-            -d {wildcards.datacard}__{params.signallabel}.root \
-            -o impacts_combine_{wildcards.datacard}_{params.signallabel}_exp.json" 2>&1 | tee -a {log}
+            -m 125 -n $(basename {input} .root)_{params.signallabel} \
+            -d $(basename {input}) \
+            -o impacts_combine_$(basename {input} .root)_{params.signallabel}_exp.json" 2>&1 | tee -a {log}
             
         echo "|---- Running creating pdf"
         echo "[$(date)] Running creating pdf" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            plotImpacts.py -i impacts_combine_{wildcards.datacard}_{params.signallabel}_exp.json \
-            -o impacts_combine_{wildcards.datacard}__{params.signallabel}_observed \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            plotImpacts.py -i impacts_combine_$(basename {input} .root)_{params.signallabel}_exp.json \
+            -o $(basename {output} .pdf) \
             --POI r{params.signallabel} \
             --per-page 20 --left-margin 0.3 --height 400 --label-size 0.04" 2>&1 | tee -a {log}
             
         echo "[$(date)] Cleaning up temporary files" >> {log}
-        rm {wildcards.workspace}/higgsCombine_*Fit* 2>&1 | tee -a {log}
+        rm $(dirname {input})/higgsCombine_*Fit* 2>&1 | tee -a {log}
         
-        echo "[$(date)] Completed impacts rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        echo "[$(date)] Completed impacts rule with signal {params.signallabel}" >> {log}
         """
 
 rule gof:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}__{signallabel}.root"
+    output: "{path}_gof__{signallabel}.pdf"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        # Freeze and set parameters string handling both single value and list
-        set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
-    output:
-        "{workspace}gof_{datacard}__{signallabel}.pdf"
-    log:
-        "{workspace}logs/gof_{datacard}__{signallabel}.log"
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/gof_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting gof rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        echo "[$(date)] Starting gof rule with signal {params.signallabel}" > {log}
         
         echo "|---- Running Goodness of Fit tests data"
         echo "[$(date)] Running Goodness of Fit tests data" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M GoodnessOfFit {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M GoodnessOfFit $(basename {input}) \
             --algo saturated \
-            -n _{wildcards.datacard}_{params.signallabel}_gof_data \
-            {params.set_params}" 2>&1 | tee -a {log} {wildcards.workspace}/gof_data_{wildcards.datacard}_{params.signallabel}.txt
+            {params.set_parameters_zero} \
+            -n _$(basename {input} .root)_{params.signallabel}_gof_data" \
+            2>&1 | tee -a {log} gof_data_$(basename {input} .root)_{params.signallabel}.txt
             
         echo "|---- Running Goodness of Fit tests toys"
         echo "[$(date)] Running Goodness of Fit tests toys" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M GoodnessOfFit {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M GoodnessOfFit $(basename {input}) \
             --toysFrequentist -t 500 --algo saturated  \
-            -n _{wildcards.datacard}_{params.signallabel}_gof_toys \
-            {params.set_params}" 2>&1 | tee -a {log} {wildcards.workspace}/gof_toys_{wildcards.datacard}_{params.signallabel}.txt
+            -n _$(basename {input} .root)_{params.signallabel}_gof_toys" \
+            2>&1 | tee -a {log} gof_toys_$(basename {input} .root)_{params.signallabel}.txt
             
         echo "|---- Collecting Goodness of Fit results"
         echo "[$(date)] Collecting Goodness of Fit results" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M CollectGoodnessOfFit \
-            --input higgsCombine_{wildcards.datacard}_{params.signallabel}_gof_data.GoodnessOfFit.mH120.root \
-            higgsCombine_{wildcards.datacard}_{params.signallabel}_gof_toys.GoodnessOfFit.mH120.123456.root" \
-            -o gof_{wildcards.datacard}_{params.signallabel}.json 2>&1 | tee -a {log}
+            --input higgsCombine_$(basename {input} .root)_{params.signallabel}_gof_data.GoodnessOfFit.mH120.root \
+            higgsCombine_$(basename {input} .root)_{params.signallabel}_gof_toys.GoodnessOfFit.mH120.123456.root" \
+            -o gof_$(basename {input} .root)_{params.signallabel}.json 2>&1 | tee -a {log}
             
         echo "|---- Plotting Goodness of Fit results"
         echo "[$(date)] Plotting Goodness of Fit results" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            plotGof.py gof_{wildcards.datacard}_{params.signallabel}.json \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            plotGof.py gof_$(basename {input} .root)_{params.signallabel}.json \
             --statistic staturated --mass 120.0 \
-            --output gof_{wildcards.datacard}__{params.signallabel}" 2>&1 | tee -a {log}
+            --output $(basename {output} .pdf)" 2>&1 | tee -a {log}
             
-        echo "[$(date)] Completed gof rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        echo "[$(date)] Completed gof rule with signal {params.signallabel}" >> {log}
         """
 
 rule postfit:
-    input:
-        "{workspace}{datacard}__{signallabel}.root"
+    input: "{path}__{signallabel}.root"
+    output: "{path}_postfit__{signallabel}.pdf"
     params:
-        signallabel = lambda wildcards: get_case_param(wildcards, "signallabel"),
-        othersignal = lambda wildcards: get_case_param(wildcards, "othersignal"),
-        signal=lambda wildcards: f"{get_key_for_datacard(wildcards.datacard).upper()}4b",
-        # Freeze and set parameters string handling both single value and list
-        freeze_set_params = lambda wildcards: (
-            (
-            "--setParameters " +
-            ",".join([f"r{sig}=0" for sig in get_case_param(wildcards, "othersignal").split(",")]) +
-            " --freezeParameters " +
-            ",".join([f"r{sig}" for sig in get_case_param(wildcards, "othersignal").split(",")])
-            ) if get_case_param(wildcards, "othersignal") else ""
-        )
-    output:
-        "{workspace}postfit_{datacard}__{signallabel}.pdf"
-    log:
-        "{workspace}logs/postfit_{datacard}__{signallabel}.log"
+        signallabel = "{signallabel}",
+        set_parameters_zero = "",
+        freeze_parameters = "",
+        container_wrapper = config.get("container_wrapper", "./run_container combine")
+    log: "output/logs/postfit_{path}__{signallabel}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting postfit rule for {wildcards.datacard} with signal {params.signallabel}" > {log}
+        echo "[$(date)] Starting postfit rule with signal {params.signallabel}" > {log}
         
         echo "[$(date)] Running postfit b-only" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M FitDiagnostics {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M FitDiagnostics $(basename {input}) \
             --redefineSignalPOIs r{params.signallabel} \
-            -n _{wildcards.datacard}_{params.signallabel}_prefit_bonly \
-            {params.freeze_set_params} \
+            {params.set_parameters_zero} \
+            --setParameters r{params.signallabel}=0 \
+            {params.freeze_parameters} \
+            -n _$(basename {input} .root)_prefit_bonly \
             --saveShapes --saveWithUncertainties --plots" 2>&1 | tee -a {log}
         
         echo "[$(date)] Running diffNuisances for b-only" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             python /home/cmsusr/CMSSW_11_3_4/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
             -p r{params.signallabel} \
-            -a fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_bonly.root \
-            -g diffNuisances_{wildcards.datacard}_{params.signallabel}_prefit_bonly.root" 2>&1 | tee -a {log}
+            -a fitDiagnostics_$(basename {input} .root)_prefit_bonly.root \
+            -g diffNuisances_$(basename {input} .root)_prefit_bonly.root" 2>&1 | tee -a {log}
 
         echo "[$(date)] Running postfit s+b" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
-            combine -M FitDiagnostics {wildcards.datacard}__{params.signallabel}.root \
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            combine -M FitDiagnostics $(basename {input}) \
             --redefineSignalPOIs r{params.signallabel} \
-            -n _{wildcards.datacard}_{params.signallabel}_prefit_sb \
-            {params.freeze_set_params} \
+            {params.set_parameters_zero} \
+            {params.freeze_parameters} \
+            -n _$(basename {input} .root)_prefit_sb \
             --saveShapes --saveWithUncertainties --plots" 2>&1 | tee -a {log}
 
-        mkdir -p {wildcards.workspace}/fitDiagnostics_sb/
-        mv {wildcards.workspace}/*th1x* {wildcards.workspace}/fitDiagnostics_sb/ 2>/dev/null || true
-        mv {wildcards.workspace}/covariance* {wildcards.workspace}/fitDiagnostics_sb/ 2>/dev/null || true
+        mkdir -p $(dirname {input})/fitDiagnostics_sb/
+        mv $(dirname {input})/*th1x* $(dirname {input})/fitDiagnostics_sb/ 2>/dev/null || true
+        mv $(dirname {input})/covariance* $(dirname {input})/fitDiagnostics_sb/ 2>/dev/null || true
 
         echo "[$(date)] Running diffNuisances for s+b" >> {log}
-        ./run_container combine "cd {wildcards.workspace} &&\
+        {params.container_wrapper} "cd $(dirname {input}) &&\
             python /home/cmsusr/CMSSW_11_3_4/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py \
             -p r{params.signallabel} \
-            -a fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
-            -g diffNuisances_{wildcards.datacard}_{params.signallabel}_prefit_sb.root" 2>&1 | tee -a {log}
-            
-        echo "[$(date)] Creating prefit plot for b-only" >> {log}
-        ./run_container combine \
-            "python3 plots/make_postfit_plot.py \
-            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
-            -o {wildcards.workspace}/plots/ \
-            -m stats_analysis/metadata/{params.signal}.yml \
-            -t prefit" 2>&1 | tee -a {log}
+            -a fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
+            -g diffNuisances_$(basename {input} .root)_prefit_sb.root" 2>&1 | tee -a {log}
+        
+        echo "[$(date)] Running postfit plots for b-only" >> {log}
+        pwd -LP
 
-        echo "[$(date)] Creating postfit plot for s+b" >> {log}
-        ./run_container combine \
-            "python3 plots/make_postfit_plot.py \
-            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
-            -o {wildcards.workspace}/plots/ \
-            -m stats_analysis/metadata/{params.signal}.yml \
-            -t fit_s" 2>&1 | tee -a {log}
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
+            -o $(basename {input} .root)/plots/ -t prefit
 
-        echo "[$(date)] Creating postfit plot for b-only" >> {log}
-        ./run_container combine \
-            "python3 plots/make_postfit_plot.py \
-            -i fitDiagnostics_{wildcards.datacard}_{params.signallabel}_prefit_sb.root \
-            -o {wildcards.workspace}/plots/ \
-            -m stats_analysis/metadata/{params.signal}.yml \
-            -t fit_b" 2>&1 | tee -a {log} 
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
+            -o $(basename {input} .root)/plots/ -t fit_b
 
-        echo "[$(date)] Completed postfit rule for {wildcards.datacard} with signal {params.signallabel}" >> {log}
+        {params.container_wrapper} "cd $(dirname {input}) &&\
+            python3 plots/make_postfit_plot.py \
+            -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
+            -o $(basename {input} .root)/plots/ -t fit_s
+
+        echo "[$(date)] Completed postfit rule with signal {params.signallabel}" >> {log}
         """

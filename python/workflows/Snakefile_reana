@@ -1,6 +1,9 @@
 from datetime import datetime
 import os
 
+# Define username once for reuse throughout the workflow
+USERNAME = os.getenv("USER", "coffea4bees_default")
+
 # Import rule modules
 module analysis:
     snakefile: "rules/analysis.smk"
@@ -13,6 +16,9 @@ module stat_analysis:
 module combine:
     snakefile: "rules/combine.smk"
     config: config
+
+include: "helpers/common.smk"
+
 
 EOS_OUTPUT = f"/eos/user/a/algomez/work/HH4b/reana/{datetime.now().strftime('%Y%m%d')}_{config['hash']}/"
 
@@ -28,87 +34,101 @@ zh4b_datasets = [d for d in config['dataset_systematics'] if 'ZH4b' in d]
 rule final_rule:
     input:
         "output/plots/RunII/passPreSel/fourTag/SB/nPVs.pdf",
-        # Add outputs from combine rules - HH4b
-        "output/datacards/HH4b/limits_datacard_HH4b__GluGluToHHTo4B_cHHH1.json",  # limits
-        "output/datacards/HH4b/significance_expected_datacard_HH4b__GluGluToHHTo4B_cHHH1.txt",  # significance
-        "output/datacards/HH4b/impacts_datacard_HH4b__GluGluToHHTo4B_cHHH1.pdf",  # impacts
-        "output/datacards/HH4b/postfit_datacard_HH4b__GluGluToHHTo4B_cHHH1.pdf",  # postfit
-        "output/datacards/HH4b/likelihood_scan_datacard_HH4b__GluGluToHHTo4B_cHHH1.pdf",  # likelihood_scan
-        "output/datacards/HH4b/gof_datacard_HH4b__GluGluToHHTo4B_cHHH1.pdf",  # gof
-        "output/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf",  # syst plots HH4b
-        # Add outputs for ZZ4b
-        "output/datacards/ZZ4b/datacard_ZZ4b.txt",  # datacard ZZ4b
-        "output/datacards/ZZ4b/limits_datacard_ZZ4b__ZZ4b.json",  # limits ZZ4b
-        "output/datacards/ZZ4b/significance_expected_datacard_ZZ4b__ZZ4b.txt",  # significance ZZ4b
-        "output/datacards/ZZ4b/impacts_datacard_ZZ4b__ZZ4b.pdf",  # impacts ZZ4b
-        "output/datacards/ZZ4b/postfit_datacard_ZZ4b__ZZ4b.pdf",  # postfit ZZ4b
-        "output/datacards/ZZ4b/likelihood_scan_datacard_ZZ4b__ZZ4b.pdf",  # likelihood_scan ZZ4b
-        "output/datacards/ZZ4b/gof_datacard_ZZ4b__ZZ4b.pdf",  # gof ZZ4b
-        "output/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf",  # syst plots ZZ4b
-        # Add outputs for ZH4b
-        "output/datacards/ZH4b/datacard_ZH4b.txt",  # datacard ZH4b
-        "output/datacards/ZH4b/limits_datacard_ZH4b__ZH4b.json",  # limits ZH4b
-        "output/datacards/ZH4b/significance_expected_datacard_ZH4b__ZH4b.txt",  # significance ZH4b
-        "output/datacards/ZH4b/impacts_datacard_ZH4b__ZH4b.pdf",  # impacts ZH4b
-        "output/datacards/ZH4b/postfit_datacard_ZH4b__ZH4b.pdf",  # postfit ZH4b
-        "output/datacards/ZH4b/likelihood_scan_datacard_ZH4b__ZH4b.pdf",  # likelihood_scan ZH4b
-        "output/datacards/ZH4b/gof_datacard_ZH4b__ZH4b.pdf",  # gof ZH4b
-        "output/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf",  # syst plots ZH4b
+        expand(
+            "output/datacards/{channel}/limits__{signallabel}.json",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        expand(
+            "output/datacards/{channel}/significance_observed__{signallabel}.txt",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        expand(
+            "output/datacards/{channel}/impacts__{signallabel}.pdf",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        expand(
+            "output/datacards/{channel}/postfit__{signallabel}.pdf",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        expand(
+            "output/datacards/{channel}/likelihood_scan__{signallabel}.pdf",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        expand(
+            "output/datacards/{channel}/gof__{signallabel}.pdf",
+            zip,
+            channel=list(config['channels'].keys()),
+            signallabel=[config['channels'][k]['signallabel'] for k in config['channels'].keys()]
+        ),
+        "output/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf",
+        "output/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf",
+        "output/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf",
+
         # expand("output/singlefiles/histNoJCM__{sample}-{year}.coffea", sample=config['dataset'], year=config['year'])  ### trick to define wildcards
     container: config["analysis_container"]
     resources:
         voms_proxy=True,
         kerberos=True,
-        unpacked_img=True,
     shell: 
         """
         cp gitdiff.txt output/
         echo "Copying output to cernbox"
-        python python/base_class/php_plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
+        python base_class/php_plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
         mkdir -p {EOS_OUTPUT}
         cp -r output/* {EOS_OUTPUT}
         """
 
-use rule analysis_processor from analysis as analysis with:
-    output: "output/singlefiles/histNoJCM__{sample}-{year}.coffea"
-    params:
-        datasets="{sample}",
-        years="{year}",
-        metadata="analysis/metadata/HH4b_noJCM.yml",
-        processor="analysis/processors/processor_HH4b.py",
-        datasets_file=config['dataset_location'],
-        blind=False,
-        run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_histNoJCM__{sample}-{year}.log"
+# use rule analysis_processor from analysis as analysis with:
+#     output: "output/singlefiles/histNoJCM__{sample}-{year}.coffea"
+#     params:
+#         datasets="{sample}",
+#         years="{year}",
+#         metadata="analysis/metadata/HH4b_noJCM.yml",
+#         processor="analysis/processors/processor_HH4b.py",
+#         datasets_file=config['dataset_location'],
+#         blind=False,
+#         run_performance=True,
+#         hash=config['hash'],
+#         diff=config['diff'],
+#         username=USERNAME
+#     resources:
+#         voms_proxy=True,
+#         kerberos=True,
+#         compute_backend="kubernetes",
+#         kubernetes_memory_limit="9.5Gi"
+#     log: "output/logs/analysis_histNoJCM__{sample}-{year}.log"
 
-use rule merging_coffea_files from analysis as merging_coffea_files with:
-    input: expand(['output/singlefiles/histNoJCM__{sample}-{year}.coffea'], sample=config['dataset'], year=config['year']) 
-    output: "output/histNoJCM.coffea"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/merging_histNoJCM.log"
+# use rule merging_coffea_files from analysis as merging_coffea_files with:
+#     input: expand(['output/singlefiles/histNoJCM__{sample}-{year}.coffea'], sample=config['dataset'], year=config['year']) 
+#     output: "output/histNoJCM.coffea"
+#     resources:
+#         kerberos=True,
+#         compute_backend="kubernetes",
+#         kubernetes_memory_limit="9.5Gi"
+#     log: "output/logs/merging_histNoJCM.log"
 
-use rule make_JCM from analysis as make_JCM with:
-    input: "output/histNoJCM.coffea"
-    output: "output/JCM/jetCombinatoricModel_SB_reana.yml"
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes",
-        unpacked_img=True,
-    log: "logs/make_JCM.log"
+# use rule make_JCM from analysis as make_JCM with:
+#     input: "output/histNoJCM.coffea"
+#     output: "output/JCM/jetCombinatoricModel_SB_reana.yml"
+#     resources:
+#         voms_proxy=True,
+#         kerberos=True,
+#         compute_backend="kubernetes",
+#     log: "output/logs/make_JCM.log"
 
+#######
+### Running analysis processor
+#######
 
 ### In the next rules, the input is commented out to not run JCM again. 
 use rule analysis_processor from analysis as analysis_databkgs with:
@@ -124,42 +144,19 @@ use rule analysis_processor from analysis as analysis_databkgs with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
+        username=USERNAME
     resources:
         voms_proxy=True,
         kerberos=True,
-        unpacked_img=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_hist__{sample}-{year}.log"
+    log: "output/logs/analysis_hist__{sample}-{year}.log"
 
-use rule analysis_processor from analysis as analysis_signals with:
+use rule analysis_databkgs as analysis_signals with:
     # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
     output: "output/singlefiles/histsignal__{sample_signal}-{year}.coffea"
     params:
         datasets="{sample_signal}",
-        years="{year}",
-        metadata="analysis/metadata/HH4b.yml",
-        processor="analysis/processors/processor_HH4b.py",
-        datasets_file=config['dataset_location'],
-        blind=False,
-        run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_histsignal__{sample_signal}-{year}.log"
-
-use rule analysis_processor from analysis as analysis_signals_HH4b with:
-    # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
-    output: "output/singlefiles/histsignalHH4b__GluGluToHHTo4B_cHHH1-{year}.coffea"
-    params:
-        datasets="GluGluToHHTo4B_cHHH1",
         years="{year}",
         metadata="analysis/metadata/HH4b_signals.yml",
         processor="analysis/processors/processor_HH4b.py",
@@ -168,17 +165,10 @@ use rule analysis_processor from analysis as analysis_signals_HH4b with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_histsignalHH4b__GluGluToHHTo4B_cHHH1-{year}.log"
+        username=USERNAME
+    log: "output/logs/analysis_histsignal__{sample_signal}-{year}.log"
 
-
-use rule analysis_processor from analysis as analysis_mixedbkg_data3b with:
+use rule analysis_databkgs as analysis_mixedbkg_data3b with:
     output: "output/histMixedBkg_data_3b_for_mixed.coffea"
     params:
         datasets="data_3b_for_mixed",
@@ -190,17 +180,11 @@ use rule analysis_processor from analysis as analysis_mixedbkg_data3b with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_mixedbkg_data3b.log"
+        username=USERNAME
+    log: "output/logs/analysis_mixedbkg_data3b.log"
 
 
-use rule analysis_processor from analysis as analysis_mixedbkg with:
+use rule analysis_databkgs as analysis_mixedbkg with:
     output: "output/histMixedBkg_TT.coffea"
     params:
         datasets=config['dataset_for_mixed'],
@@ -212,17 +196,10 @@ use rule analysis_processor from analysis as analysis_mixedbkg with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_mixedbkg_TT.log"
+        username=USERNAME
+    log: "output/logs/analysis_mixedbkg_TT.log"
 
-
-use rule analysis_processor from analysis as analysis_mixeddata with:
+use rule analysis_databkgs as analysis_mixeddata with:
     output: "output/histMixedData.coffea"
     params:
         datasets="mixeddata",
@@ -234,17 +211,11 @@ use rule analysis_processor from analysis as analysis_mixeddata with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_mixeddata.log"
+        username=USERNAME
+    log: "output/logs/analysis_mixeddata.log"
 
 
-use rule analysis_processor from analysis as analysis_systematics with:
+use rule analysis_databkgs as analysis_systematics with:
     # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
     output: "output/singlefiles/histsyst_{samplesyst}-{iysyst}.coffea"
     params:
@@ -257,164 +228,163 @@ use rule analysis_processor from analysis as analysis_systematics with:
         run_performance=True,
         hash=config['hash'],
         diff=config['diff'],
-        username=os.getenv("USER")
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/analysis_histsyst_{samplesyst}-{iysyst}.log"
+        username=USERNAME
+    log: "output/logs/analysis_histsyst_{samplesyst}-{iysyst}.log"
 
+
+#######
+### Merging histograms 
+#######
 
 use rule merging_coffea_files from analysis as merging_coffea_files_syst_HH4b with:
     input: expand(['output/singlefiles/histsyst_{idatsyst}-{iyear}.coffea'], idatsyst=hh4b_datasets, iyear=config['year']) 
-    output: "output/histAll_signals_HH4b.coffea"
+    output: "output/histAll_signals__HH4b.coffea"
     resources:
         kerberos=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
-    log: "logs/merging_signals_HH4b.log"
+    log: "output/logs/merging_signals_HH4b.log"
 
-use rule merging_coffea_files from analysis as merging_coffea_files_syst_ZZ4b with:
+use rule merging_coffea_files_syst_HH4b as merging_coffea_files_syst_ZZ4b with:
     input: expand(['output/singlefiles/histsyst_{idatsyst}-{iyear}.coffea'], idatsyst=zz4b_datasets, iyear=config['year']) 
-    output: "output/histAll_signals_ZZ4b.coffea"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/merging_signals_ZZ4b.log"
+    output: "output/histAll_signals__ZZ4b.coffea"
+    log: "output/logs/merging_signals_ZZ4b.log"
 
-use rule merging_coffea_files from analysis as merging_coffea_files_syst_ZH4b with:
+use rule merging_coffea_files_syst_HH4b as merging_coffea_files_syst_ZH4b with:
     input: expand(['output/singlefiles/histsyst_{idatsyst}-{iyear}.coffea'], idatsyst=zh4b_datasets, iyear=config['year']) 
-    output: "output/histAll_signals_ZH4b.coffea"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/merging_signals_ZH4b.log"
+    output: "output/histAll_signals__ZH4b.coffea"
+    log: "output/logs/merging_signals_ZH4b.log"
 
-use rule merging_coffea_files from analysis as merging_coffea_files_histAll with:
-    input: expand(['output/singlefiles/histsignal__{sample_signal}-{year}.coffea'], sample_signal=config['dataset_signals'], year=config['year']) + expand(['output/singlefiles/hist__{idat}-{iyear}.coffea'], idat=config['dataset'], iyear=config['year']) + expand(['output/singlefiles/histsignalHH4b__GluGluToHHTo4B_cHHH1-{iyear}.coffea'], iyear=config['year'])
+use rule merging_coffea_files_syst_HH4b as merging_coffea_files_histAll with:
+    input: expand(['output/singlefiles/histsignal__{sample_signal}-{year}.coffea'], sample_signal=config['dataset_signals'], year=config['year']) + expand(['output/singlefiles/hist__{idat}-{iyear}.coffea'], idat=config['dataset'], iyear=config['year'])
     output: "output/histAll.coffea"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/merging_histAll.log"
+    log: "output/logs/merging_histAll.log"
+
+########
+### Making plots
+########    
 
 use rule make_plots from analysis as make_plots with:
     input: "output/histAll.coffea"
     output: "output/plots/RunII/passPreSel/fourTag/SB/nPVs.pdf"
     resources:
         kerberos=True,
-        unpacked_img=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="8Gi"
-    log: "logs/make_plots.log"
-        
+    log: "output/logs/make_plots.log"
+
+########
+### Converting histograms to JSON and ROOT formats
+########
+
 use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_histAll with:
     input: "output/histAll.coffea"
     output: "output/histAll.json"
-    log: "logs/convert_hist_to_json_histAll.log"
+    log: "output/logs/convert_hist_to_json_histAll.log"
 
-use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_signals_HH4b with:
-    input: "output/histAll_signals_HH4b.coffea"
-    output: "output/histAll_signals_HH4b.json"
+use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_signals with:
+    input: "output/histAll_signals__{channel}.coffea"
+    output: "output/histAll_signals__{channel}.json"
     params:
         syst_flag = "-s"
-    log: "logs/convert_hist_to_json_signals_HH4b.log"
-
-use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_signals_ZZ4b with:
-    input: "output/histAll_signals_ZZ4b.coffea"
-    output: "output/histAll_signals_ZZ4b.json"
-    params:
-        syst_flag = "-s"
-    log: "logs/convert_hist_to_json_signals_ZZ4b.log"
-
-use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_signals_ZH4b with:
-    input: "output/histAll_signals_ZH4b.coffea"
-    output: "output/histAll_signals_ZH4b.json"
-    params:
-        syst_flag = "-s"
-    log: "logs/convert_hist_to_json_signals_ZH4b.log"
+    log: "output/logs/convert_hist_to_json_signals__{channel}.log"
 
 use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json_mixdata3b with:
     input: "output/histMixedBkg_data_3b_for_mixed.coffea"
     output: "output/histMixedBkg_data_3b_for_mixed.json"
-    log: "logs/convert_hist_to_json_mixdata3b.log"
+    log: "output/logs/convert_hist_to_json_mixdata3b.log"
 
 use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json_mixbkgtt with:
     input: "output/histMixedBkg_TT.coffea"
     output: "output/histMixedBkg_TT.json"
-    log: "logs/convert_hist_to_json_mixbkgtt.log"
+    log: "output/logs/convert_hist_to_json_mixbkgtt.log"
 
 use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json_mixdata with:
     input: "output/histMixedData.coffea"
     output: "output/histMixedData.json"
-    log: "logs/convert_hist_to_json_mixdata.log"
+    log: "output/logs/convert_hist_to_json_mixdata.log"
 
 use rule convert_json_to_root from stat_analysis as convert_json_to_root_TT with:
     input: "output/histMixedBkg_TT.json"
     output: "output/histMixedBkg_TT.root"
+    container: config["combine_container"]
     resources:
-        unpacked_img=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="8Gi"
-    log: "logs/convert_json_to_root_TT.log"
+    log: "output/logs/convert_json_to_root_TT.log"
 
-use rule convert_json_to_root from stat_analysis as convert_json_to_root_mix with:
+use rule convert_json_to_root_TT as convert_json_to_root_mix with:
     input: "output/histMixedData.json"
     output: "output/histMixedData.root"
-    resources:
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="8Gi"
-    log: "logs/convert_json_to_root_mix.log"
+    container: config["combine_container"]
+    log: "output/logs/convert_json_to_root_mix.log"
 
-use rule convert_json_to_root from stat_analysis as convert_json_to_root_sig with:
+use rule convert_json_to_root_TT as convert_json_to_root_histall with:
     input: "output/histAll.json"
     output: "output/histAll.root"
-    resources:
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="8Gi"
-    log: "logs/convert_json_to_root_sig.log"
+    container: config["combine_container"]
+    log: "output/logs/convert_json_to_root_histall.log"
 
-use rule convert_json_to_root from stat_analysis as convert_json_to_root_data3b with:
+use rule convert_json_to_root_TT as convert_json_to_root_data3b with:
     input: "output/histMixedBkg_data_3b_for_mixed.json"
     output: "output/histMixedBkg_data_3b_for_mixed.root"
-    resources:
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="8Gi"
-    log: "logs/convert_json_to_root_data3b.log"
+    container: config["combine_container"]
+    log: "output/logs/convert_json_to_root_data3b.log"
 
-use rule run_two_stage_closure from stat_analysis as run_two_stage_closure with:
+#######
+### Closure fits (background systematics)
+########
+
+use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_HH4b with:
     input: 
         file_TT = "output/histMixedBkg_TT.root",
         file_mix = "output/histMixedData.root",
         file_sig = "output/histAll.root",
         file_data3b = "output/histMixedBkg_data_3b_for_mixed.root"
-    output: "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl"
+    output: "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl"
+    container: config["combine_container"]
     params:
-        outputPath = "output/closureFits/ULHH_kfold",
+        outputPath = "output/closureFits/",
         rebin = "1",
         variable = "SvB_MA_ps_hh",
-        variable_binning = ""
+        variable_binning = "",
+        container_wrapper = config['container_wrapper']
     resources:
-        unpacked_img=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="8Gi"
-    log: "logs/run_two_stage_closure.log"
+    log: "output/logs/run_two_stage_closure_HH4b.log"
 
-use rule make_combine_inputs from stat_analysis as make_combine_inputs with:
+use rule run_two_stage_closure_HH4b as run_two_stage_closure_ZZ4b with:
+    output: "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl"
+    params:
+        outputPath = "output/closureFits",
+        rebin = "1",
+        variable = "SvB_MA_ps_zz",
+        variable_binning = "",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/run_two_stage_closure_ZZ4b.log"
+
+use rule run_two_stage_closure_HH4b as run_two_stage_closure_ZH4b with:
+    output: "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl"
+    params:
+        outputPath = "output/closureFits",
+        rebin = "1",
+        variable = "SvB_MA_ps_zh",
+        variable_binning = "",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/run_two_stage_closure_ZH4b.log"
+
+########
+### Making combine inputs and datacards
+########
+
+use rule make_combine_inputs from stat_analysis as make_combine_inputs_HH4b with:
     input:
         injson = "output/histAll.json",
-        injsonsyst = "output/histAll_signals_HH4b.json",  # Using GluGlu signals - you can change this
-        bkgsyst = "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl"
-    output:
-        "output/datacards/HH4b/datacard_HH4b.txt"
+        injsonsyst = "output/histAll_signals__HH4b.json", 
+        bkgsyst = "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl"
+    output: "output/datacards/HH4b/datacard__HH4b.txt"
+    container: config["combine_container"]
     params:
         variable= "SvB_MA.ps_hh",
         rebin=1,
@@ -422,132 +392,21 @@ use rule make_combine_inputs from stat_analysis as make_combine_inputs with:
         output_dir="output/datacards/HH4b/",
         variable_binning="",
         stat_only="",
-        signal="HH4b"
+        signal="HH4b",
+        container_wrapper = config['container_wrapper']
     resources:
         voms_proxy=True,
         kerberos=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
-    log: "logs/make_combine_inputs.log"
+    log: "output/logs/make_combine_inputs_HH4b.log"
 
-use rule workspace from combine as workspace with:
-    input: "output/datacards/HH4b/{datacard}.txt"
-    output: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/workspace_{datacard}__{signallabel}.log"
-
-use rule limits from combine as limits with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output: 
-        txt="output/datacards/HH4b/limits_{datacard}__{signallabel}.txt",
-        json="output/datacards/HH4b/limits_{datacard}__{signallabel}.json"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/limits_{datacard}__{signallabel}.log"
-
-use rule significance from combine as significance with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output:
-        observed="output/datacards/HH4b/significance_observed_{datacard}__{signallabel}.txt",
-        expected="output/datacards/HH4b/significance_expected_{datacard}__{signallabel}.txt"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/significance_{datacard}__{signallabel}.log"
-
-use rule impacts from combine as impacts with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output: "output/datacards/HH4b/impacts_{datacard}__{signallabel}.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/impacts_{datacard}__{signallabel}.log"
-
-use rule postfit from combine as postfit with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output: "output/datacards/HH4b/postfit_{datacard}__{signallabel}.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/postfit_{datacard}__{signallabel}.log"
-
-use rule likelihood_scan from combine as likelihood_scan with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output: "output/datacards/HH4b/likelihood_scan_{datacard}__{signallabel}.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/likelihood_scan_{datacard}__{signallabel}.log"
-
-use rule gof from combine as gof with:
-    input: "output/datacards/HH4b/{datacard}__{signallabel}.root"
-    output: "output/datacards/HH4b/gof_{datacard}__{signallabel}.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/gof_{datacard}__{signallabel}.log"
-
-use rule make_syst_plots from stat_analysis as make_syst_plots with:
-    input: "output/datacards/HH4b/datacard_HH4b.txt"
-    output: "output/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf"
-    params:
-        variable="SvB_MA_ps_hh",
-        output_dir="output/datacards/HH4b/"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        unpacked_img=True,
-        kubernetes_memory_limit="8Gi"
-    log: "logs/make_syst_plots_SvB_MA_ps_hh.log"
-
-# ZZ4b analysis rules
-use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_ZZ4b with:
-    input: 
-        file_TT = "output/histMixedBkg_TT.root",
-        file_mix = "output/histMixedData.root",
-        file_sig = "output/histAll.root",
-        file_data3b = "output/histMixedBkg_data_3b_for_mixed.root"
-    output: "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl"
-    params:
-        outputPath = "output/closureFits/ULHH_kfold",
-        rebin = "1",
-        variable = "SvB_MA_ps_zz",
-        variable_binning = ""
-    resources:
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="8Gi"
-    log: "logs/run_two_stage_closure_ZZ4b.log"
-
-use rule make_combine_inputs from stat_analysis as make_combine_inputs_ZZ4b with:
+use rule make_combine_inputs_HH4b as make_combine_inputs_ZZ4b with:
     input:
         injson = "output/histAll.json",
-        injsonsyst = "output/histAll_signals_ZZ4b.json",
-        bkgsyst = "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl"
-    output:
-        "output/datacards/ZZ4b/datacard_ZZ4b.txt"
+        injsonsyst = "output/histAll_signals__ZZ4b.json", 
+        bkgsyst = "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl"
+    output: "output/datacards/ZZ4b/datacard__ZZ4b.txt"
     params:
         variable= "SvB_MA.ps_zz",
         rebin=1,
@@ -555,53 +414,16 @@ use rule make_combine_inputs from stat_analysis as make_combine_inputs_ZZ4b with
         output_dir="output/datacards/ZZ4b/",
         variable_binning="",
         stat_only="",
-        signal="ZZ4b"
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/make_combine_inputs_ZZ4b.log"
+        signal="HH4b",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/make_combine_inputs_ZZ4b.log"
 
-use rule make_syst_plots from stat_analysis as make_syst_plots_ZZ4b with:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b.txt"
-    output: "output/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf"
-    params:
-        variable="SvB_MA_ps_zz",
-        output_dir="output/datacards/ZZ4b/"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        unpacked_img=True,
-        kubernetes_memory_limit="8Gi"
-    log: "logs/make_syst_plots_SvB_MA_ps_zz.log"
-
-# ZH4b analysis rules
-use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_ZH4b with:
-    input: 
-        file_TT = "output/histMixedBkg_TT.root",
-        file_mix = "output/histMixedData.root",
-        file_sig = "output/histAll.root",
-        file_data3b = "output/histMixedBkg_data_3b_for_mixed.root"
-    output: "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl"
-    params:
-        outputPath = "output/closureFits/ULHH_kfold",
-        rebin = "1",
-        variable = "SvB_MA_ps_zh",
-        variable_binning = ""
-    resources:
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="8Gi"
-    log: "logs/run_two_stage_closure_ZH4b.log"
-
-use rule make_combine_inputs from stat_analysis as make_combine_inputs_ZH4b with:
+use rule make_combine_inputs_HH4b as make_combine_inputs_ZH4b with:
     input:
         injson = "output/histAll.json",
-        injsonsyst = "output/histAll_signals_ZH4b.json",
-        bkgsyst = "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl"
-    output:
-        "output/datacards/ZH4b/datacard_ZH4b.txt"
+        injsonsyst = "output/histAll_signals__ZH4b.json", 
+        bkgsyst = "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl"
+    output: "output/datacards/ZH4b/datacard__ZH4b.txt"
     params:
         variable= "SvB_MA.ps_zh",
         rebin=1,
@@ -609,423 +431,146 @@ use rule make_combine_inputs from stat_analysis as make_combine_inputs_ZH4b with
         output_dir="output/datacards/ZH4b/",
         variable_binning="",
         stat_only="",
-        signal="ZH4b"
+        signal="ZH4b",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/make_combine_inputs_ZH4b.log"
+
+use rule workspace from combine as workspace with:
+    input: "output/datacards/{channel}/datacard__{channel}.txt"
+    output: "output/datacards/{channel}/datacard__{signallabel}.root"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        othersignal_maps=lambda wildcards: additional_poi(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/workspace_{channel}__{signallabel}.log"
+
+use rule limits from combine as limits with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output: 
+        txt="output/datacards/{channel}/limits__{signallabel}.txt",
+        json="output/datacards/{channel}/limits__{signallabel}.json"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        freeze_parameters=lambda wildcards: freeze_parameters(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/limits_{channel}__{signallabel}.log"
+
+use rule significance from combine as significance with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output:
+        observed="output/datacards/{channel}/significance_observed__{signallabel}.txt",
+        expected="output/datacards/{channel}/significance_expected__{signallabel}.txt"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        freeze_parameters=lambda wildcards: freeze_parameters(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/significance_{channel}__{signallabel}.log"
+
+use rule impacts from combine as impacts with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output: "output/datacards/{channel}/impacts__{signallabel}.pdf"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        set_parameters_ranges=lambda wildcards: set_parameters_ranges(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
     resources:
         voms_proxy=True,
         kerberos=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
-    log: "logs/make_combine_inputs_ZH4b.log"
+    log: "output/logs/impacts_{channel}_datacard_{channel}__{signallabel}.log"
 
-use rule make_syst_plots from stat_analysis as make_syst_plots_ZH4b with:
-    input: "output/datacards/ZH4b/datacard_ZH4b.txt"
+use rule postfit from combine as postfit_generic with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output: "output/datacards/{channel}/postfit__{signallabel}.pdf"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        freeze_parameters=lambda wildcards: freeze_parameters(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/postfit_{channel}_datacard_{channel}__{signallabel}.log"
+
+use rule likelihood_scan from combine as likelihood_scan with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output: "output/datacards/{channel}/likelihood_scan__{signallabel}.pdf"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        freeze_parameters=lambda wildcards: freeze_parameters(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/likelihood_scan_{channel}_datacard_{channel}__{signallabel}.log"
+
+use rule gof from combine as gof with:
+    input: "output/datacards/{channel}/datacard__{signallabel}.root"
+    output: "output/datacards/{channel}/gof__{signallabel}.pdf"
+    container: config["combine_container"]
+    params:
+        signallabel="{signallabel}",
+        set_parameters_zero=lambda wildcards: set_parameters_zero(wildcards.channel),
+        container_wrapper=config.get("container_wrapper", "./run_container combine")
+    resources:
+        voms_proxy=True,
+        kerberos=True,
+        compute_backend="kubernetes"
+    log: "output/logs/gof_{channel}_datacard_{channel}__{signallabel}.log"
+
+use rule make_syst_plots from stat_analysis as make_syst_plots_HH4b with:
+    input: "output/datacards/HH4b/datacard__HH4b.txt"
+    output: "output/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf"
+    container: config["combine_container"]
+    params:
+        variable="SvB_MA_ps_hh",
+        output_dir="output/datacards/HH4b/",
+        container_wrapper = config['container_wrapper']
+    resources:
+        kerberos=True,
+        compute_backend="kubernetes",
+        kubernetes_memory_limit="8Gi"
+    log: "output/logs/make_syst_plots_HH4b.log"
+
+use rule make_syst_plots_HH4b as make_syst_plots_ZZ4b with:
+    input: "output/datacards/ZZ4b/datacard__ZZ4b.txt"
+    output: "output/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf"
+    params:
+        variable="SvB_MA_ps_zz",
+        output_dir="output/datacards/ZZ4b/",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/make_syst_plots_ZZ4b.log"
+
+use rule make_syst_plots_HH4b as make_syst_plots_ZH4b with:
+    input: "output/datacards/ZH4b/datacard__ZH4b.txt"
     output: "output/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf"
     params:
         variable="SvB_MA_ps_zh",
-        output_dir="output/datacards/ZH4b/"
-    resources:
-        kerberos=True,
-        compute_backend="kubernetes",
-        unpacked_img=True,
-        kubernetes_memory_limit="8Gi"
-    log: "logs/make_syst_plots_SvB_MA_ps_zh.log"
-
-# ZZ4b combine rules
-rule workspace_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b.txt"
-    output: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/workspace_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting workspace rule for ZZ4b" > {log}
-        cd $(dirname {input})
-        text2workspace.py $(basename {input}) -o $(basename {output}) --PO 'map=.*/ZZ4b:r[1,-10,10]' 2>&1 | tee -a {log}
-        echo "[$(date)] Finished workspace rule for ZZ4b" >> {log}
-        """
-
-rule limits_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output: 
-        txt="output/datacards/ZZ4b/limits_datacard_ZZ4b__ZZ4b.txt",
-        json="output/datacards/ZZ4b/limits_datacard_ZZ4b__ZZ4b.json"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/limits_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting limits calculation for ZZ4b" > {log}
-        cd $(dirname {input})
-        combine -M AsymptoticLimits $(basename {input}) --name _ZZ4b -t -1 2>&1 | tee -a {log}
-        combine -M AsymptoticLimits $(basename {input}) --name _ZZ4b -t -1 --verbose 2 2>&1 | grep -E "(Expected|Observed)" > $(basename {output.txt}) 2>&1 | tee -a {log}
-        python -c "
-import json
-import re
-with open('$(basename {output.txt})') as f:
-    lines = f.readlines()
-limits = {{}}
-for line in lines:
-    if 'Expected 50.0%' in line:
-        limits['expected'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-    elif 'Expected 16.0%' in line:
-        limits['expected_m1sigma'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-    elif 'Expected 84.0%' in line:
-        limits['expected_p1sigma'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-with open('$(basename {output.json})', 'w') as f:
-    json.dump(limits, f, indent=2)
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished limits calculation for ZZ4b" >> {log}
-        """
-
-rule significance_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output:
-        observed="output/datacards/ZZ4b/significance_observed_datacard_ZZ4b__ZZ4b.txt",
-        expected="output/datacards/ZZ4b/significance_expected_datacard_ZZ4b__ZZ4b.txt"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/significance_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting significance calculation for ZZ4b" > {log}
-        cd $(dirname {input})
-        combine -M Significance $(basename {input}) --name _ZZ4b_obs 2>&1 | tee -a {log}
-        combine -M Significance $(basename {input}) --name _ZZ4b_exp -t -1 --expectSignal=1 2>&1 | tee -a {log}
-        grep "Significance:" higgsCombine_ZZ4b_obs.Significance.mH120.root.log > $(basename {output.observed}) 2>&1 | tee -a {log}
-        grep "Significance:" higgsCombine_ZZ4b_exp.Significance.mH120.root.log > $(basename {output.expected}) 2>&1 | tee -a {log}
-        echo "[$(date)] Finished significance calculation for ZZ4b" >> {log}
-        """
-
-rule impacts_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output: "output/datacards/ZZ4b/impacts_datacard_ZZ4b__ZZ4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/impacts_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting impacts calculation for ZZ4b" > {log}
-        cd $(dirname {input})
-        combineTool.py -M Impacts -d $(basename {input}) --doInitialFit --robustFit 1 2>&1 | tee -a {log}
-        combineTool.py -M Impacts -d $(basename {input}) --robustFit 1 --doFits 2>&1 | tee -a {log}
-        combineTool.py -M Impacts -d $(basename {input}) --robustFit 1 -o impacts_ZZ4b.json 2>&1 | tee -a {log}
-        plotImpacts.py -i impacts_ZZ4b.json -o $(basename {output}) 2>&1 | tee -a {log}
-        echo "[$(date)] Finished impacts calculation for ZZ4b" >> {log}
-        """
-
-rule postfit_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output: "output/datacards/ZZ4b/postfit_datacard_ZZ4b__ZZ4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/postfit_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting postfit plots for ZZ4b" > {log}
-        cd $(dirname {input})
-        combine -M FitDiagnostics $(basename {input}) --saveShapes --saveWithUncertainties 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.text(0.5, 0.5, 'ZZ4b Postfit Results\\nSee log for details', ha='center', va='center', transform=ax.transAxes)
-ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
-ax.set_title('ZZ4b Postfit Analysis')
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished postfit plots for ZZ4b" >> {log}
-        """
-
-rule likelihood_scan_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output: "output/datacards/ZZ4b/likelihood_scan_datacard_ZZ4b__ZZ4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/likelihood_scan_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting likelihood scan for ZZ4b" > {log}
-        cd $(dirname {input})
-        combine -M MultiDimFit $(basename {input}) --algo=grid --points=100 --rMin=-5 --rMax=5 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-r_values = np.linspace(-5, 5, 100)
-likelihood = -0.5 * r_values**2 + np.random.normal(0, 0.1, 100)
-ax.plot(r_values, likelihood, 'b-', linewidth=2)
-ax.set_xlabel('Signal Strength (r)')
-ax.set_ylabel('-2ΔNL')
-ax.set_title('ZZ4b Likelihood Scan')
-ax.grid(True, alpha=0.3)
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished likelihood scan for ZZ4b" >> {log}
-        """
-
-rule gof_ZZ4b:
-    input: "output/datacards/ZZ4b/datacard_ZZ4b__ZZ4b.root"
-    output: "output/datacards/ZZ4b/gof_datacard_ZZ4b__ZZ4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/gof_datacard_ZZ4b__ZZ4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting goodness of fit test for ZZ4b" > {log}
-        cd $(dirname {input})
-        combine -M GoodnessOfFit $(basename {input}) --algorithm=saturated 2>&1 | tee -a {log}
-        combine -M GoodnessOfFit $(basename {input}) --algorithm=saturated -t 100 --seed 12345 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-gof_values = np.random.chisquare(10, 100)
-ax.hist(gof_values, bins=20, alpha=0.7, density=True, label='Toys')
-ax.axvline(x=12.5, color='red', linestyle='--', linewidth=2, label='Observed')
-ax.set_xlabel('Test Statistic')
-ax.set_ylabel('Probability Density')
-ax.set_title('ZZ4b Goodness of Fit Test')
-ax.legend()
-ax.grid(True, alpha=0.3)
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished goodness of fit test for ZZ4b" >> {log}
-        """
-
-# ZH4b combine rules  
-rule workspace_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b.txt"
-    output: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/workspace_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting workspace rule for ZH4b" > {log}
-        cd $(dirname {input})
-        text2workspace.py $(basename {input}) -o $(basename {output}) --PO 'map=.*/ZH4b:r[1,-10,10]' 2>&1 | tee -a {log}
-        echo "[$(date)] Finished workspace rule for ZH4b" >> {log}
-        """
-
-rule limits_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output: 
-        txt="output/datacards/ZH4b/limits_datacard_ZH4b__ZH4b.txt",
-        json="output/datacards/ZH4b/limits_datacard_ZH4b__ZH4b.json"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/limits_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting limits calculation for ZH4b" > {log}
-        cd $(dirname {input})
-        combine -M AsymptoticLimits $(basename {input}) --name _ZH4b -t -1 2>&1 | tee -a {log}
-        combine -M AsymptoticLimits $(basename {input}) --name _ZH4b -t -1 --verbose 2 2>&1 | grep -E "(Expected|Observed)" > $(basename {output.txt}) 2>&1 | tee -a {log}
-        python -c "
-import json
-import re
-with open('$(basename {output.txt})') as f:
-    lines = f.readlines()
-limits = {{}}
-for line in lines:
-    if 'Expected 50.0%' in line:
-        limits['expected'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-    elif 'Expected 16.0%' in line:
-        limits['expected_m1sigma'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-    elif 'Expected 84.0%' in line:
-        limits['expected_p1sigma'] = float(re.search(r'r < ([0-9.]+)', line).group(1))
-with open('$(basename {output.json})', 'w') as f:
-    json.dump(limits, f, indent=2)
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished limits calculation for ZH4b" >> {log}
-        """
-
-rule significance_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output:
-        observed="output/datacards/ZH4b/significance_observed_datacard_ZH4b__ZH4b.txt",
-        expected="output/datacards/ZH4b/significance_expected_datacard_ZH4b__ZH4b.txt"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        compute_backend="kubernetes"
-    log: "logs/significance_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting significance calculation for ZH4b" > {log}
-        cd $(dirname {input})
-        combine -M Significance $(basename {input}) --name _ZH4b_obs 2>&1 | tee -a {log}
-        combine -M Significance $(basename {input}) --name _ZH4b_exp -t -1 --expectSignal=1 2>&1 | tee -a {log}
-        grep "Significance:" higgsCombine_ZH4b_obs.Significance.mH120.root.log > $(basename {output.observed}) 2>&1 | tee -a {log}
-        grep "Significance:" higgsCombine_ZH4b_exp.Significance.mH120.root.log > $(basename {output.expected}) 2>&1 | tee -a {log}
-        echo "[$(date)] Finished significance calculation for ZH4b" >> {log}
-        """
-
-rule impacts_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output: "output/datacards/ZH4b/impacts_datacard_ZH4b__ZH4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes",
-        kubernetes_memory_limit="9.5Gi"
-    log: "logs/impacts_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting impacts calculation for ZH4b" > {log}
-        cd $(dirname {input})
-        combineTool.py -M Impacts -d $(basename {input}) --doInitialFit --robustFit 1 2>&1 | tee -a {log}
-        combineTool.py -M Impacts -d $(basename {input}) --robustFit 1 --doFits 2>&1 | tee -a {log}
-        combineTool.py -M Impacts -d $(basename {input}) --robustFit 1 -o impacts_ZH4b.json 2>&1 | tee -a {log}
-        plotImpacts.py -i impacts_ZH4b.json -o $(basename {output}) 2>&1 | tee -a {log}
-        echo "[$(date)] Finished impacts calculation for ZH4b" >> {log}
-        """
-
-rule postfit_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output: "output/datacards/ZH4b/postfit_datacard_ZH4b__ZH4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/postfit_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting postfit plots for ZH4b" > {log}
-        cd $(dirname {input})
-        combine -M FitDiagnostics $(basename {input}) --saveShapes --saveWithUncertainties 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.text(0.5, 0.5, 'ZH4b Postfit Results\\nSee log for details', ha='center', va='center', transform=ax.transAxes)
-ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
-ax.set_title('ZH4b Postfit Analysis')
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished postfit plots for ZH4b" >> {log}
-        """
-
-rule likelihood_scan_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output: "output/datacards/ZH4b/likelihood_scan_datacard_ZH4b__ZH4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/likelihood_scan_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting likelihood scan for ZH4b" > {log}
-        cd $(dirname {input})
-        combine -M MultiDimFit $(basename {input}) --algo=grid --points=100 --rMin=-5 --rMax=5 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-r_values = np.linspace(-5, 5, 100)
-likelihood = -0.5 * r_values**2 + np.random.normal(0, 0.1, 100)
-ax.plot(r_values, likelihood, 'b-', linewidth=2)
-ax.set_xlabel('Signal Strength (r)')
-ax.set_ylabel('-2ΔNL')
-ax.set_title('ZH4b Likelihood Scan')
-ax.grid(True, alpha=0.3)
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished likelihood scan for ZH4b" >> {log}
-        """
-
-rule gof_ZH4b:
-    input: "output/datacards/ZH4b/datacard_ZH4b__ZH4b.root"
-    output: "output/datacards/ZH4b/gof_datacard_ZH4b__ZH4b.pdf"
-    container: config["combine_container"]
-    resources:
-        voms_proxy=True,
-        kerberos=True,
-        unpacked_img=True,
-        compute_backend="kubernetes"
-    log: "logs/gof_datacard_ZH4b__ZH4b.log"
-    shell:
-        """
-        mkdir -p $(dirname {log})
-        echo "[$(date)] Starting goodness of fit test for ZH4b" > {log}
-        cd $(dirname {input})
-        combine -M GoodnessOfFit $(basename {input}) --algorithm=saturated 2>&1 | tee -a {log}
-        combine -M GoodnessOfFit $(basename {input}) --algorithm=saturated -t 100 --seed 12345 2>&1 | tee -a {log}
-        python -c "
-import matplotlib.pyplot as plt
-import numpy as np
-fig, ax = plt.subplots(figsize=(8, 6))
-gof_values = np.random.chisquare(10, 100)
-ax.hist(gof_values, bins=20, alpha=0.7, density=True, label='Toys')
-ax.axvline(x=12.5, color='red', linestyle='--', linewidth=2, label='Observed')
-ax.set_xlabel('Test Statistic')
-ax.set_ylabel('Probability Density')
-ax.set_title('ZH4b Goodness of Fit Test')
-ax.legend()
-ax.grid(True, alpha=0.3)
-plt.savefig('$(basename {output})')
-plt.close()
-" 2>&1 | tee -a {log}
-        echo "[$(date)] Finished goodness of fit test for ZH4b" >> {log}
-        """
+        output_dir="output/datacards/ZH4b/",
+        container_wrapper = config['container_wrapper']
+    log: "output/logs/make_syst_plots_ZH4b.log"

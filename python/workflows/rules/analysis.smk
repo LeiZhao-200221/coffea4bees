@@ -1,5 +1,5 @@
 import os
-username = os.getenv("USER")
+username = os.getenv("USER", "coffea4bees_default")
 
 rule analysis_processor:
     output: "{output_file}"
@@ -15,11 +15,15 @@ rule analysis_processor:
         hash = "",
         diff = "",
         username = username
-    log: "logs/analysis_processor.log"
+    log: "output/logs/analysis_processor.log"
     shell:
         """
-        mkdir -p $(dirname {output})/logs
+        mkdir -p output/logs
         mkdir -p /tmp/{params.username}/
+        
+        # Set matplotlib config directory to avoid permission issues
+        export MPLCONFIGDIR="/tmp/{params.username}/matplotlib"
+        mkdir -p $MPLCONFIGDIR
         
         # Prepare metadata file
         meta_tmp="/tmp/{params.username}/metadata_$(basename {output} .coffea).yml"
@@ -68,6 +72,10 @@ rule merging_coffea_files:
     log: "logs/merging_{params.logname}.log"
     shell:
         """
+        # Set matplotlib config directory to avoid permission issues
+        export MPLCONFIGDIR="/tmp/matplotlib"
+        mkdir -p $MPLCONFIGDIR
+        
         echo "Merging all the coffea files" 2>&1 | tee -a {log}
         cmd="mprof run -C -o /tmp/mprofile_merge_{params.logname}.dat python analysis/tools/merge_coffea_files.py -f {input} -o {params.output_path}/{params.output}"
         echo $cmd 2>&1 | tee -a {log}
@@ -88,6 +96,10 @@ rule make_JCM:
     log: "logs/make_JCM.log"
     shell:
         """
+        # Set matplotlib config directory to avoid permission issues
+        export MPLCONFIGDIR="/tmp/matplotlib"
+        mkdir -p $MPLCONFIGDIR
+        
         echo "Computing JCM" 2>&1 | tee -a {log}
         python analysis/make_jcm_weights.py -o {params.output_dir} -c passPreSel -r SB -i {input} -w 2024_v2 2>&1 | tee -a {log}
         ls {params.output_dir}
@@ -105,6 +117,10 @@ rule make_plots:
     log: "logs/make_plots.log"
     shell:
         """
+        # Set matplotlib config directory to avoid permission issues
+        export MPLCONFIGDIR="/tmp/matplotlib"
+        mkdir -p $MPLCONFIGDIR
+        
         echo "Making plots" 2>&1 | tee -a {log}
         python plots/makePlots.py {input} -o {params.output_dir} -m plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
         """

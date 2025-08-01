@@ -514,6 +514,13 @@ datasets:
       picoAOD:
         FvT_file_template: root://cmseos.fnal.gov//store/user/jda102/condor/ZH4b/ULTrig//TTToSemiLeptonic2018_4b_noPSData_wTrigW/FvT_3bDvTMix4bDvT_vXXX_newSBDef.root
         FvT_name_template: FvT_3bDvTMix4bDvT_vXXX_newSBDef
+        files:
+        - root://cmseos.fnal.gov//store/user/jda102/condor/ZH4b/ULTrig//TTToSemiLeptonic2018_4b_noPSData_wTrigW/picoAOD_4b_wJCM_newSBDef.root
+        sumw: 146472193017.084
+        sumw2: 44795533094350.31
+        total_events: 486770000.0
+    nSamples: 15
+    xs: 365.7826460496
   ZH4b:
     UL16_postVFP:
       nanoAOD: /ZH_HToBB_ZToBB_M-125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM

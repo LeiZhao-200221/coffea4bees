@@ -12,7 +12,7 @@ dataset_signals:
   - ZZ4b 
   - ggZH4b
   - ZH4b 
-  # - GluGluToHHTo4B_cHHH1
+  - GluGluToHHTo4B_cHHH1
 dataset_systematics:
   - GluGluToHHTo4B_cHHH1
   - GluGluToHHTo4B_cHHH0
@@ -28,32 +28,27 @@ dataset_for_mixed:
 dataset_mixeddata:
   - data_3b_for_mixed
   - mixeddata
-# dataset_preUL:
-#   - HH4b  
 year_preUL:
   - '2016'
   - '2017'
   - '2018'
 # Cases configuration for combine rules
-cases:
-  HH4b_case:
-    datacard: "datacard_HH4b"
-    workspace: "output/datacards/HH4b/"
+channels:
+  HH4b:
     signallabel: "GluGluToHHTo4B_cHHH1"
     othersignal: "GluGluToHHTo4B_cHHH0 GluGluToHHTo4B_cHHH2p45 GluGluToHHTo4B_cHHH5"
-  ZZ4b_case:
-    datacard: "datacard_ZZ4b"
-    workspace: "output/datacards/ZZ4b/"
+  ZZ4b:
     signallabel: "ZZ4b"
     othersignal: ""
-  ZH4b_case:
-    datacard: "datacard_ZH4b"
-    workspace: "output/datacards/ZH4b/"
+  ZH4b:
     signallabel: "ZH4b"
     othersignal: ""
 hash: "--githash 10b4f707"
 diff: "--gitdiff In_gitdiff.txt_file"
-analysis_container: "gitlab-registry.cern.ch/cms-cmu/coffea4bees:20250408_0c141101"   ### actual tag for reproducibility
+analysis_container: "gitlab-registry.cern.ch/cms-cmu/coffea4bees:20250714_44f08ac8"   ### actual tag for reproducibility
 combine_container: "gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"
+# analysis_container: "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-cmu/coffea4bees:latest"
+# combine_container: "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"  
 output_path: "output/"
 dataset_location: "metadata/datasets_HH4b_v1p2.yml"
+container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv || true && cd - && cd python/"
