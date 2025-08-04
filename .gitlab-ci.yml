@@ -45,11 +45,17 @@ stages:
   - pages
 
 validation:
+  before_script:
+    - cp docs/mkdocs.yml .
+    - cp docs/requirements.txt .
   rules:
     - changes:
       - docs/**
 
 pages:
+  before_script:
+    - cp docs/mkdocs.yml .
+    - cp docs/requirements.txt .
   rules:
     - changes:
       - docs/**
