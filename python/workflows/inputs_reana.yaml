@@ -51,4 +51,4 @@ combine_container: "gitlab-registry.cern.ch/cms-analysis/general/combine-contain
 # combine_container: "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"  
 output_path: "output/"
 dataset_location: "metadata/datasets_HH4b_v1p2.yml"
-container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv || true && cd - && cd python/"
+container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv || true && cd - "
