@@ -1,5 +1,7 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "bbww/scripts/common.sh"
+
 
 echo "############### Checking and creating output/skimmer directory"
 OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_make_dataset"
@@ -29,7 +31,4 @@ time python runner.py -s -p skimmer/processor/make_declustered_data_boosted_4b.p
 
 ls -R $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

@@ -1,5 +1,7 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"}
+# Source common functions
+source "bbww/scripts/common.sh"
+
 
 INPUT_DIR="${DEFAULT_DIR}analysis_merge_test_job"
 OUTPUT_DIR="${DEFAULT_DIR}analysis_make_jcm_weights_job"
@@ -13,7 +15,3 @@ python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel 
 python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
 python analysis/tests/make_weights_test.py --path $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

@@ -1,5 +1,13 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${DEFAULT_DIR}analysis_test_mixed_job"
 echo "############### Checking and creating output directory"
@@ -34,7 +42,3 @@ python stats_analysis/convert_hist_to_json_closure.py --input $OUTPUT_DIR/testSi
 
 ls $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

@@ -1,5 +1,9 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
 
 OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_make_dataset_all_2025"
 echo "############### Checking and creating output directory"
@@ -36,7 +40,4 @@ done
 
 #ls -R skimmer/
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+
