@@ -80,12 +80,6 @@ class analysis(processor.ProcessorABC):
         selFatJet = selFatJet[(selFatJet.subjets [:, :, 0] + selFatJet.subjets [:, :, 1]).mass > 50]
 
 
-        #print(f" fields FatJets: {selFatJet.fields}")
-        #print(f" fields subJet: {selFatJet.subjets.fields}")
-        # print(f"  tau2 : {selFatJet.subjets.tau2}\n")
-        # print(f"  tau1 : {selFatJet.subjets.tau2}\n")
-        # print(f"  tau21 : {selFatJet.subjets.tau2 / selFatJet.subjets.tau1}\n")
-
         #print(f" fields nSubJets: {ak.num(selFatJet.subjets)},\n")
 
         #selFatJet = selFatJet[ak.num(selFatJet.subjets) > 1]
@@ -131,34 +125,6 @@ class analysis(processor.ProcessorABC):
         # Event selection
         #
         #
-        #print(f"Number of selected Fat Jets: {ak.num(selev.selFatJet)}")
-        #print(f" Any passNFatJets: {ak.any(selev.passNFatJets)}")
-        #print(f" Any passHLT: {ak.any(selev.passHLT)}")
-        #print(f" FatJet pt: {selev.selFatJet.pt}")
-
-        #print(f" nSubJets: {ak.num(selev.selFatJet.subjets, axis=2)}")
-        #print(f" subjet pt: {selev.selFatJet.pt[0:10]}")
-
-        #print(f" FatJet pt: {selev.selFatJet.pt}")
-        #print(f" FatJet Subjet pt pt: {selev.selFatJet.subjets.pt}")
-        #print(f" FatJet subjet pt A: {selev.selFatJet.subjets[:,:,0].pt}")
-        #print(f" FatJet subjet pt B: {selev.selFatJet.subjets[:,:,1].pt}")
-        #print(f" FatJet subjet len(: {len(selev.selFatJet.subjets[:,:,0].pt)}")
-
-        #
-        # btagDeepB
-        #
-        #print(f" FatJet subjet0 pt: {selev.selFatJet[:,0].subjets.pt}")
-        #print(f" FatJet subjet0_0 pt: {selev.selFatJet[:,0].subjets[:,0].pt}")
-        #print(f" FatJet subjet0_1 pt: {selev.selFatJet[:,0].subjets[:,1].pt}")
-        #print(f" FatJet subjet1 pt: {selev.selFatJet[:,1].subjets.pt}")
-        #print("SubJet 0",ak.Array([[v.pt   for v in sublist] for sublist in selev.selFatJet.subjets[:,0]]))
-        #print("SubJet 1",ak.Array([[v.pt   for v in sublist] for sublist in selev.selFatJet.subjets[:,1]]))
-        #str(round(v,3))
-        #print("btag1",selev.selFatJet.subjets.btagDeepB,"\n")
-        #print(selev.selFatJet.particleNet_HbbvsQCD)
-        #print(ak.unflatten(particleNet_HbbvsQCD_flat_str, ak.num(selev.selFatJet.subjets)))
-        #print(selev.selFatJet.btag_string)
 
         #
         #  Compute Soft drop
@@ -190,164 +156,84 @@ class analysis(processor.ProcessorABC):
             indices.append(list(range(len(arr))))
 
         selev["selFatJet", "btag_string"] = indices_str
-
         selev["selFatJet", "btagScore"] = selev.selFatJet.particleNetMD_Xbb
 
+        #
+        #  Create the subjets
+        #
+        sorted_sub_jets = selev.selFatJet.subjets
+        sorted_sub_jets = sorted_sub_jets[ak.argsort(sorted_sub_jets.pt, axis=2, ascending=False)]
 
-        # ───────────── build per-sub-jet helper arrays ─────────────
-        subj            = selev.selFatJet.subjets            # (evt,fj,sj)
+        if "tau1" not in sorted_sub_jets.fields:
+            # If the subjets do not have tau1, tau2, tau3, we need to add them
+            sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau1")
+            sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau2")
+            sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau3")
 
-        # 1) numeric scores  → fill None, round, stringify
-        btag_num        = ak.fill_none(subj.pt, -2.0)
-        flat_all        = ak.flatten(btag_num, axis=None)    # 1-D
-        flat_all_str    = ak.Array(np.char.mod('%.3f',
-                                               np.round(ak.to_numpy(flat_all), 3)))
 
-        # 2) unflatten back to (evt,fj,sj)
-        counts_sj       = ak.flatten(ak.num(subj, axis=2))
-        lvl2            = ak.unflatten(flat_all_str, counts_sj)        # (evt*fj ,sj)
-        counts_fj       = ak.num(selev.selFatJet)
-        btag_string     = ak.unflatten(lvl2, counts_fj)                # (evt,fj,sj)
+        subjets = ak.zip({"i0" : sorted_sub_jets[:, :, 0],
+                          "i1" : sorted_sub_jets[:, :, 1],
+                          } )
 
-        # 3) dummy jet-flavor (same ragged shape, constant "b")
-        jet_flavor      = ak.full_like(btag_string, "b")
+        # Define the tau21 variable for each subjet
+        subjets["i0", "tau21"] = subjets.i0.tau2 / (subjets.i0.tau1 + 0.001)
+        subjets["i1", "tau21"] = subjets.i1.tau2 / (subjets.i1.tau1 + 0.001)
 
-        # ───────────── expose them in the event record ──────────────
-        #    They sit alongside selFatJet so later code can do e.g.
-        #    selev.subjet_btag_string[:, :, 1]   (same indices)
-        selev["subjet_btag_string"] = btag_string
-        selev["subjet_jet_flavor"]  = jet_flavor
+        subjets["i0", "tau32"] = subjets.i0.tau3 / (subjets.i0.tau2 + 0.001)
+        subjets["i1", "tau32"] = subjets.i1.tau3 / (subjets.i1.tau2 + 0.001)
 
-        # Adding btag and jet flavor to subjets
+        # Dummy
+        subjets["i0", "btag_string"] = "0.001"
+        subjets["i1", "btag_string"] = "0.001"
+
+
+        # Define the jet flavor for each subjet
+        subjets["i0", "jet_flavor"] = ak.where(subjets.i0.tau21 > 0.5, "b", "bj")
+        subjets["i1", "jet_flavor"] = ak.where(subjets.i1.tau21 > 0.5, "b", "bj")
+
+        # Swap if i1 more complex than i0
+        i1_more_complex = (subjets.i1.jet_flavor == "bj") & (subjets.i0.jet_flavor == "b")
+
+        subjets["iA"] = ak.where(i1_more_complex, subjets.i1, subjets.i0)
+        subjets["iB"] = ak.where(i1_more_complex, subjets.i0, subjets.i1)
+
+        # print(f"Subjets: {subjets.fields}")
+        # print(f"  iA flavor: {subjets.iA.jet_flavor[0:10]}")
+        # print(f"  iB flavor: {subjets.iA.jet_flavor[0:10]}")
 
         #
-#        subjet_btagDeepB_flat = ak.flatten(selev.selFatJet.subjets.btagDeepB)
-#        subjet_btagDeepB_flat_str = [ str(round(v,3)) for v in subjet_btagDeepB_flat ]
-#        print(len(selFatJet.subjets))
-#        print(len(subjet_btagDeepB_flat))
-        #selFatJet["btag_string"] = ak.unflatten(particleNet_HbbvsQCD_flat_str, ak.num(selFatJet))
-
-        #has_nan = np.any(np.isnan(selev.selFatJet.subjets[:, :, 0].pt.to_numpy()))
-        #print("pt has_nan", has_nan, "\n")
-        #print("is None loop",   np.any([ v == None for v in rotated_pt_A_pos_dphi.tolist()]), "\n")
-
-#        print("fat jet pt0",    np.any([ v == None for v in selev.selFatJet.pt.to_numpy().tolist()]), "\n")
-#        print("fat jet eta0",   np.any([ v == None for v in selev.selFatJet.eta.to_numpy().tolist()]), "\n")
-#        print("fat jet phi0",   np.any([ v == None for v in selev.selFatJet.phi.to_numpy().tolist()]), "\n")
-#        print("fat jet mass0",  np.any([ v == None for v in selev.selFatJet.mass.to_numpy().tolist()]), "\n")
-#
-#
-#        print("pt0",    np.any([ v == None for v in selev.selFatJet.subjets[:, :, 0].pt.to_numpy().tolist()]), "\n")
-#        print("eta0",   np.any([ v == None for v in selev.selFatJet.subjets[:, :, 0].eta.to_numpy().tolist()]), "\n")
-#        print("phi0",   np.any([ v == None for v in selev.selFatJet.subjets[:, :, 0].phi.to_numpy().tolist()]), "\n")
-#        print("mass0",  np.any([ v == None for v in selev.selFatJet.subjets[:, :, 0].mass.to_numpy().tolist()]), "\n")
-#
-#        print("pt0",    np.any([ v == None for v in selev.selFatJet.subjets[:, :, 1].pt.to_numpy().tolist()]), "\n")
-#        print("eta0",   np.any([ v == None for v in selev.selFatJet.subjets[:, :, 1].eta.to_numpy().tolist()]), "\n")
-#        print("phi0",   np.any([ v == None for v in selev.selFatJet.subjets[:, :, 1].phi.to_numpy().tolist()]), "\n")
-#        print("mass0",  np.any([ v == None for v in selev.selFatJet.subjets[:, :, 1].mass.to_numpy().tolist()]), "\n")
-
-
-        swap_pt_flag_flat = (ak.flatten(selev.selFatJet.subjets [:, :, 0].pt) < ak.flatten(selev.selFatJet.subjets [:, :, 1].pt))
-
-
-        subjet_lead_pt           = ak.flatten(selev.selFatJet.subjets [:, :, 0].pt).to_numpy()
-        subjet_lead_eta          = ak.flatten(selev.selFatJet.subjets [:, :, 0].eta).to_numpy()
-        subjet_lead_phi          = ak.flatten(selev.selFatJet.subjets [:, :, 0].phi).to_numpy()
-        subjet_lead_mass         = ak.flatten(selev.selFatJet.subjets [:, :, 0].mass).to_numpy()
-        subjet_lead_flavor       = ak.flatten(selev.subjet_jet_flavor [:, :, 0]).to_numpy()
-        subjet_lead_btag_string  = ak.flatten(selev.subjet_btag_string[:, :, 0]).to_numpy()
-        subjet_lead_tau21        = ak.flatten(selev.selFatJet.subjets [:, :, 0].tau2 / (selev.selFatJet.subjets [:, :, 0].tau1 + 0.001)).to_numpy()
-        subjet_lead_tau32        = ak.flatten(selev.selFatJet.subjets [:, :, 0].tau3 / (selev.selFatJet.subjets [:, :, 0].tau2 + 0.001)).to_numpy()
-        subjet_lead_flavor = subjet_lead_flavor.astype('<U2')
-        subjet_lead_flavor[subjet_lead_tau21 < 0.5] = "bj"
-
-
-
-        subjet_subl_pt           = ak.flatten(selev.selFatJet.subjets [:, :, 1].pt).to_numpy()
-        subjet_subl_eta          = ak.flatten(selev.selFatJet.subjets [:, :, 1].eta).to_numpy()
-        subjet_subl_phi          = ak.flatten(selev.selFatJet.subjets [:, :, 1].phi).to_numpy()
-        subjet_subl_mass         = ak.flatten(selev.selFatJet.subjets [:, :, 1].mass).to_numpy()
-        subjet_subl_flavor       = ak.flatten(selev.subjet_jet_flavor [:, :, 1]).to_numpy()
-        subjet_subl_btag_string  = ak.flatten(selev.subjet_btag_string[:, :, 1]).to_numpy()
-        subjet_subl_tau21        = ak.flatten(selev.selFatJet.subjets [:, :, 1].tau2 / (selev.selFatJet.subjets [:, :, 1].tau1 + 0.001)).to_numpy()
-        subjet_subl_tau32        = ak.flatten(selev.selFatJet.subjets [:, :, 1].tau3 / (selev.selFatJet.subjets [:, :, 1].tau2 + 0.001)).to_numpy()
-        subjet_subl_flavor = subjet_subl_flavor.astype('<U2')
-        subjet_subl_flavor[subjet_subl_tau21 < 0.5] = "bj"
-
-        subl_more_complex = (subjet_subl_flavor == "bj") & (subjet_lead_flavor == "b")
-        swap_pt_flag_flat = (ak.flatten(selev.selFatJet.subjets [:, :, 0].pt) < ak.flatten(selev.selFatJet.subjets [:, :, 1].pt))
-        swap_flag_flat    = subl_more_complex | (~subl_more_complex &  swap_pt_flag_flat)
-
+        #  Set the jet flavor for the combined fat jet
         #
-        # Swap if needed
-        #
-        subjet_lead_pt         [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].pt)   [swap_flag_flat]
-        subjet_lead_eta        [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].eta)  [swap_flag_flat]
-        subjet_lead_phi        [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].phi)  [swap_flag_flat]
-        subjet_lead_mass       [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].mass) [swap_flag_flat]
-        subjet_lead_flavor     [swap_flag_flat]  = ak.flatten(selev.subjet_jet_flavor [:, :, 1])      [swap_flag_flat]
-        subjet_lead_btag_string[swap_flag_flat]  = ak.flatten(selev.subjet_btag_string[:, :, 1])      [swap_flag_flat]
-        subjet_lead_tau21      [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].tau2 / (selev.selFatJet.subjets [:, :, 1].tau1 + 0.001)) [swap_flag_flat]
-        subjet_lead_tau32      [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 1].tau3 / (selev.selFatJet.subjets [:, :, 1].tau2 + 0.001)) [swap_flag_flat]
-        subjet_lead_flavor = subjet_lead_flavor.astype('<U2')
-        subjet_lead_flavor[subjet_lead_tau21 < 0.5] = "bj"
-
-
-        subjet_subl_pt         [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].pt)   [swap_flag_flat]
-        subjet_subl_eta        [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].eta)  [swap_flag_flat]
-        subjet_subl_phi        [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].phi)  [swap_flag_flat]
-        subjet_subl_mass       [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].mass) [swap_flag_flat]
-        subjet_subl_flavor     [swap_flag_flat]  = ak.flatten(selev.subjet_jet_flavor [:, :, 0])      [swap_flag_flat]
-        subjet_subl_btag_string[swap_flag_flat]  = ak.flatten(selev.subjet_btag_string[:, :, 0])      [swap_flag_flat]
-        subjet_subl_tau21      [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].tau2 / (selev.selFatJet.subjets [:, :, 0].tau1 + 0.001)) [swap_flag_flat]
-        subjet_subl_tau32      [swap_flag_flat]  = ak.flatten(selev.selFatJet.subjets [:, :, 0].tau3 / (selev.selFatJet.subjets [:, :, 0].tau2 + 0.001)) [swap_flag_flat]
-        subjet_subl_flavor = subjet_subl_flavor.astype('<U2')
-        subjet_subl_flavor[subjet_subl_tau21 < 0.5] = "bj"
-
-
-
-
-        # print(f"subjet_lead_pt: {subjet_lead_pt[0:10]}")
-        # print(f"subjet_lead_tau21: {subjet_lead_tau21[0:10]}")
-        # print(f" small tau21:{subjet_lead_tau21[subjet_lead_tau21 < 0.5][0:10]}")
-        # print(f" before small flavortau:{subjet_lead_flavor[subjet_lead_tau21 < 0.5][0:10]}\n")
-        # print(f" after smalltau flavor:{subjet_lead_flavor[subjet_lead_tau21 < 0.5][0:10]}\n")
-
-        #part_comb_jet_flavor = comb_jet_flavor(new_part_A.jet_flavor, new_part_B.jet_flavor)
-
-
-        C = [comb_jet_flavor(a, b) for a, b in zip(subjet_lead_flavor, subjet_subl_flavor)]
-        #C = [a + b for a, b in zip(subjet_lead_flavor, subjet_subl_flavor)]
-
-
+        C = [comb_jet_flavor(a, b) for a, b in zip(ak.flatten(subjets.iA.jet_flavor), ak.flatten(subjets.iB.jet_flavor))]
         fatjet_flavor_flat = np.array(C)
         selev["selFatJet", "jet_flavor"] = ak.unflatten(fatjet_flavor_flat, ak.num(selev.selFatJet))
 
-        print(f" Combined:{selev.selFatJet.jet_flavor[0:10]}")
-        print(f" \tpartA:{subjet_lead_flavor[0:10]}")
-        print(f" \tpartB:{subjet_subl_flavor[0:10]}")
+        # print(f" Combined:{selev.selFatJet.jet_flavor[0:10]}")
+        # print(f" \tpartA:{subjets.iA.jet_flavor[0:10]}")
+        # print(f" \tpartB:{subjets.iB.jet_flavor[0:10]}")
 
-        # Create the PtEtaPhiMLorentzVectorArray
+        #
+        # Create the splittings
+        #
         fat_jet_splittings_events = ak.zip(
             {
-                "pt":   (selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).pt  ,
-                "eta":  (selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).eta ,
-                "phi":  (selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).phi ,
-                "mass": (selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).mass,
+                "pt":   (subjets.iA + subjets.iB).pt  ,
+                "eta":  (subjets.iA + subjets.iB).eta ,
+                "phi":  (subjets.iA + subjets.iB).phi ,
+                "mass": (subjets.iA + subjets.iB).mass,
                 "jet_flavor": selev.selFatJet.jet_flavor,
                 "btag_string": selev.selFatJet.btag_string,
 
                 "part_A": ak.zip(
                     {
-                        "pt":          ak.unflatten(subjet_lead_pt, ak.num(selev.selFatJet.subjets)),
-                        "eta":         ak.unflatten(subjet_lead_eta, ak.num(selev.selFatJet.subjets)),
-                        "phi":         ak.unflatten(subjet_lead_phi, ak.num(selev.selFatJet.subjets)),
-                        "mass":        ak.unflatten(subjet_lead_mass, ak.num(selev.selFatJet.subjets)),
-                        "jet_flavor":  ak.unflatten(subjet_lead_flavor, ak.num(selev.selFatJet.subjets)),
-                        "btag_string": ak.unflatten(subjet_lead_btag_string, ak.num(selev.selFatJet.subjets)),
-                        "tau21":       ak.unflatten(subjet_lead_tau21, ak.num(selev.selFatJet.subjets)),
-                        "tau32":       ak.unflatten(subjet_lead_tau32, ak.num(selev.selFatJet.subjets)),
+                        "pt":          subjets.iA.pt,
+                        "eta":         subjets.iA.eta,
+                        "phi":         subjets.iA.phi,
+                        "mass":        subjets.iA.mass,
+                        "jet_flavor":  subjets.iA.jet_flavor,
+                        "btag_string": subjets.iA.btag_string,
+                        "tau21":       subjets.iA.tau21,
+                        "tau32":       subjets.iA.tau32,
                     },
                     with_name="PtEtaPhiMLorentzVector",
                     behavior=vector.backends.awkward.behavior
@@ -355,14 +241,14 @@ class analysis(processor.ProcessorABC):
 
                 "part_B": ak.zip(
                     {
-                        "pt":          ak.unflatten(subjet_subl_pt, ak.num(selev.selFatJet.subjets)),
-                        "eta":         ak.unflatten(subjet_subl_eta, ak.num(selev.selFatJet.subjets)),
-                        "phi":         ak.unflatten(subjet_subl_phi, ak.num(selev.selFatJet.subjets)),
-                        "mass":        ak.unflatten(subjet_subl_mass, ak.num(selev.selFatJet.subjets)),
-                        "jet_flavor":  ak.unflatten(subjet_subl_flavor, ak.num(selev.selFatJet.subjets)),
-                        "btag_string": ak.unflatten(subjet_subl_btag_string, ak.num(selev.selFatJet.subjets)),
-                        "tau21":       ak.unflatten(subjet_subl_tau21, ak.num(selev.selFatJet.subjets)),
-                        "tau32":       ak.unflatten(subjet_subl_tau32, ak.num(selev.selFatJet.subjets)),
+                        "pt":          subjets.iB.pt,
+                        "eta":         subjets.iB.eta,
+                        "phi":         subjets.iB.phi,
+                        "mass":        subjets.iB.mass,
+                        "jet_flavor":  subjets.iB.jet_flavor,
+                        "btag_string": subjets.iB.btag_string,
+                        "tau21":       subjets.iB.tau21,
+                        "tau32":       subjets.iB.tau32,
                     },
                     with_name="PtEtaPhiMLorentzVector",
                     behavior=vector.backends.awkward.behavior
@@ -372,29 +258,34 @@ class analysis(processor.ProcessorABC):
             behavior=vector.backends.awkward.behavior
         )
 
-        # Look at this function
+        #
+        # Compute the declustering variables
+        #
         compute_decluster_variables(fat_jet_splittings_events)
 
-
+        #
+        # Assign the splitting names
+        #
         split_name_flat = [get_splitting_name(str(i)) for i in ak.flatten(fat_jet_splittings_events.jet_flavor)]
         split_name = ak.unflatten(split_name_flat, ak.num(fat_jet_splittings_events))
         fat_jet_splittings_events["splitting_name"] = split_name
 
-
+        #
+        # Get list of all the splitting types
+        #
         cleaned_combined_jet_flavors = get_list_of_combined_jet_types(fat_jet_splittings_events)
         cleaned_split_jet_flavors = []
         for _s in cleaned_combined_jet_flavors:
             cleaned_split_jet_flavors += get_list_of_all_sub_splittings(_s)
 
-
-        #
-        # Convert to list of cleaned splitting names
-        #
         cleaned_splitting_name = [get_splitting_name(i) for i in cleaned_split_jet_flavors]
         cleaned_splitting_name = set(cleaned_splitting_name)
         # will not split 1b0j/0b1j
-        cleaned_splitting_name.remove("1b0j/0b1j")
-        print(f"cleaned splitting types: {cleaned_splitting_name}")
+
+        if "1b0j/0b1j" in cleaned_splitting_name:
+            cleaned_splitting_name.remove("1b0j/0b1j")
+
+        # print(f"cleaned splitting types: {cleaned_splitting_name}")
 
         #
         # Sort clusterings by type
@@ -403,13 +294,6 @@ class analysis(processor.ProcessorABC):
             selev[f"splitting_{_s_type}"]   = fat_jet_splittings_events[fat_jet_splittings_events.splitting_name == _s_type]
 
 
-
-        #fat_jet_splittings_events["splitting_name"] = "1b0j/1b0j"
-
-        #
-        # Sort clusterings by type
-        #
-        #selev["splitting_1b0j/1b0j"]   = fat_jet_splittings_events
 
         fat_jet_splittings_events_low_mass = fat_jet_splittings_events[fat_jet_splittings_events.mass_AB < 75.0]
         selev["splitting_1b0j/1b0j_lowMass"]   = fat_jet_splittings_events_low_mass
@@ -427,14 +311,8 @@ class analysis(processor.ProcessorABC):
         dr_partB = selev["splitting_1b0j/1b0j"].delta_r(selev["splitting_1b0j/1b0j"].part_B)
         bad_match_B = ak.any(dr_partB > 1.0, axis=1)
 
-        # print(f"selev['splitting_1b0j/1b0j'].part_A.pt: {selev['splitting_1b0j/1b0j'].part_A.pt.tolist()[0:10]}")
-        # print(f"selev['splitting_1b0j/1b0j'].part_A.tau21: {selev['splitting_1b0j/1b0j'].part_A.tau21.tolist()[0:10]}")
-
         bad_match_flag = bad_match_A | bad_match_B
 
-        # print(f"RAW Bad Match A: {bad_match_A}")
-        # print(f"RAW Bad Match B: {bad_match_B}")
-        # print(f"RAW Bad Match OR: {bad_match_B | bad_match_A}")
 
         if ak.sum(bad_match_flag) > 0:
 
@@ -453,30 +331,6 @@ class analysis(processor.ProcessorABC):
             print("\tpart B\n\t pt:",bad_splitting.part_B.pt[0:10], "\n\t eta:", bad_splitting.part_B.eta[0:10], "\n\t phi:", bad_splitting.part_B.phi[0:10],"\n\t dr:", dr_partB.tolist()[0:10],"\n")
 
 
-
-        #        # ------------------------------------------------------------
-#        # ❶  Grab the two part-level Lorentz‐vector branches
-#        # ------------------------------------------------------------
-#        vec_A = fat_jet_splittings_events.part_A      # (evt , fj , sj=0)
-#        vec_B = fat_jet_splittings_events.part_B      # (evt , fj , sj=1)
-#
-#        # ------------------------------------------------------------
-#        # ❷  Print their field lists – jet_flavor & btag_string
-#        #     must be present here
-#        # ------------------------------------------------------------
-#        print("\n══ VECTOR BRANCH FIELD LISTS ══")
-#        print("part_A fields :", vec_A.fields)
-#        print("part_B fields :", vec_B.fields)
-#
-#        # ------------------------------------------------------------
-#        # ❸  Peek at the first two fat-jets worth of strings
-#        #     to eyeball that the values look right
-#        # ------------------------------------------------------------
-#        print("\n══ FIRST TWO FJ – STRING CHECK ══")
-#        print("part_A.btag_string :", vec_A.btag_string[:2].to_list())
-#        print("part_B.btag_string :", vec_B.btag_string[:2].to_list())
-#        print("part_A.jet_flavor  :", vec_A.jet_flavor[:2].to_list())
-#        print("part_B.jet_flavor  :", vec_B.jet_flavor[:2].to_list())
 
         #
         # Better Hists
@@ -510,10 +364,6 @@ class analysis(processor.ProcessorABC):
                            )
 
 
-        #print(f" SubJets: {selev.selFatJet.subjets}")
-        #print(f" SubJets fields: {selev.selFatJet.subjets.fields}")
-        #selev["selFatJet_subjets"] = selev.selFatJet.subjets
-        #print(f" SubJets pt: {selev.selFatJet_subjets.pt}")
 
         #
         # Jets
@@ -531,12 +381,6 @@ class analysis(processor.ProcessorABC):
 
         #fill += hist.add( "subjet0.tau21",  (100, 0, 400, ("selFatJet.subjetpt0",   'Sub Jet0 Pt')))
         #fill += hist.add( "subjet1.tau21",  (100, 0, 400, ("selFatJet.subjetpt1",   'Sub Jet1 Pt')))
-
-
-        # print(f" SubJets pt {selev.selFatJet_subjets.pt[0:5]}\n")
-        # fill += Jet.plot(("subJets", "Selected Fat Jet SubJet"),   "selFatJet_subjets",  skip=["deepjet_c","deepjet_b","id_pileup","id_jet","n"], bins={"pt": (50, 0, 1000)})
-
-#        print("filling splitting_bb for", len(fat_jet_splittings_events), "events")
 
 
         for _s_type in cleaned_splitting_name:

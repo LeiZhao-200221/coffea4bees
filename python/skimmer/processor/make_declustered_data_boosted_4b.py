@@ -24,6 +24,7 @@ import logging
 import awkward as ak
 import uproot
 from coffea.nanoevents.methods import vector
+from jet_clustering.clustering import comb_jet_flavor
 
 class DeClustererBoosted(PicoAOD):
     def __init__(self, clustering_pdfs_file = "None",
@@ -145,12 +146,42 @@ class DeClustererBoosted(PicoAOD):
         indices_str = ak.unflatten(indices_str_flat, ak.num(selev.selFatJet))
         selev["selFatJet", "btag_string"] = indices_str
 
-        fatjet_flavor_flat = np.array(["bb"] * len(particleNet_HbbvsQCD_flat))
+
+
+        #
+        #  Create the subjets
+        #
+        sorted_sub_jets = selev.selFatJet.subjets
+        sorted_sub_jets = sorted_sub_jets[ak.argsort(sorted_sub_jets.pt, axis=2, ascending=False)]
+
+
+        subjets = ak.zip({"i0" : sorted_sub_jets[:, :, 0],
+                          "i1" : sorted_sub_jets[:, :, 1],
+                          } )
+
+        # Define the tau21 variable for each subjet
+        subjets["i0", "tau21"] = subjets.i0.tau2 / (subjets.i0.tau1 + 0.001)
+        subjets["i1", "tau21"] = subjets.i1.tau2 / (subjets.i1.tau1 + 0.001)
+
+        subjets["i0", "tau32"] = subjets.i0.tau3 / (subjets.i0.tau2 + 0.001)
+        subjets["i1", "tau32"] = subjets.i1.tau3 / (subjets.i1.tau2 + 0.001)
+
+        # Define the jet flavor for each subjet
+        subjets["i0", "jet_flavor"] = ak.where(subjets.i0.tau21 > 0.5, "b", "bj")
+        subjets["i1", "jet_flavor"] = ak.where(subjets.i1.tau21 > 0.5, "b", "bj")
+
+        # Swap if i1 more complex than i0
+        i1_more_complex = (subjets.i1.jet_flavor == "bj") & (subjets.i0.jet_flavor == "b")
+
+        subjets["iA"] = ak.where(i1_more_complex, subjets.i1, subjets.i0)
+        subjets["iB"] = ak.where(i1_more_complex, subjets.i0, subjets.i1)
+
+        #
+        #  Set the jet flavor for the combined fat jet
+        #
+        C = [comb_jet_flavor(a, b) for a, b in zip(ak.flatten(subjets.iA.jet_flavor), ak.flatten(subjets.iB.jet_flavor))]
+        fatjet_flavor_flat = np.array(C)
         selev["selFatJet", "jet_flavor"] = ak.unflatten(fatjet_flavor_flat, ak.num(selev.selFatJet))
-
-
-
-
 
 
         # Create the PtEtaPhiMLorentzVectorArray
@@ -160,10 +191,6 @@ class DeClustererBoosted(PicoAOD):
                 "eta":  ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).eta , np.float64),
                 "phi":  ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).phi , np.float64),
                 "mass": ak.values_astype((selev.selFatJet.subjets [:, :, 0] + selev.selFatJet.subjets [:, :, 1]).mass, np.float64),
-                #"pt":   ak.values_astype(selev.selFatJet.pt,   np.float64),
-                #"eta":  ak.values_astype(selev.selFatJet.eta,  np.float64),
-                #"phi":  ak.values_astype(selev.selFatJet.phi,  np.float64),
-                #"mass": ak.values_astype(selev.selFatJet.mass, np.float64),
                 "jet_flavor": selev.selFatJet.jet_flavor,
                 "btag_string": selev.selFatJet.btag_string,
             },
@@ -183,7 +210,8 @@ class DeClustererBoosted(PicoAOD):
         #
         b_pt_threshold = 20 # Min pt of subjets ?
         declustered_jets = make_synthetic_event(clustered_jets, clustering_pdfs, declustering_rand_seed=self.declustering_rand_seed,
-                                                b_pt_threshold=b_pt_threshold, dr_threshold=0, chunk=chunk, debug=False)
+                                                b_pt_threshold=b_pt_threshold, dr_threshold=0, chunk=chunk, debug=True,
+                                                splitting_types_to_ignore = [('bj','b')])
 
         declustered_jets = declustered_jets[ak.argsort(declustered_jets.btagScore, axis=1, ascending=True)]
 
@@ -209,7 +237,7 @@ class DeClustererBoosted(PicoAOD):
                 "SubJet_eta":             declustered_jets.eta,
                 "SubJet_phi":             declustered_jets.phi,
                 "SubJet_mass":            declustered_jets.mass,
-                "SubJet_btagSCore":            declustered_jets.btagScore,
+                "SubJet_btagScore":       declustered_jets.btagScore,
                 # create new regular branch
                 #"nClusteredJets":      selev.nClusteredJets,
             }

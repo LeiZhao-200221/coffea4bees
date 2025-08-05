@@ -88,8 +88,8 @@ class ClusterHistsBoosted(Template):
     mB_l      = H((100, 0, 400,  ('mB', "mB [GeV]")))
     mB_vl     = H((100, 0, 600,  ('mB', "mB [GeV]")))
 
-    zA        = H((100,  0.5, 1.3, ('zA', "z fraction")))
-    zA_l      = H((100,  0.45, 1.0, ('zA', "z fraction")))
+    zA        = H((100,  0.45, 1.0, ('zA', "z fraction")))
+    zA_l      = H((100,  0, 1.0, ('zA', "z fraction")))
     zA_vl      = H((100,  -3, 3, ('zA', "z fraction")))
 
     decay_phi = H((100, -0.1, 3.2, ('decay_phi', "decay angle")))
@@ -145,10 +145,10 @@ class ClusterHistsBoosted(Template):
 
     zA_vs_thetaA_pT = H(pt_binning,
                         (50,  0.5, 1.0, ('zA', "z fraction")),
-                        (50,    0, 0.6, ('thetaA',    "theta angle")))
+                        (50,    0, 0.5, ('thetaA',    "theta angle")))
 
     zA_l_vs_thetaA_pT = H(pt_binning,
-                          (50,  0.45, 1.0, ('zA', "z fraction")),
+                          (50,   0, 1.0, ('zA', "z fraction")),
                           (150,  0, 0.6, ('thetaA',    "theta angle")))
 
     rhoA_pT = H(pt_binning,

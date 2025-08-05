@@ -289,6 +289,7 @@ def doPlots(year, doBoosted=False, debug=False):
     splitting_config = {}
 
     zA_mA_mB         = { "mA":("mA_r",    1),  "mB":("mB_r",    1), "decay_phi":("decay_phi", 4), "zA_vs_thetaA":("zA_vs_thetaA",   1), "rhoA": ("rhoA", 1), "rhoB": ("rhoB", 1)}
+    zA_mA_r_mB         = { "mA":("mA_r",    1),  "mB":("mB",    1), "decay_phi":("decay_phi", 4), "zA_vs_thetaA":("zA_vs_thetaA",   1), "rhoA": ("rhoA", 1), "rhoB": ("rhoB", 1)}
     zA_l_mA_mB       = { "mA":("mA_r",    1),  "mB":("mB_r",    1), "decay_phi":("decay_phi", 4), "zA_vs_thetaA":("zA_l_vs_thetaA", 1), "rhoA": ("rhoA", 1), "rhoB": ("rhoB", 1)}
     #zA_mA_mB         = { "mA":("mA",    1),  "mB":("mB",    1), "decay_phi":("decay_phi", 4), "zA_vs_thetaA":("zA_vs_thetaA",   1), "rhoA": ("rhoA", 1), "rhoB": ("rhoB", 1)}
     #zA_l_mA_mB       = { "mA":("mA",    1),  "mB":("mB",    1), "decay_phi":("decay_phi", 4), "zA_vs_thetaA":("zA_l_vs_thetaA", 1), "rhoA": ("rhoA", 1), "rhoB": ("rhoB", 1)}
@@ -338,8 +339,9 @@ def doPlots(year, doBoosted=False, debug=False):
 
     # If doing boosted
     if doBoosted:
-         patterns["1b0j/1b0j"] = zA_l_mA_l_mB_l
-
+        patterns["1b0j/1b0j"] = zA_mA_r_mB
+        patterns["1b1j/1b0j"] = zA_l_mA_mB
+        patterns["1b1j/1b1j"] = zA_mA_mB
 
     #
     #  Get All splittings

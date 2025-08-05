@@ -618,7 +618,7 @@ def decluster_splitting_types(input_jets, splitting_types, input_pdfs, rand_seed
     return unclustered_jets
 
 
-def make_synthetic_event_core(input_jets, input_pdfs, rand_seed, *, b_pt_threshold=40, dr_threshold=0.4, chunk=None, debug=False):
+def make_synthetic_event_core(input_jets, input_pdfs, rand_seed, *, b_pt_threshold=40, dr_threshold=0.4, chunk=None, debug=False, splitting_types_to_ignore=[]):
 
     if debug:
         print(f"{chunk} make_synthetic_event_core rand_seed {rand_seed}\n")
@@ -627,6 +627,10 @@ def make_synthetic_event_core(input_jets, input_pdfs, rand_seed, *, b_pt_thresho
     #  Get all the different types of splitted needed
     #
     splitting_types = get_list_of_combined_jet_types(input_jets)
+
+    for _s in splitting_types_to_ignore:
+        if _s[0] in splitting_types:
+            splitting_types.remove(_s[0])
 
     if debug:
         print(f" (make_synthetic_event_core) splitting_types {splitting_types}")
@@ -639,6 +643,10 @@ def make_synthetic_event_core(input_jets, input_pdfs, rand_seed, *, b_pt_thresho
         input_jets = decluster_splitting_types(input_jets, splitting_types, input_pdfs, rand_seed, b_pt_threshold=b_pt_threshold, dr_threshold=dr_threshold, chunk=chunk, debug=debug)
 
         splitting_types = get_list_of_combined_jet_types(input_jets)
+
+        for _s in splitting_types_to_ignore:
+            if _s[0] in splitting_types:
+                splitting_types.remove(_s[0])
 
         if debug:
             print(f"(make_synthetic_event_core) splitting_types is now {splitting_types}")
@@ -653,7 +661,7 @@ def make_synthetic_event_core(input_jets, input_pdfs, rand_seed, *, b_pt_thresho
 #   return make_synthetic_event_core(input_jets, input_pdfs, debug=debug)
 
 
-def make_synthetic_event(input_jets, input_pdfs, declustering_rand_seed=66, *, b_pt_threshold=40, dr_threshold=0.4, chunk=None, debug=False):
+def make_synthetic_event(input_jets, input_pdfs, declustering_rand_seed=66, *, b_pt_threshold=40, dr_threshold=0.4, chunk=None, debug=False, splitting_types_to_ignore=[]):
 
     if debug:
         print(f"{chunk} make_synthetic_event rand_seed {declustering_rand_seed}\n")
@@ -665,6 +673,11 @@ def make_synthetic_event(input_jets, input_pdfs, declustering_rand_seed=66, *, b
 
     # Get number of expected output jets
     jet_clustering_summary = ["".join(ak.to_list(i)) for i in input_jets.jet_flavor]
+
+
+    for i in splitting_types_to_ignore:
+        jet_clustering_summary = [s.replace(i[0], i[1]) for s in jet_clustering_summary]
+
     n_declustered_jets_per_event = [s.count('b') + s.count('j') for s in jet_clustering_summary]
 
     n_total_declustered_jets = np.sum(n_declustered_jets_per_event)
@@ -686,7 +699,8 @@ def make_synthetic_event(input_jets, input_pdfs, declustering_rand_seed=66, *, b
         to_decluster_indicies = np.where(events_to_decluster_mask)[0]
 
         declustered_events = make_synthetic_event_core(input_jets[to_decluster_indicies], input_pdfs, 7 * num_trys + declustering_rand_seed,
-                                                       b_pt_threshold=b_pt_threshold, dr_threshold=dr_threshold, chunk=chunk, debug=debug)
+                                                       b_pt_threshold=b_pt_threshold, dr_threshold=dr_threshold, chunk=chunk, debug=debug,
+                                                       splitting_types_to_ignore=splitting_types_to_ignore)
 
         #
         #  Check the min dr
