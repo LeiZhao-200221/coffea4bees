@@ -12,8 +12,7 @@ rule analysis_processor:
         datasets_file = config.get("datasets", "datasets/"),
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = "",
+        extra_arguments = "",
         username = username
     log: "output/logs/analysis_processor.log"
     shell:
@@ -43,7 +42,7 @@ rule analysis_processor:
         mprofile_png="$(dirname {output})/performance/mprofile_$(basename {log} .log).png"
         
         # Run analysis with optional performance monitoring
-        cmd="python runner.py -d {params.datasets} -p {params.processor} -y {params.years} -o $(basename {output}) -op $(dirname {output})/ -m {params.datasets_file} -c $meta_tmp {params.hash} {params.diff}"
+        cmd="python runner.py -d {params.datasets} -p {params.processor} -y {params.years} -o $(basename {output}) -op $(dirname {output})/ -m {params.datasets_file} -c $meta_tmp {params.extra_arguments}"
         if [ "{params.run_performance}" = "True" ]; then
             cmd="mprof run -C -o $mprofile_dat $cmd"
         fi
@@ -65,9 +64,6 @@ rule merging_coffea_files:
     output: "{output_file}"
     container: config["analysis_container"]
     params:
-        output = lambda wildcards, output: output[0],
-        logname = "merge_log",
-        output_path = "output/",
         run_performance = False
     log: "logs/merging_{params.logname}.log"
     shell:
@@ -77,13 +73,13 @@ rule merging_coffea_files:
         mkdir -p $MPLCONFIGDIR
         
         echo "Merging all the coffea files" 2>&1 | tee -a {log}
-        cmd="mprof run -C -o /tmp/mprofile_merge_{params.logname}.dat python analysis/tools/merge_coffea_files.py -f {input} -o {params.output_path}/{params.output}"
+        cmd="mprof run -C -o /tmp/mprofile_merge_$(basename {log} .log).dat python analysis/tools/merge_coffea_files.py -f {input} -o {output}"
         echo $cmd 2>&1 | tee -a {log}
         $cmd 2>&1 | tee -a {log}
         if [ "{params.run_performance}" = "True" ]; then
             echo "Running performance analysis" 2>&1 | tee -a {log}
-            mkdir -p {params.output_path}/performance/
-            mprof plot -o {params.output_path}/performance/mprofile_merge_{params.logname}.png /tmp/mprofile_merge_{params.logname}.dat
+            mkdir -p $(dirname {output})/performance/
+            mprof plot -o $(dirname {output})/performance/mprofile_merge_$(basename {log} .log).png /tmp/mprofile_merge_$(basename {log} .log).dat
         fi
         """
 

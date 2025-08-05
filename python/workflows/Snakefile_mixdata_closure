@@ -1,5 +1,4 @@
 import os
-username = os.getenv("USER")
 
 config = {
     "analysis_container": "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-cmu/coffea4bees:latest",
@@ -8,21 +7,25 @@ config = {
     "datasets": "metadata/datasets_HH4b_v1.yml",
 }
 
-# Adding specific rules for analysis
+# Define username once for reuse throughout the workflow
+USERNAME = os.getenv("USER", "coffea4bees_default")
+
+# Import rule modules
 module analysis:
     snakefile: "rules/analysis.smk"
     config: config
+
 module stat_analysis:
     snakefile: "rules/stat_analysis.smk"
     config: config
 
-rule all:
+include: "helpers/common.smk"
+
+rule final_rule:
     input: 
         f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl",
         f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl",
         # f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl",
-
-        
 
 use rule analysis_processor from analysis as mixed_bkg_tt with:
     output: f"{config['output_path']}/histMixedBkg_TT.coffea"
@@ -34,8 +37,8 @@ use rule analysis_processor from analysis as mixed_bkg_tt with:
         datasets_file = config["datasets"],
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = ""
+        extra_arguments="",
+        username = USERNAME
     log: f"{config['output_path']}/logs/analysis_processor_mixed_bkg_tt.log"
 
 use rule analysis_processor from analysis as hist_all with:
@@ -48,9 +51,10 @@ use rule analysis_processor from analysis as hist_all with:
         datasets_file = config["datasets"],
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = ""
+        extra_arguments="",
+        username = USERNAME
     log: f"{config['output_path']}/logs/analysis_processor_hist_all.log"
+
 
 use rule analysis_processor from analysis as mixed_bkg_data_3b_for_mixed_kfold with:
     output: f"{config['output_path']}/histMixedBkg_data_3b_for_mixed_kfold.coffea"
@@ -62,8 +66,8 @@ use rule analysis_processor from analysis as mixed_bkg_data_3b_for_mixed_kfold w
         datasets_file = config["datasets"],
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = ""
+        extra_arguments="",
+        username = USERNAME
     log: f"{config['output_path']}/logs/analysis_processor_hmixed_bkg_data_3b_for_mixed_kfold.log"
 
 use rule analysis_processor from analysis as mixed_data with:
@@ -76,8 +80,8 @@ use rule analysis_processor from analysis as mixed_data with:
         datasets_file = config["datasets"],
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = ""
+        extra_arguments="",
+        username = USERNAME
     log: f"{config['output_path']}/logs/analysis_processor_mixed_data.log"
 
 
@@ -91,8 +95,8 @@ use rule analysis_processor from analysis as mixed_bkg_data_3b_for_mixed with:
         datasets_file = config["datasets"],
         blind = False,
         run_performance = False,
-        hash = "",
-        diff = ""
+        extra_arguments="",
+        username = USERNAME
     log: f"{config['output_path']}/logs/analysis_processor_mixed_bkg_data_3b_for_mixed.log"
 
 use rule convert_hist_to_json from stat_analysis as hist_to_json_histall with:
@@ -158,7 +162,8 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_hh wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_hh",
-        variable_binning = ""
+        variable_binning = "",
+        container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_hh.log"
 
 use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zz with:
@@ -172,7 +177,8 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zz wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_zz",
-        variable_binning = ""
+        variable_binning = "",
+        container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_zz.log"
 
 use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zh with:
@@ -186,5 +192,6 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zh wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_zh",
-        variable_binning = ""
+        variable_binning = "",
+        container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_zh.log"
