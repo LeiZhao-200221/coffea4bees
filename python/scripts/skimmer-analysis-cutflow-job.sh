@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 
 INPUT_DIR="${DEFAULT_DIR}skimmer_analysis_test_job"

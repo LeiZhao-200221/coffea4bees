@@ -37,7 +37,7 @@ echo "The base output directory is: $DEFAULT_DIR"
 
 echo "############### Checking datasets"
 if [[ $(hostname) = *fnal* ]]; then
-    DATASETS=metadata/datasets_HH4b.yml
+    DATASETS=metadata/datasets_HH4b_v1p1.yml
 else
     DATASETS=metadata/datasets_HH4b_cernbox.yml
 fi
