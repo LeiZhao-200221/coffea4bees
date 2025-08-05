@@ -19,8 +19,8 @@ module combine:
 
 include: "helpers/common.smk"
 
-
-EOS_OUTPUT = f"/eos/user/a/algomez/work/HH4b/reana/{datetime.now().strftime('%Y%m%d')}_{config['hash']}/"
+hash = config['extra_arguments'].split("--githash ")[1]
+EOS_OUTPUT = f"/eos/user/a/algomez/work/HH4b/reana/{datetime.now().strftime('%Y%m%d')}_{hash}/"
 
 # Filter dataset_systematics by signal type
 hh4b_datasets = [d for d in config['dataset_systematics'] if d.startswith('GluGlu')]
@@ -142,8 +142,7 @@ use rule analysis_processor from analysis as analysis_databkgs with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     resources:
         voms_proxy=True,
@@ -151,6 +150,39 @@ use rule analysis_processor from analysis as analysis_databkgs with:
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
     log: "output/logs/analysis_hist__{sample}-{year}.log"
+
+
+use rule analysis_databkgs as analysis_data with:
+    # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
+    output: "output/singlefiles/histdata__data-{year}.coffea"
+    params:
+        datasets="data",
+        years="{year}",
+        metadata="analysis/metadata/HH4b.yml",
+        processor="analysis/processors/processor_HH4b.py",
+        datasets_file=config['dataset_location'],
+        blind=False,
+        run_performance=True,
+        extra_arguments=lambda wildcards: f"{config['extra_arguments']} -e {config['data_eras'][wildcards.year]}",
+
+        username=USERNAME
+    log: "output/logs/analysis_histdata__data-{year}.log"
+
+
+use rule analysis_databkgs as analysis_data_UL17B with:
+    output: "output/singlefiles/histdata__data-UL17B.coffea"
+    params:
+        datasets="data",
+        years="UL17",
+        metadata="analysis/metadata/HH4b_dataUL17B.yml",
+        processor="analysis/processors/processor_HH4b.py",
+        datasets_file=config['dataset_location'],
+        blind=False,
+        run_performance=True,
+        extra_arguments=f"{config['extra_arguments']} -e B",
+
+        username=USERNAME
+    log: "output/logs/analysis_histdata__data-UL17B.log"
 
 use rule analysis_databkgs as analysis_signals with:
     # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
@@ -163,8 +195,7 @@ use rule analysis_databkgs as analysis_signals with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     log: "output/logs/analysis_histsignal__{sample_signal}-{year}.log"
 
@@ -178,8 +209,7 @@ use rule analysis_databkgs as analysis_mixedbkg_data3b with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     log: "output/logs/analysis_mixedbkg_data3b.log"
 
@@ -194,8 +224,7 @@ use rule analysis_databkgs as analysis_mixedbkg with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     log: "output/logs/analysis_mixedbkg_TT.log"
 
@@ -209,8 +238,7 @@ use rule analysis_databkgs as analysis_mixeddata with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     log: "output/logs/analysis_mixeddata.log"
 
@@ -226,8 +254,7 @@ use rule analysis_databkgs as analysis_systematics with:
         datasets_file=config['dataset_location'],
         blind=False,
         run_performance=True,
-        hash=config['hash'],
-        diff=config['diff'],
+        extra_arguments=config['extra_arguments'],
         username=USERNAME
     log: "output/logs/analysis_histsyst_{samplesyst}-{iysyst}.log"
 
@@ -243,6 +270,8 @@ use rule merging_coffea_files from analysis as merging_coffea_files_syst_HH4b wi
         kerberos=True,
         compute_backend="kubernetes",
         kubernetes_memory_limit="9.5Gi"
+    params:
+        run_performance=True
     log: "output/logs/merging_signals_HH4b.log"
 
 use rule merging_coffea_files_syst_HH4b as merging_coffea_files_syst_ZZ4b with:
@@ -256,7 +285,7 @@ use rule merging_coffea_files_syst_HH4b as merging_coffea_files_syst_ZH4b with:
     log: "output/logs/merging_signals_ZH4b.log"
 
 use rule merging_coffea_files_syst_HH4b as merging_coffea_files_histAll with:
-    input: expand(['output/singlefiles/histsignal__{sample_signal}-{year}.coffea'], sample_signal=config['dataset_signals'], year=config['year']) + expand(['output/singlefiles/hist__{idat}-{iyear}.coffea'], idat=config['dataset'], iyear=config['year'])
+    input: expand(['output/singlefiles/histsignal__{sample_signal}-{year}.coffea'], sample_signal=config['dataset_signals'], year=config['year']) + expand(['output/singlefiles/hist__{idat}-{iyear}.coffea'], idat=config['dataset_tt'], iyear=config['year']) + expand(['output/singlefiles/histdata__data-{iyear}.coffea'], iyear=config['year']) + [ 'output/singlefiles/histdata__data-UL17B.coffea' ]
     output: "output/histAll.coffea"
     log: "output/logs/merging_histAll.log"
 
@@ -282,7 +311,7 @@ use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_histAll
     output: "output/histAll.json"
     log: "output/logs/convert_hist_to_json_histAll.log"
 
-use rule convert_hist_to_json from stat_analysis as convert_hist_to_json_signals with:
+use rule convert_hist_to_json_histAll as convert_hist_to_json_signals with:
     input: "output/histAll_signals__{channel}.coffea"
     output: "output/histAll_signals__{channel}.json"
     params:
@@ -294,12 +323,12 @@ use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json
     output: "output/histMixedBkg_data_3b_for_mixed.json"
     log: "output/logs/convert_hist_to_json_mixdata3b.log"
 
-use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json_mixbkgtt with:
+use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixbkgtt with:
     input: "output/histMixedBkg_TT.coffea"
     output: "output/histMixedBkg_TT.json"
     log: "output/logs/convert_hist_to_json_mixbkgtt.log"
 
-use rule convert_hist_to_json_closure from stat_analysis as convert_hist_to_json_mixdata with:
+use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixdata with:
     input: "output/histMixedData.coffea"
     output: "output/histMixedData.json"
     log: "output/logs/convert_hist_to_json_mixdata.log"
@@ -316,19 +345,16 @@ use rule convert_json_to_root from stat_analysis as convert_json_to_root_TT with
 use rule convert_json_to_root_TT as convert_json_to_root_mix with:
     input: "output/histMixedData.json"
     output: "output/histMixedData.root"
-    container: config["combine_container"]
     log: "output/logs/convert_json_to_root_mix.log"
 
 use rule convert_json_to_root_TT as convert_json_to_root_histall with:
     input: "output/histAll.json"
     output: "output/histAll.root"
-    container: config["combine_container"]
     log: "output/logs/convert_json_to_root_histall.log"
 
 use rule convert_json_to_root_TT as convert_json_to_root_data3b with:
     input: "output/histMixedBkg_data_3b_for_mixed.json"
     output: "output/histMixedBkg_data_3b_for_mixed.root"
-    container: config["combine_container"]
     log: "output/logs/convert_json_to_root_data3b.log"
 
 #######

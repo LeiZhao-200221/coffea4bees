@@ -14,12 +14,12 @@ rule workspace:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting workspace rule with signal {params.signallabel}" > {log}
-        {params.container_wrapper} "cd $(dirname {input}) &&\
+        {params.container_wrapper} cd $(dirname {input}) &&\
             text2workspace.py $(basename {input}) \
             -P HiggsAnalysis.CombinedLimit.PhysicsModel:multiSignalModel --PO verbose \
             --PO 'map=.*/{params.signallabel}:r{params.signallabel}[1,-10,10]' \
             {params.othersignal_maps} \
-            -o $(basename {output})" 2>&1 | tee -a {log}
+            -o $(basename {output}) 2>&1 | tee -a {log}
         echo "[$(date)] Completed workspace rule with signal {params.signallabel}" >> {log}
         """
 
