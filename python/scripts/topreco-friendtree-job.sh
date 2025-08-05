@@ -9,7 +9,7 @@ display_section_header "Input Datasets"
 DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
-OUTPUT_DIR="${DEFAULT_DIR}topreco_friendtree_job"
+OUTPUT_DIR="${1:-"output"}/topreco_friendtree_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

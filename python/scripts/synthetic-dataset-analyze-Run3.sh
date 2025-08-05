@@ -5,8 +5,8 @@ source "base_class/scripts/common.sh"
 # Setup proxy if needed
 setup_proxy --do_proxy
 
-INPUT_DIR="${DEFAULT_DIR}synthetic_dataset_make_dataset_Run3"
-OUTPUT_DIR="${DEFAULT_DIR}synthetic_dataset_analyze_Run3"
+INPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_Run3"
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_Run3"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

@@ -3,8 +3,8 @@
 source "base_class/scripts/common.sh"
 
 
-INPUT_DIR="${DEFAULT_DIR}synthetic_dataset_analyze"
-OUTPUT_DIR="${DEFAULT_DIR}synthetic_dataset_analyze_cutflow"
+INPUT_DIR="${1:-"output"}/synthetic_dataset_analyze"
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_cutflow"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
