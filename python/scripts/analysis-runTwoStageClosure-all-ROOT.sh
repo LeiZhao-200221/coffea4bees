@@ -104,7 +104,3 @@ done
 #python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_zz  --rebin 8 --outputPath $OUTPUT_DIR/test/ --reuse_inputs --do_CI
 #python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_zh  --rebin 5 --outputPath $OUTPUT_DIR/tests --reuse_inputs --do_CI
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

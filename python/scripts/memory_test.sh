@@ -1,5 +1,13 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${DEFAULT_DIR}memory_test"
 echo "############### Checking and creating output directory"
@@ -12,7 +20,3 @@ sed -e "s#  workers: 4.*#  workers: 1\n  maxchunks: 1#" analysis/metadata/HH4b_s
 python base_class/tests/memory_test.py --threshold 3300 -o $OUTPUT_DIR/mprofile_ci_test --script runner.py -o test.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op local_outputs/analysis/ -m $DATASETS -c $OUTPUT_DIR/HH4b_memory_test.yml
 ls $OUTPUT_DIR/mprofile_ci_test.png
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

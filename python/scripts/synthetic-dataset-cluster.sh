@@ -1,5 +1,13 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${DEFAULT_DIR}synthetic_dataset_cluster"
 echo "############### Checking and creating output directory"
@@ -25,7 +33,4 @@ python runner.py -t -o test_synthetic_datasets.coffea -d data  -p analysis/proce
 
 ls
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

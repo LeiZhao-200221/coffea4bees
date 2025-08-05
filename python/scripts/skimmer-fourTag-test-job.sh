@@ -1,5 +1,9 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
 
 OUTPUT_DIR="${DEFAULT_DIR}/skimmer_fourTag_test_job"
 echo "############### Checking and creating output directory"
@@ -19,7 +23,3 @@ cat ${OUTPUT_DIR}/tmp_fourTag.yml
 echo "############### Running test processor"
 python runner.py -s -p skimmer/processor/skimmer_4b.py -c ${OUTPUT_DIR}/tmp_fourTag.yml -y UL18 -d data -op ${OUTPUT_DIR} -o picoaod_datasets_fourTag_data_test_UL18.yml -m metadata/datasets_HH4b.yml 
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

@@ -1,5 +1,7 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"}
+# Source common functions
+source "bbww/scripts/common.sh"
+
 
 INPUT_DIR="${DEFAULT_DIR}analysis_test_job_unsup"
 OUTPUT_DIR="${DEFAULT_DIR}analysis_cutflow_job_unsup"
@@ -16,7 +18,4 @@ echo "############### Running dump cutflow test"
 python analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_unsup.coffea -o $OUTPUT_DIR/test_dump_cutflow_unsup.yml
 ls $OUTPUT_DIR/test_dump_cutflow_unsup.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

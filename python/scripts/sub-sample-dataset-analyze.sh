@@ -1,5 +1,9 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
 
 OUTPUT_DIR="${DEFAULT_DIR}/sub_sample_dataset_analyze"
 echo "############### Checking and creating output directory"
@@ -35,7 +39,3 @@ echo "############### Running test processor "
 #cat ${OUTPUT_DIR}/datasets_synthetic_test.yml
 time python runner.py -o test_TT_pseudodata_datasets.coffea -d ps_data_TTToHadronic -p analysis/processors/processor_HH4b.py -y UL18  -op ${OUTPUT_DIR} -c analysis/metadata/HH4b_ps_data.yml -m metadata/datasets_TT_pseudodata_test.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

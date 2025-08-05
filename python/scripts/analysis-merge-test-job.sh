@@ -1,5 +1,7 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"}
+# Source common functions
+source "bbww/scripts/common.sh"
+
 
 OUTPUT_DIR="${DEFAULT_DIR}/analysis_merge_test_job"
 echo "############### Checking and creating output directory"
@@ -12,7 +14,4 @@ python analysis/tools/merge_coffea_files.py -f $DEFAULT_DIR/analysis_test_job/te
 
 ls $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

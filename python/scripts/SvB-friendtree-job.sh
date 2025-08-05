@@ -1,5 +1,13 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "bbww/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy --do_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${DEFAULT_DIR}SvB_friendtree_job"
 echo "############### Checking and creating output directory"
@@ -19,7 +27,3 @@ echo "############### Running test processor"
 python runner.py -t -o make_friend_SvB.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/HH4b_make_friend_SvB.yml -m $DATASETS
 ls $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

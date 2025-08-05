@@ -1,5 +1,7 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "bbww/scripts/common.sh"
+
 
 OUTPUT_DIR="${DEFAULT_DIR}/analysis_mixed_plot_job/"
 echo "############### Checking and creating output directory"
@@ -23,7 +25,3 @@ ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/
 #ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/HH4b/quadJet_min_dr_close_vs_other_m.pdf
 #ls ${OUTPUT_DIR}/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_other_m.pdf 
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
