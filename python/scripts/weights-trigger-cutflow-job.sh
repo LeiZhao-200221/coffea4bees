@@ -3,8 +3,8 @@
 source "base_class/scripts/common.sh"
 
 
-INPUT_DIR="${DEFAULT_DIR}weights_trigger_analysis_job"
-OUTPUT_DIR="${DEFAULT_DIR}weights_trigger_cutflow_job"
+INPUT_DIR="${1:-"output"}/weights_trigger_analysis_job"
+OUTPUT_DIR="${1:-"output"}/weights_trigger_cutflow_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

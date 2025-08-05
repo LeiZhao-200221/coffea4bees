@@ -3,8 +3,8 @@
 source "base_class/scripts/common.sh"
 
 
-INPUT_DIR="${DEFAULT_DIR}analysis_test_mixed_job"
-OUTPUT_DIR="${DEFAULT_DIR}analysis_runTwoStageClosure_ROOT"
+INPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
+OUTPUT_DIR="${1:-"output"}/analysis_runTwoStageClosure_ROOT"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

@@ -9,7 +9,7 @@ display_section_header "Input Datasets"
 DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
-OUTPUT_DIR="${DEFAULT_DIR}analysis_test_job_truthStudy"
+OUTPUT_DIR="${1:-"output"}/analysis_test_job_truthStudy"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

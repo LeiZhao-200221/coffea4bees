@@ -3,8 +3,8 @@
 source "base_class/scripts/common.sh"
 
 
-INPUT_DIR="${DEFAULT_DIR}analysis_test_job_unsup"
-OUTPUT_DIR="${DEFAULT_DIR}analysis_cutflow_job_unsup"
+INPUT_DIR="${1:-"output"}/analysis_test_job_unsup"
+OUTPUT_DIR="${1:-"output"}/analysis_cutflow_job_unsup"
 
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
