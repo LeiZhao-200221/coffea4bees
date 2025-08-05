@@ -1,22 +1,22 @@
-workflow:
-  rules:
-    # Do not run if only markdown files changed
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH'
-      changes:
-        - "**/*.md"
-      when: never
-    # Do not run for tags
-    - if: '$CI_COMMIT_TAG'
-      when: never
-    # Do not run for branches with 'test' in the name
-    - if: '$CI_COMMIT_BRANCH =~ /test/'
-      when: never
-    # Run for merge requests
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    # Run for all other branch pushes
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
+# workflow:
+#   rules:
+#     # Do not run if only markdown files changed
+#     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH'
+#       changes:
+#         - "**/*.md"
+#       when: never
+#     # Do not run for tags
+#     - if: '$CI_COMMIT_TAG'
+#       when: never
+#     # Do not run for branches with 'test' in the name
+#     - if: '$CI_COMMIT_BRANCH =~ /test/'
+#       when: never
+#     # Run for merge requests
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#       when: always
+#     # Run for all other branch pushes
+#     - if: '$CI_PIPELINE_SOURCE == "push"'
+#       when: always
 
 variables:
   CONTAINER_HOST: cms-cmu
