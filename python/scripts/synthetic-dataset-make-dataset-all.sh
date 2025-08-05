@@ -1,11 +1,11 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy --do_proxy
 
-OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_make_dataset_all_2025"
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_all_2025"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

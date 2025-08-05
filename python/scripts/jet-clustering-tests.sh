@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 
 echo "############### Running jet clustering test"

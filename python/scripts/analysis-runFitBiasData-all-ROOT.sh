@@ -1,9 +1,9 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_runFitBiasData_all_ROOT"
+OUTPUT_DIR="${1:-"output"}/analysis_runFitBiasData_all_ROOT"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

@@ -1,9 +1,9 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_mixed_plot_job/"
+OUTPUT_DIR="${1:-"output"}/analysis_mixed_plot_job/"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

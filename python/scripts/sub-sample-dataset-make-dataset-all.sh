@@ -1,11 +1,11 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy --do_proxy
 
-OUTPUT_DIR="${DEFAULT_DIR}/sub_sample_dataset_make_dataset_all"
+OUTPUT_DIR="${1:-"output"}/sub_sample_dataset_make_dataset_all"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR

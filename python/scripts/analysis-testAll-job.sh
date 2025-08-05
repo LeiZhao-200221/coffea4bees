@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "bbww/scripts/common.sh"
+source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy --do_proxy
@@ -9,7 +9,7 @@ display_section_header "Input Datasets"
 DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_testAll_job"
+OUTPUT_DIR="${1:-"output"}/analysis_testAll_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
