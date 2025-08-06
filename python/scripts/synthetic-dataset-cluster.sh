@@ -3,10 +3,11 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+# DATASETS=${DATASET:-"metadata/datasets_HH4b_v1p1.yml"}
+DATASETS="metadata/datasets_HH4b_v1p1.yml"
 echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_cluster"

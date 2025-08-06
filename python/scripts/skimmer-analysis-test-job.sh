@@ -3,7 +3,7 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 INPUT_DIR="${1:-"output"}/skimmer_test_job"
 OUTPUT_DIR="${1:-"output"}/skimmer_analysis_test_job"

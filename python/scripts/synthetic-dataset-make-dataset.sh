@@ -3,7 +3,7 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 echo "############### Checking and creating output/skimmer directory"
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset"

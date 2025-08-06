@@ -3,7 +3,7 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 OUTPUT_DIR="${1:-"output"}/sub_sample_dataset_make_dataset"
 echo "############### Checking and creating output directory"
