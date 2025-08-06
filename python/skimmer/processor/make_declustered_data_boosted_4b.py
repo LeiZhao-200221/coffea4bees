@@ -130,12 +130,6 @@ class DeClustererBoosted(PicoAOD):
         #
         subjetIdx1_flat = ak.flatten(selev.selFatJet.subJetIdx1)
         subjetIdx2_flat = ak.flatten(selev.selFatJet.subJetIdx2)
-        # print(f"subjetIdx1_flat: {subjetIdx1_flat}\n")
-        # print(f"subjetIdx2_flat: {subjetIdx2_flat}\n")
-
-        particleNet_HbbvsQCD_flat = ak.flatten(selev.selFatJet.particleNet_HbbvsQCD)
-        # particleNet_HbbvsQCD_flat_str = [ f"({round(v,3)},{round(v,3)})" for v in particleNet_HbbvsQCD_flat ]
-        # selev["selFatJet", "btag_string"] = ak.unflatten(particleNet_HbbvsQCD_flat_str, ak.num(selev.selFatJet))
 
 
         indices_str_flat = []
@@ -198,19 +192,13 @@ class DeClustererBoosted(PicoAOD):
             behavior=vector.behavior
         )
 
-        # Look at this function
-        # fat_jet_splittings_events = compute_decluster_variables(fat_jet_splittings_events)
-        #        print("new fields:", fat_jet_splittings_events.fields)
-
-        clustered_jets["splitting_name"] = "1b0j/1b0j"
-
 
         #
         # Declustering
         #
         b_pt_threshold = 20 # Min pt of subjets ?
         declustered_jets = make_synthetic_event(clustered_jets, clustering_pdfs, declustering_rand_seed=self.declustering_rand_seed,
-                                                b_pt_threshold=b_pt_threshold, dr_threshold=0, chunk=chunk, debug=True,
+                                                b_pt_threshold=b_pt_threshold, dr_threshold=0, chunk=chunk, debug=False,
                                                 splitting_types_to_ignore = [('bj','b')])
 
         declustered_jets = declustered_jets[ak.argsort(declustered_jets.btagScore, axis=1, ascending=True)]

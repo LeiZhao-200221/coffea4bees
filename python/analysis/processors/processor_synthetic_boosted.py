@@ -4,6 +4,7 @@ import numpy as np
 import yaml
 import warnings
 from collections import OrderedDict
+from base_class.hist import Template
 
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
@@ -11,10 +12,11 @@ from coffea.analysis_tools import PackedSelection
 import hist
 from analysis.helpers.cutflow import cutFlow
 
+
 from analysis.helpers.event_selection import apply_event_selection
 from base_class.hist import Collection, Fill
 from jet_clustering.clustering_hist_templates import ClusterHistsBoosted, ClusterHistsDetailedBoosted
-from base_class.physics.object import Jet
+from base_class.physics.object import LorentzVector, Jet
 
 from jet_clustering.declustering import compute_decluster_variables, get_splitting_name, get_list_of_combined_jet_types, get_list_of_all_sub_splittings
 from jet_clustering.clustering import comb_jet_flavor
@@ -126,28 +128,6 @@ class analysis(processor.ProcessorABC):
         #
         #
 
-        #
-        #  Compute Soft drop
-        #
-        selev["selFatJet","subjetmass"] = (selev.selFatJet.subjets[:,:,0] + selev.selFatJet.subjets[:,:,1]).mass
-
-        selev["selFatJet","subjetdr"]    = (selev.selFatJet.subjets[:,:,0].delta_r(selev.selFatJet.subjets[:,:,1]))
-        selev["selFatJet","subjetpt0"]   = (selev.selFatJet.subjets[:,:,0].pt)
-        selev["selFatJet","subjetpt1"]   = (selev.selFatJet.subjets[:,:,1].pt)
-
-
-        # print( "softdrop mass",selev[0:5].selFatJet.msoftdrop.tolist(),"\n")
-        # print( "subjet mass",selev[0:5].selFatJet.subjetmass.tolist(),"\n")
-        #print( "subjet pt0",selev[0:5].selFatJet.subjets[:,:,0].pt.tolist(),"\n")
-        #print( "subjet pt1",selev[0:5].selFatJet.subjets[:,:,1].pt.tolist(),"\n")
-
-        #
-        # Adding btag and jet flavor to fat jets
-        #
-        particleNet_HbbvsQCD_flat = ak.flatten(selev.selFatJet.particleNet_HbbvsQCD)
-        particleNet_HbbvsQCD_flat_str = [ str(round(v,3)) for v in particleNet_HbbvsQCD_flat ]
-        #selev["selFatJet", "btag_string"] = ak.unflatten(particleNet_HbbvsQCD_flat_str, ak.num(selev.selFatJet))
-
 
         indices = []
         indices_str = []
@@ -171,9 +151,16 @@ class analysis(processor.ProcessorABC):
             sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau3")
 
 
-        subjets = ak.zip({"i0" : sorted_sub_jets[:, :, 0],
+        subjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
+                          "i0" : sorted_sub_jets[:, :, 0],
                           "i1" : sorted_sub_jets[:, :, 1],
                           } )
+
+        # Calculate di-jet variables
+        subjets["p", "st"]   = subjets.i0.pt + subjets.i1.pt
+        subjets["p", "dr"]   = subjets.i0.delta_r(subjets.i1)
+        subjets["p", "dphi"] = subjets.i0.delta_phi(subjets.i1)
+
 
         # Define the tau21 variable for each subjet
         subjets["i0", "tau21"] = subjets.i0.tau2 / (subjets.i0.tau1 + 0.001)
@@ -207,6 +194,11 @@ class analysis(processor.ProcessorABC):
         C = [comb_jet_flavor(a, b) for a, b in zip(ak.flatten(subjets.iA.jet_flavor), ak.flatten(subjets.iB.jet_flavor))]
         fatjet_flavor_flat = np.array(C)
         selev["selFatJet", "jet_flavor"] = ak.unflatten(fatjet_flavor_flat, ak.num(selev.selFatJet))
+
+        #
+        #  Add the subjets to the event
+        #
+        selev["subjets"] = subjets
 
         # print(f" Combined:{selev.selFatJet.jet_flavor[0:10]}")
         # print(f" \tpartA:{subjets.iA.jet_flavor[0:10]}")
@@ -368,19 +360,25 @@ class analysis(processor.ProcessorABC):
         #
         # Jets
         #
-        fill += Jet.plot(("fatJets", "Selected Fat Jets"),        "selFatJet",           skip=["deepjet_c"], bins={"pt": (50, 0, 1000)})
-
-        #                 "Histogram Name", (nBins, min, max, (variable (selev.variable), title) )
         fill += hist.add( "msoftdrop",  (100, 40, 400, ("selFatJet.msoftdrop",   'Soft Drop Mass')))
 
-        fill += hist.add( "msubjet",    (100, 40, 400, ("selFatJet.subjetmass",  'Sub Jet Mass')))
-        fill += hist.add( "subjetdr",   (100, 0, 1.0, ("selFatJet.subjetdr",    'Sub Jet Delta R')))
 
-        fill += hist.add( "subjet0.pt",  (100, 0, 400, ("selFatJet.subjetpt0",   'Sub Jet0 Pt')))
-        fill += hist.add( "subjet1.pt",  (100, 0, 400, ("selFatJet.subjetpt1",   'Sub Jet1 Pt')))
+        #
+        #  Class to plot the Fat Jets
+        #
+        class FatJetHists(Template):
 
-        #fill += hist.add( "subjet0.tau21",  (100, 0, 400, ("selFatJet.subjetpt0",   'Sub Jet0 Pt')))
-        #fill += hist.add( "subjet1.tau21",  (100, 0, 400, ("selFatJet.subjetpt1",   'Sub Jet1 Pt')))
+            p  = LorentzVector.plot_pair(('...', R'Fat Jet'), 'p',  skip=['n'], bins={"mass": (100, 40, 300),
+                                                                                      "pt": (60, 250, 1000),
+                                                                                      "dr": (50, 0, 1.2),
+                                                                                      "dphi": (50, -1.5, 1.5)
+                                                                                      })
+
+            i0 = Jet.plot(('...', R'subjet 0'), 'i0',     skip=['deepjet_c','n'], bins={"mass": (100, 0, 200), "pt": (50, 100, 1000)})
+            i1 = Jet.plot(('...', R'subjet 1'), 'i1',     skip=['deepjet_c','n'], bins={"mass": (50, 0, 100)})
+
+        fill += FatJetHists(('fatJets', R''), 'subjets')
+
 
 
         for _s_type in cleaned_splitting_name:
