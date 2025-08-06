@@ -3,7 +3,7 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 INPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_Run3"
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_Run3"

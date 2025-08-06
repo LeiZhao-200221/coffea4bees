@@ -3,7 +3,7 @@
 source "base_class/scripts/common.sh"
 
 # Setup proxy if needed
-setup_proxy --do_proxy
+setup_proxy
 
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_all_2025"
 echo "############### Checking and creating output directory"

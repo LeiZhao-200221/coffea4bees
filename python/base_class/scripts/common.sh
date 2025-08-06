@@ -4,23 +4,17 @@
 
 # Function to setup proxy if needed
 setup_proxy() {
-    local do_proxy="$1"
-    echo "############### Setting up environment"
-    if [[ "$do_proxy" == "--do_proxy" ]]; then
-        echo "############### Including proxy"
-        if [ ! -f "${PWD}/proxy/x509_proxy" ]; then
-            echo "Error: x509_proxy file not found!"
-            echo "Run manually:"
-            echo "mkdir -p proxy && voms-proxy-init -voms cms -valid 192:00 -out ./proxy/x509_proxy"
-            echo "and try again."
-            exit 1
-        fi
-        export X509_USER_PROXY=${PWD}/proxy/x509_proxy
-        echo "############### Checking proxy"
-        voms-proxy-info
-    else
-        echo "############### Skipping proxy setup"
+    echo "############### Including proxy"
+    if [ ! -f "${PWD}/proxy/x509_proxy" ]; then
+        echo "Error: x509_proxy file not found!"
+        echo "Run manually:"
+        echo "mkdir -p proxy && voms-proxy-init -voms cms -valid 192:00 -out ./proxy/x509_proxy"
+        echo "and try again."
+        exit 1
     fi
+    export X509_USER_PROXY=${PWD}/proxy/x509_proxy
+    echo "############### Checking proxy"
+    voms-proxy-info
 }
 
 # Function to create output directory
@@ -59,7 +53,7 @@ check_file_exists() {
 
 # Function to parse --output-base argument (common pattern for wrapper scripts)
 parse_output_base_arg() {
-    local default_output_base="${1:-bbww/output/}"
+    local default_output_base="${1:-output/}"
     local output_base="$default_output_base"
     
     # Parse command line arguments

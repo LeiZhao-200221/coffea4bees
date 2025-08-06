@@ -655,16 +655,6 @@ datasets:
         E: /BTagCSV/Run2017E-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD
         F: /BTagCSV/Run2017F-UL2017_MiniAODv2_NanoAODv9-v1/NANOAOD
       picoAOD:
-        B:
-          count: 1808836.0
-          files:
-          - root://cmseos.fnal.gov//store/user/algomez/XX4b/2024_v2/data_UL17B/picoAOD.chunk0.root
-          - root://cmseos.fnal.gov//store/user/algomez/XX4b/2024_v2/data_UL17B/picoAOD.chunk1.root
-          missing: {}
-          saved_events: 128782
-          sumw: 1808836
-          sumw2: 1808836
-          total_events: 1808836
         C:
           files:
           - root://cmseos.fnal.gov//store/user/algomez/XX4b/20231115/data2017C/picoAOD.root
