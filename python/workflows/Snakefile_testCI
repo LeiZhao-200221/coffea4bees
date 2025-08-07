@@ -205,7 +205,7 @@ rule analysis_test_job:
     output: f"{output_dir}/analysis_test_job/test_databkgs.coffea" 
     log: f"{output_dir}/analysis_test_job.log"
     container: analysis_container
-    shell: "source scripts/analysis-test-job.sh {output_dir}/ 2>&1 | tee -a {log}"
+    shell: "source scripts/analysis-test-job.sh --output-base {output_dir}/ 2>&1 | tee -a {log}"
 
 rule analysis_signals_test_job:
     output: f"{output_dir}/analysis_signals_test_job/test_signal.coffea" 
