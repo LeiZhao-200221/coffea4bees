@@ -6,7 +6,7 @@ source "base_class/scripts/common.sh"
 setup_proxy
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET_RUN3:-"metadata/datasets_HH4b_Run3_cernbox.yml"}
+DATASETS=${DATASET_RUN3:-"metadata/datasets_synthetic_test_Run3.yml"}
 echo "Using datasets file: $DATASETS"
 
 echo "############### Checking and creating output/skimmer directory"
