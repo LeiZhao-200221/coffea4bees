@@ -66,7 +66,8 @@ def make_PDFs_vs_Pt(config, output_file_name_vs_pT, year, doBoosted=False):
 
 
     if doBoosted:
-        pt_bins = [300, 533, 766, np.inf]
+        #pt_bins = [300, 533, 766, np.inf]
+        pt_bins = [300, 400, 500, 600, 700, 800, 900, np.inf]
     else:
         pt_bins = [0, 140, 230, 320, 410, np.inf]
 
@@ -337,8 +338,7 @@ def doPlots(year, doBoosted=False, debug=False):
 
     # If doing boosted
     if doBoosted:
-         patterns["1b0j/1b0j"] = zA_mA_l_mB_l
-
+         patterns["1b0j/1b0j"] = zA_l_mA_l_mB_l
 
 
     #

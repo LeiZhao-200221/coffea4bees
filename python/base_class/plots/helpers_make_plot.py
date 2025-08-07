@@ -790,7 +790,9 @@ def _plot2d_from_dict(plot_data: Dict[str, Any], **kwargs) -> Tuple[plt.Figure, 
                 y_label=num_hist_data["y_label"]
             )
 
-            num_hist_obj_2d.plot2d(cmap="turbo")
+            num_hist_obj_2d.plot2d(cmap="turbo",
+                                   cmin=kwargs.get("zlim", [None, None])[0],
+                                   cmax=kwargs.get("zlim", [None, None])[1])
 
             ax_bottom_right = fig.add_subplot(gs[1, 1])
             den_hd = np.array(den_hist_data["values"])
@@ -805,7 +807,20 @@ def _plot2d_from_dict(plot_data: Dict[str, Any], **kwargs) -> Tuple[plt.Figure, 
                 y_label=den_hist_data["y_label"]
             )
 
-            den_hist_obj_2d.plot2d(cmap="turbo")
+            den_hist_obj_2d.plot2d(cmap="turbo",
+                                   cmin=kwargs.get("zlim", [None, None])[0],
+                                   cmax=kwargs.get("zlim", [None, None])[1])
+
+
+            axis_list = [ax_big, ax_top_right, ax_bottom_right]
+            if kwargs.get('xlim', False):
+                for ax in axis_list:
+                    ax.set_xlim(*kwargs.get('xlim'))
+
+            if kwargs.get('ylim', False):
+                for ax in axis_list:
+                    ax.set_ylim(*kwargs.get('ylim'))
+
 
         else:
             if len(plot_data.get("hists", {})):
@@ -851,7 +866,17 @@ def _plot2d_from_dict(plot_data: Dict[str, Any], **kwargs) -> Tuple[plt.Figure, 
 
                 fig = plt.figure()
                 fig.add_axes((0.1, 0.15, 0.85, 0.8))
-                hist_obj_2d.plot2d(cmap="turbo")
+                hist_obj_2d.plot2d(cmap="turbo",
+                                   cmin=kwargs.get("zlim", [None, None])[0],
+                                   cmax=kwargs.get("zlim", [None, None])[1])
+
+            ax = fig.gca()
+            if kwargs.get('xlim', False):
+                ax.set_xlim(*kwargs.get('xlim'))
+
+            if kwargs.get('ylim', False):
+                ax.set_ylim(*kwargs.get('ylim'))
+
 
             # Add additional plot elements if requested
             if kwargs.get("plot_contour", False):
