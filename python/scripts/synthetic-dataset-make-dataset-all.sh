@@ -1,7 +1,11 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_make_dataset_all_2025"
+# Setup proxy if needed
+setup_proxy
+
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_all_2025"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -36,7 +40,4 @@ done
 
 #ls -R skimmer/
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

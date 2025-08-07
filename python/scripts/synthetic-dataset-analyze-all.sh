@@ -1,7 +1,11 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_analyze_all"
+# Setup proxy if needed
+setup_proxy
+
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_all"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -35,7 +39,4 @@ time python runner.py -o synthetic_data_Run3_2025_v2.coffea -d synthetic_data da
 ## 
 ## time python runner.py -o nominal_GluGluToHHTo4B_cHHH1.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL17 UL18 UL16_preVFP UL16_postVFP -op ${OUTPUT_DIR} -c analysis/metadata/HH4b.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

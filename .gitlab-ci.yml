@@ -1,18 +1,25 @@
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'    
     # Do not run if only markdown files changed
-    - changes:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH'
+      changes:
         - "**/*.md"
       when: never
-      # Do not run for tags
-    - if: $CI_COMMIT_TAG
+    # Do not run for tags
+    - if: '$CI_COMMIT_TAG'
       when: never
     # Do not run for branches with 'test' in the name
-    - if: $CI_COMMIT_BRANCH =~ /test/
+    - if: '$CI_COMMIT_BRANCH =~ /test/'
       when: never
-    # Run for all other branch pushes (including after MR is accepted)
-    - if: $CI_COMMIT_BRANCH
+    # Run for merge requests
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    # Run for pushes to branches WITHOUT open merge requests
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS == null'
+      when: always
+     # Run for web-triggered pipelines
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
 
 variables:
   CONTAINER_HOST: cms-cmu
@@ -22,6 +29,10 @@ variables:
   GIT_SUBMODULE_FORCE_HTTPS: "true"
   MKDOCS_VERSION: '1.5.3'
   MATERIAL_VERSION: '9.5.3'
+  DATASET: metadata/datasets_HH4b_v1p1.yml
+  DATASET_RUN3: metadata/datasets_synthetic_test_Run3.yml
+  # DATASET: metadata/datasets_HH4b_cernbox.yml
+  # DATASET_RUN3: metadata/datasets_HH4b_Run3_cernbox.yml
 
 include:
   - local: '.ci-workflows/stages_*.yml'
@@ -45,11 +56,17 @@ stages:
   - pages
 
 validation:
+  before_script:
+    - cp docs/mkdocs.yml .
+    - cp docs/requirements.txt .
   rules:
     - changes:
       - docs/**
 
 pages:
+  before_script:
+    - cp docs/mkdocs.yml .
+    - cp docs/requirements.txt .
   rules:
     - changes:
       - docs/**

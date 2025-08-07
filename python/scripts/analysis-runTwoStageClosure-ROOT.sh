@@ -1,8 +1,10 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "base_class/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}analysis_test_mixed_job"
-OUTPUT_DIR="${DEFAULT_DIR}analysis_runTwoStageClosure_ROOT"
+
+INPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
+OUTPUT_DIR="${1:-"output"}/analysis_runTwoStageClosure_ROOT"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -58,7 +60,3 @@ python3 stats_analysis/tests/test_runTwoStageClosure.py --knownCounts stats_anal
 
 python3 stats_analysis/tests/dumpTwoStageInputs.py --input $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root   --output $OUTPUT_DIR/test_dump_twoStageClosureInputsCounts.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

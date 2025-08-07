@@ -1,8 +1,12 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
+
+# Setup proxy if needed
+setup_proxy
 
 echo "############### Checking and creating output/skimmer directory"
-OUTPUT_DIR="${DEFAULT_DIR}/synthetic_dataset_make_dataset"
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
@@ -23,7 +27,4 @@ time python runner.py -s -p skimmer/processor/make_declustered_data_4b.py -c $OU
 # time python runner.py -s -p skimmer/processor/make_declustered_data_4b.py -c $OUTPUT_DIR/declustering_for_test.yml -y UL18  -d GluGluToHHTo4B_cHHH1 -op $OUTPUT_DIR -o picoaod_datasets_declustered_GluGluToHHTo4B_cHHH1_test_UL18.yml -m metadata/datasets_HH4b.yml
 ls -R $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

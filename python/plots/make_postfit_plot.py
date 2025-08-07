@@ -221,7 +221,7 @@ if __name__ == '__main__':
     CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetYaxis().SetTitleOffset(0.8)
 
     # output_file = f"{args.output}/SvB_MA_postfitplots_{channels[0]}_{args.type_of_fit}"
-    output_file = f"{args.output}/SvB_MA_postfitplots_{args.type_of_fit}"
+    output_file = f"{args.output}/SvB_MA_postfitplots_{args.signal}_{args.type_of_fit}"
     CMS.SaveCanvas(nominal_can, f"{output_file}.pdf", close=False )
     CMS.SaveCanvas(nominal_can, f"{output_file}.png", close=False )
     CMS.SaveCanvas(nominal_can, f"{output_file}.C" )

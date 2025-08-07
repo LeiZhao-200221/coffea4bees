@@ -1,8 +1,16 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}weights_trigger_friendtree_job"
-OUTPUT_DIR="${DEFAULT_DIR}weights_trigger_analysis_job"
+# Setup proxy if needed
+setup_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
+
+INPUT_DIR="${1:-"output"}/weights_trigger_friendtree_job"
+OUTPUT_DIR="${1:-"output"}/weights_trigger_analysis_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -20,7 +28,3 @@ echo "############### Running test processor"
 python runner.py -t -o test_trigWeight.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/trigger_weights_HH4b.yml -m $DATASETS
 ls -lR ${OUTPUT_DIR}
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

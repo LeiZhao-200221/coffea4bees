@@ -1,22 +1,28 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_test_job"
-echo "############### Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output/" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory."
+    exit 1
 fi
 
-echo "############### Modifying config"
-sed -e "s|hist_cuts: .*|hist_cuts: [ passPreSel, passSvB, failSvB ]|" analysis/metadata/HH4b.yml > $OUTPUT_DIR/HH4b.yml
-cat $OUTPUT_DIR/HH4b.yml
+# Create output directory
+create_output_directory "$OUTPUT_BASE_DIR/analysis_test_job"
 
-echo "############### Running test processor"
-python runner.py -t -o test_databkgs.coffea -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ggZH4b ZH4b ZZ4b -p analysis/processors/processor_HH4b.py -y UL17 UL18 UL16_preVFP UL16_postVFP -op $OUTPUT_DIR -m $DATASETS -c $OUTPUT_DIR/HH4b.yml
+# Modify the config file
+display_section_header "Modifying config"
+sed -e "s|hist_cuts: .*|hist_cuts: [ passPreSel, passSvB, failSvB ]|" analysis/metadata/HH4b.yml > $OUTPUT_BASE_DIR/analysis_test_job/HH4b.yml
+cat $OUTPUT_BASE_DIR/analysis_test_job/HH4b.yml
 
-ls $OUTPUT_DIR
-
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+# Call the main analysis_test.sh script with Run3-specific parameters
+bash scripts/run_analysis_processor.sh \
+    --output-base "$OUTPUT_BASE_DIR" \
+    --datasets "data TTToHadronic TTToSemiLeptonic TTTo2L2Nu" \
+    --year "UL17 UL18 UL16_preVFP UL16_postVFP" \
+    --output-filename "test_databkgs.coffea" \
+    --output-subdir "analysis_test_job" \
+    --config $OUTPUT_BASE_DIR/analysis_test_job/HH4b.yml \
+    # --additional-flags "--debug"

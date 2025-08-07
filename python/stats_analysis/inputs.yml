@@ -1,9 +1,0 @@
-cases:
-  - datacard: combine_SvB_MA
-    signallabel: ZZ_bbbb
-    othersignal: ZH_bbbb
-    workspace: output/tmp/
-  - datacard: combine_SvB_MA
-    signallabel: ZH_bbbb
-    othersignal: ZZ_bbbb
-    workspace: output/tmp/

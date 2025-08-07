@@ -1,8 +1,10 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "base_class/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}analysis_merge_test_job"
-OUTPUT_DIR="${DEFAULT_DIR}analysis_plot_job"
+
+INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
+OUTPUT_DIR="${1:-"output"}/analysis_plot_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -49,7 +51,3 @@ ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/data/quadJet_min
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/HH4b/quadJet_min_dr_close_vs_other_m.pdf
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_other_m.pdf 
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
