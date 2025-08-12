@@ -4,7 +4,7 @@ import os
 import yaml
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
-#from hist.intervals import ratio_uncertainty
+from hist.intervals import ratio_uncertainty
 from base_class.physics.di_higgs import Coupling, ggF
 
 # Constants
@@ -21,7 +21,7 @@ COLORS = [
 ]
 
 # Dictionary and List Operations
-def get_value_nested_dict(nested_dict: Dict[str, Any], target_key: str) -> Any:
+def get_value_nested_dict(nested_dict: Dict[str, Any], target_key: str, debug: bool = False) -> Any:
     """Return the first value matching the target key from a nested dictionary.
 
     Args:
@@ -34,13 +34,15 @@ def get_value_nested_dict(nested_dict: Dict[str, Any], target_key: str) -> Any:
     Raises:
         ValueError: If the target key is not found in the dictionary
     """
+    if debug: print("Searching in nested_dict:", nested_dict)
+
     for k, v in nested_dict.items():
         if k == target_key:
             return v
 
         if isinstance(v, dict):
             try:
-                return get_value_nested_dict(v, target_key)
+                return get_value_nested_dict(v, target_key, debug=debug)
             except ValueError:
                 continue
 

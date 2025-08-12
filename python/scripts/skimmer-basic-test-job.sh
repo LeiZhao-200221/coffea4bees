@@ -1,7 +1,11 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/skimmer_basic_test_job"
+# Setup proxy if needed
+setup_proxy
+
+OUTPUT_DIR="${1:-"output"}/skimmer_basic_test_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -27,7 +31,3 @@ echo "############### Checking skimmer output"
 python metadata/merge_yaml_datasets.py -m ${OUTPUT_DIR}/datasets_HH4b.yml -f ${OUTPUT_DIR}/picoAOD_modify_branches.yml -o ${OUTPUT_DIR}/picoAOD_modify_branches.yml
 python runner.py -p skimmer/tests/modify_branches.py -c skimmer/tests/modify_branches_analysis.yml -y UL18 -d GluGluToHHTo4B_cHHH1 -op ${OUTPUT_DIR} -o modify_branches.coffea -m ${OUTPUT_DIR}/picoAOD_modify_branches.yml -t --debug
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

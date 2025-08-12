@@ -13,7 +13,7 @@ import pickle
 import re
 import tempfile
 from datetime import datetime
-from pathlib import Path
+from pathlib import PurePosixPath as Path
 from subprocess import PIPE, CalledProcessError, check_output
 from typing import Any, Generator, Literal
 
@@ -358,6 +358,9 @@ class EOS:
     def parts(self):
         return self.path.parts
 
+    def with_suffix(self, suffix: str):
+        return EOS(self.path.with_suffix(suffix), self.host)
+
     def __hash__(self):
         return hash((self.host, self.path))
 
@@ -391,7 +394,7 @@ class EOS:
 
 PathLike = str | EOS | os.PathLike
 """
-str, ~heptools.system.eos.EOS, os.PathLike: A str or path-like object with :meth:`__fspath__` method.
+str, ~heptools.system.eos.EOS, ~os.PathLike: A str or path-like object with :meth:`__fspath__` method.
 """
 
 

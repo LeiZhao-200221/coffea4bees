@@ -267,6 +267,7 @@ def create_combine_root_file( file_to_convert,
     #### make datacard
     for i, ibin in enumerate(metadata['bin']):
 
+        ibin_label = ibin.split("_")[0]
         cb = ch.CombineHarvester()
         cb.SetVerbosity(3)
 
@@ -295,13 +296,13 @@ def create_combine_root_file( file_to_convert,
                 if ('2016' in nuisance) or ('UL16' in nuisance):
                     nuisance = nuisance.replace('UL16_postVFP', '2016')
                     if ('2016' in ibin):
-                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')(['HHbb_2016'],1.0))
+                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')([f'{ibin_label}_2016'],1.0))
                 elif ('2017' in nuisance):
                     if('2017' in ibin):
-                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')(['HHbb_2017'],1.0))
-                elif ('2018' in nuisance): 
+                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')([f'{ibin_label}_2017'],1.0))
+                elif ('2018' in nuisance):
                     if ('2018' in ibin):
-                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')(['HHbb_2018'],1.0))
+                        cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap('bin')([f'{ibin_label}_2018'],1.0))
                 else:
                     cb.cp().signals().AddSyst(cb, nuisance, 'shape', ch.SystMap()(1.0))
                 if 'btag' in nuisance:
@@ -317,13 +318,13 @@ def create_combine_root_file( file_to_convert,
                 else: othersSysts.append(isyst)
                 if ('2016' in isyst):
                     if ('2016' in ibin):
-                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')(['HHbb_2016'],metadata['uncertainty'][isyst]['years']['HHbb_2016']))
+                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')([f'{ibin_label}_2016'],metadata['uncertainty'][isyst]['years'][f'{ibin_label}_2016']))
                 elif ('2017' in isyst):
                     if ('2017' in ibin):
-                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')(['HHbb_2017'],metadata['uncertainty'][isyst]['years']['HHbb_2017']))
+                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')([f'{ibin_label}_2017'],metadata['uncertainty'][isyst]['years'][f'{ibin_label}_2017']))
                 elif ('2018' in isyst):
                     if ('2018' in ibin):
-                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')(['HHbb_2018'],metadata['uncertainty'][isyst]['years']['HHbb_2018']))
+                        cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')([f'{ibin_label}_2018'],metadata['uncertainty'][isyst]['years'][f'{ibin_label}_2018']))
                 elif ('1718' in isyst):
                     if '2017' in ibin or '2018' in ibin:
                         cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')
@@ -332,8 +333,12 @@ def create_combine_root_file( file_to_convert,
                     cb.cp().signals().AddSyst(cb, isyst, metadata['uncertainty'][isyst]['type'], ch.SystMap('bin')
                                             ([ibin], metadata['uncertainty'][isyst]['years'][ibin])
                                             )
-            cb.SetGroup("mtop", mtopSysts)
             cb.SetGroup("others", othersSysts)
+            if ibin_label.startswith('hh'):    
+                cb.SetGroup("mtop", mtopSysts)
+                cb.SetGroup("signal_norm_xsbr", [
+                    'pdf_Higgs_ggHH', 'BR_hbb', 'THU_HH'])
+                cb.SetGroup("signal_norm_xs", ['THU_HH', 'pdf_Higgs_ggHH'])
 
             cb.cp().backgrounds().ExtractShapes(
                 output, '$BIN/$PROCESS', '$BIN/$PROCESS_$SYSTEMATIC')

@@ -1,8 +1,12 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}synthetic_dataset_make_dataset"
-OUTPUT_DIR="${DEFAULT_DIR}synthetic_dataset_analyze"
+# Setup proxy if needed
+setup_proxy
+
+INPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset"
+OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -11,7 +15,7 @@ fi
 echo "############### Changing metadata"
 if [[ $(hostname) = *fnal* ]]; then
     echo "No change in metadata."
-    sed -e "s#output#${DEFAULT_DIR}#" metadata/datasets_synthetic_test.yml > $OUTPUT_DIR/datasets_synthetic_test.yml
+    sed -e "s#output#${1:-"output"}#" metadata/datasets_synthetic_test.yml > $OUTPUT_DIR/datasets_synthetic_test.yml
 else
     sed -e "s#\/srv#\/builds\/${CI_PROJECT_PATH}#" metadata/datasets_synthetic_test.yml > $OUTPUT_DIR/datasets_synthetic_test.yml
 fi
@@ -43,7 +47,4 @@ time python runner.py -o test_synthetic_datasets.coffea -d synthetic_data synthe
 # time python runner.py -o test_synthetic_datasets.coffea -d data GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18  -op $OUTPUT_DIR/ -c analysis/metadata/HH4b_synthetic_data.yml -m $OUTPUT_DIR/datasets_synthetic_test.yml
 # time python runner.py -o test_synthetic_datasets_Run3.coffea -d data  -p analysis/processors/processor_HH4b.py -y 2022_EE  -op ${OUTPUT_DIR} -c analysis/metadata/HH4b_synthetic_data.yml -m metadata/datasets_HH4b_Run3_fourTag.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

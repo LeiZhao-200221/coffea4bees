@@ -1,8 +1,10 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"}
+# Source common functions
+source "base_class/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}analysis_merge_test_job"
-OUTPUT_DIR="${DEFAULT_DIR}baseclass_test_job"
+
+INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
+OUTPUT_DIR="${1:-"output"}/baseclass_test_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -12,7 +14,3 @@ python base_class/tests/dumpPlotCounts.py --input $INPUT_DIR/test.coffea --outpu
 python base_class/tests/plots_test.py --inputFile $INPUT_DIR/test.coffea --known base_class/tests/known_PlotCounts.yml
 ls $OUTPUT_DIR/test_dumpPlotCounts.yml
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

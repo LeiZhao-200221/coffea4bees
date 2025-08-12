@@ -3,8 +3,7 @@ year:
   - UL16_postVFP
   - UL17
   - UL18
-dataset:
-  - data 
+dataset_tt:
   - TTToHadronic 
   - TTToSemiLeptonic 
   - TTTo2L2Nu 
@@ -12,12 +11,15 @@ dataset_signals:
   - ZZ4b 
   - ggZH4b
   - ZH4b 
-  # - GluGluToHHTo4B_cHHH1
+  - GluGluToHHTo4B_cHHH1
 dataset_systematics:
   - GluGluToHHTo4B_cHHH1
   - GluGluToHHTo4B_cHHH0
   - GluGluToHHTo4B_cHHH2p45
   - GluGluToHHTo4B_cHHH5
+  - ZZ4b
+  - ggZH4b
+  - ZH4b
 dataset_for_mixed:
   - TTToSemiLeptonic_for_mixed
   - TTToHadronic_for_mixed
@@ -25,15 +27,31 @@ dataset_for_mixed:
 dataset_mixeddata:
   - data_3b_for_mixed
   - mixeddata
-# dataset_preUL:
-#   - HH4b  
 year_preUL:
   - '2016'
   - '2017'
   - '2018'
-hash: 10b4f707
-diff: "In_gitdiff.txt_file"
-analysis_container: "gitlab-registry.cern.ch/cms-cmu/coffea4bees:20250408_0c141101"   ### actual tag for reproducibility
+data_eras:
+  UL16_preVFP: "B C D E F"
+  UL16_postVFP: "F G H"
+  UL17: "C D E F"
+  UL18: "A B C D"
+# Cases configuration for combine rules
+channels:
+  HH4b:
+    signallabel: "GluGluToHHTo4B_cHHH1"
+    othersignal: "GluGluToHHTo4B_cHHH0 GluGluToHHTo4B_cHHH2p45 GluGluToHHTo4B_cHHH5"
+  ZZ4b:
+    signallabel: "ZZ4b"
+    othersignal: ""
+  ZH4b:
+    signallabel: "ZH4b"
+    othersignal: ""
+extra_arguments: "--gitdiff In_gitdiff.txt_file --githash ec9732b7"
+analysis_container: "gitlab-registry.cern.ch/cms-cmu/coffea4bees:20250714_44f08ac8"   ### actual tag for reproducibility
 combine_container: "gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"
+# analysis_container: "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-cmu/coffea4bees:latest"
+# combine_container: "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"  
 output_path: "output/"
-dataset_location: "metadata/datasets_HH4b_v1p1.yml"
+dataset_location: "metadata/datasets_HH4b_v1p2.yml"
+container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv || true && cd - &&"

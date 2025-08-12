@@ -68,6 +68,11 @@ def _init_classfier(path: str | list[HCRModelMetadata]):
         from ..helpers.classifier.HCR import HCREnsemble
         return HCREnsemble(path)
 
+def _init_classfier_FvT(path: str | list[HCRModelMetadata]):
+    if path is None:
+        return None
+    from ..helpers.classifier.HCR import Legacy_HCREnsemble_FvT
+    return Legacy_HCREnsemble_FvT(path)
 
 class analysis(processor.ProcessorABC):
     def __init__(
@@ -75,6 +80,7 @@ class analysis(processor.ProcessorABC):
         *,
         SvB: str|list[HCRModelMetadata] = None,
         SvB_MA: str|list[HCRModelMetadata] = None,
+        FvT: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
         JCM_file: str = "analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
@@ -110,6 +116,7 @@ class analysis(processor.ProcessorABC):
         self.apply_boosted_veto = apply_boosted_veto
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
+        self.classifier_FvT = _init_classfier_FvT(FvT)
         with open(corrections_metadata, "r") as f:
             self.corrections_metadata = yaml.safe_load(f)
 
@@ -174,13 +181,14 @@ class analysis(processor.ProcessorABC):
         # Reading SvB friend trees
         #
         path = fname.replace(fname.split("/")[-1], "")
-        if self.apply_FvT:
+        if self.apply_FvT and self.classifier_FvT is None:
             if "FvT" in self.friends:
                 event["FvT"] = rename_FvT_friend(target, self.friends["FvT"])
                 if self.config["isDataForMixed"] or self.config["isTTForMixed"]:
                     for _FvT_name in event.metadata["FvT_names"]:
                         event[_FvT_name] = rename_FvT_friend(target, self.friends[_FvT_name])
                         event[_FvT_name, _FvT_name] = event[_FvT_name].FvT
+
             else:
                 # TODO: remove backward compatibility in the future
                 if self.config["isMixedData"]:
@@ -515,15 +523,17 @@ class analysis(processor.ProcessorABC):
             self._cutFlow.fill( "passPreSel_allTag_woTrig", event[selections.all(*allcuts)], allTag=True,
                                 wOverride=np.sum(weights.partial_weight(exclude=['CMS_bbbb_resolved_ggf_triggerEffSF'])[selections.all(*allcuts)] ))
 
-        weights, list_weight_names = add_pseudotagweights( event, weights,
-                                                           JCM=self.apply_JCM,
-                                                           apply_FvT=self.apply_FvT,
-                                                           isDataForMixed=self.config["isDataForMixed"],
-                                                           list_weight_names=list_weight_names,
-                                                           event_metadata=event.metadata,
-                                                           year_label=self.year_label,
-                                                           len_event=len(event),
-                                                          )
+        weights, list_weight_names = add_pseudotagweights( 
+            event, 
+            weights,
+            JCM=self.apply_JCM,
+            apply_FvT=self.apply_FvT,
+            isDataForMixed=self.config["isDataForMixed"],
+            list_weight_names=list_weight_names,
+            event_metadata=event.metadata,
+            year_label=self.year_label,
+            len_event=len(event),
+            )
 
         #
         # Example of how to write out event numbers
@@ -586,15 +596,20 @@ class analysis(processor.ProcessorABC):
         #
         #  Build di-jets and Quad-jets
         #
-        selev = create_cand_jet_dijet_quadjet( selev,
-                                               apply_FvT=self.apply_FvT,
-                                               run_SvB=self.run_SvB,
-                                               run_systematics=self.run_systematics,
-                                               classifier_SvB=self.classifier_SvB,
-                                               classifier_SvB_MA=self.classifier_SvB_MA,
-                                               processOutput = processOutput,
-                                               isRun3=self.config["isRun3"],
-                                              )
+        selev = create_cand_jet_dijet_quadjet( 
+            selev,
+            apply_FvT=self.apply_FvT,
+            classifier_FvT=self.classifier_FvT,
+            run_SvB=self.run_SvB,
+            run_systematics=self.run_systematics,
+            classifier_SvB=self.classifier_SvB,
+            classifier_SvB_MA=self.classifier_SvB_MA,
+            processOutput = processOutput,
+            isRun3=self.config["isRun3"],
+            weights=weights,
+            list_weight_names=list_weight_names,
+            analysis_selections=analysis_selections,
+            )
 
 
 
@@ -667,32 +682,40 @@ class analysis(processor.ProcessorABC):
         #
         # Hists
         #
+        if self.classifier_FvT: apply_FvT = True
+        else: apply_FvT = self.apply_FvT
         hist = {}
         if self.fill_histograms:
             if not self.run_systematics:
                 ## this can be simplified
-                hist = filling_nominal_histograms(selev, self.apply_JCM,
-                                                  processName=self.processName,
-                                                  year=self.year,
-                                                  isMC=self.config["isMC"],
-                                                  histCuts=self.histCuts,
-                                                  apply_FvT=self.apply_FvT,
-                                                  run_SvB=self.run_SvB,
-                                                  run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
-                                                  top_reconstruction=self.top_reconstruction,
-                                                  isDataForMixed=self.config['isDataForMixed'],
-                                                  event_metadata=event.metadata)
+                hist = filling_nominal_histograms(
+                    selev, 
+                    self.apply_JCM,
+                    processName=self.processName,
+                    year=self.year,
+                    isMC=self.config["isMC"],
+                    histCuts=self.histCuts,
+                    apply_FvT=apply_FvT,
+                    run_SvB=self.run_SvB,
+                    run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
+                    top_reconstruction=self.top_reconstruction,
+                    isDataForMixed=self.config['isDataForMixed'],
+                    event_metadata=event.metadata
+                    )
 
             #
             # Run systematics
             #
             else:
-                hist = filling_syst_histograms(selev, weights,
-                                               analysis_selections,
-                                               shift_name=shift_name,
-                                               processName=self.processName,
-                                               year=self.year,
-                                               histCuts=self.histCuts)
+                hist = filling_syst_histograms(
+                    selev, 
+                    weights,
+                    analysis_selections,
+                    shift_name=shift_name,
+                    processName=self.processName,
+                    year=self.year,
+                    histCuts=self.histCuts
+                    )
 
         friends = { 'friends': {} }
         if self.make_top_reconstruction is not None:

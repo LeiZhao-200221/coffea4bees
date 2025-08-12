@@ -1,7 +1,11 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}skimmer_boosted_job"
+# Setup proxy if needed
+setup_proxy
+
+OUTPUT_DIR="${1:-"output"}/skimmer_boosted_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -25,7 +29,3 @@ echo "############### Running test processor"
 python runner.py -s -p skimmer/processor/skimmer_4b_boosted.py -c $OUTPUT_DIR/HH4b_boosted.yml -y UL18 -d GluGluToHHTo4B_cHHH0 -op $OUTPUT_DIR -o picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml -m $OUTPUT_DIR/datasets_HH4b.yml  -t 
 ls -R $OUTPUT_DIR
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

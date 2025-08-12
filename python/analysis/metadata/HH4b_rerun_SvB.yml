@@ -17,4 +17,4 @@ config:
       # name: Final # name of the output stage (e.g. Final or some other checkpoint)
   top_reconstruction_override: false
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
+    trigWeight: "metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def _reweight_bkg(df: pd.DataFrame):
-    df.loc[:, "weight"] *= df["pseudoTagWeight"] * df["FvT"]
+    df.loc[:, "weight"] *= df["FvT"]
     return df
 
 
@@ -116,7 +116,7 @@ class Background(_picoAOD.Background, _Train):
         self.preprocessors.append(drop_columns("FvT"))
 
     def other_branches(self):
-        return super().other_branches() | {"FvT", "pseudoTagWeight"}
+        return super().other_branches() | {"FvT"}
 
     @staticmethod
     def normalize(df: pd.DataFrame, norm: float):

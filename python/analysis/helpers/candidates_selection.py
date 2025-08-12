@@ -1,18 +1,27 @@
 import numpy as np
 import awkward as ak
+import logging
 from base_class.math.random import Squares
 from analysis.helpers.SvB_helpers import compute_SvB
+from analysis.helpers.FvT_helpers import compute_FvT
 from coffea.nanoevents.methods import vector
+from coffea.analysis_tools import Weights
 
 def create_cand_jet_dijet_quadjet(
     selev,
     apply_FvT: bool = False,
+    classifier_FvT=None,
     run_SvB: bool = False,
     run_systematics: bool = False,
     classifier_SvB=None,
     classifier_SvB_MA=None,
     processOutput=None,
     isRun3=False,
+    include_lowptjets=False,
+    label3b: str = "threeTag",
+    weights: Weights = None,
+    list_weight_names: list[str] = None,
+    analysis_selections: ak.Array = None,
 ):
     """
     Creates candidate jets, dijets, and quadjets for event selection.
@@ -51,8 +60,22 @@ def create_cand_jet_dijet_quadjet(
     # Build and select boson candidate jets with bRegCorr applied
     #
     sorted_idx = ak.argsort( selev.Jet.btagScore * selev.Jet.selected, axis=1, ascending=False )
-    canJet_idx = sorted_idx[:, 0:4]
-    notCanJet_idx = sorted_idx[:, 4:]
+    if include_lowptjets:
+        sorted_idx_lowpt = ak.argsort( selev.Jet.btagScore * selev.Jet.selected_lowpt, axis=1, ascending=False )
+        canJet_idx = ak.concatenate([sorted_idx[:, 0:3], sorted_idx_lowpt[:, :1]], axis=1)
+        logging.debug(f"lowpt selected {(selev.Jet.selected_lowpt)[:1]}")
+        logging.debug(f"both lowpt {(selev.Jet.btagScore * selev.Jet.selected_lowpt)[:1]}")
+        logging.debug(f"sorted_idx_lowpt {sorted_idx_lowpt[:1]}")
+
+    else:
+        canJet_idx = sorted_idx[:, 0:4]
+    # Exclude canJet_idx from sorted_idx
+    mask = ~ak.any(canJet_idx[:, :, np.newaxis] == sorted_idx[:, np.newaxis, :], axis=1)
+    notCanJet_idx = sorted_idx[mask]
+    
+    logging.debug(f"canJet_idx {canJet_idx[:1]}")
+    logging.debug(f"notCanJet_idx {notCanJet_idx[:1]}\n\n")
+    
 
     # # apply bJES to canJets
     canJet = selev.Jet[canJet_idx] * selev.Jet[canJet_idx].bRegCorr
@@ -242,8 +265,19 @@ def create_cand_jet_dijet_quadjet(
         quadJet["rank"] = ( 10 * quadJet.passDiJetMass + quadJet.lead.passMDR + quadJet.subl.passMDR + quadJet.random )
         quadJet["selected"] = quadJet.rank == np.max(quadJet.rank, axis=1)
 
+    if classifier_FvT is not None:
+        logging.info("Computing FvT scores with classifier")
 
-    if apply_FvT:
+        compute_FvT(selev, selev[label3b], FvT=classifier_FvT)
+        weight_FvT = np.ones(len(weights.weight()), dtype=float)
+        weight_FvT[analysis_selections] *= ak.to_numpy(selev.FvT.FvT)
+        weights.add("FvT", weight_FvT)
+        list_weight_names.append("FvT")
+        logging.debug( f"FvT {weights.partial_weight(include=['FvT'])[:10]}\n" )
+        apply_FvT = True
+
+    if apply_FvT and ("FvT" in selev.fields):
+
         quadJet["FvT_q_score"] = np.concatenate( [
             selev.FvT.q_1234[:, np.newaxis],
             selev.FvT.q_1324[:, np.newaxis],

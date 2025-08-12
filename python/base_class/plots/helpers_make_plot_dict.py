@@ -789,13 +789,14 @@ def _add_1d_ratio_plots(plot_data: Dict, **kwargs) -> None:
             num_vars = plot_data["hists"][_num_key]["variances"]
 
             ratio_config = {
-                "color": plot_helpers.COLORS[iH],
+                "color": plot_data["hists"][_num_key].get("edgecolor",plot_helpers.COLORS[iH]),
                 "marker": "o"
             }
             ratios, ratio_uncert = plot_helpers.make_ratio(num_values, num_vars, den_values, den_vars, **kwargs)
             ratio_config["ratio"] = ratios.tolist()
             ratio_config["error"] = ratio_uncert.tolist()
             ratio_config["centers"] = den_centers
+
             plot_data["ratio"][f"ratio_{_num_key}_to_{den_key}_{iH}"] = ratio_config
     except (KeyError, IndexError) as e:
         raise ValueError(f"Failed to create 1D ratio plot: {str(e)}")

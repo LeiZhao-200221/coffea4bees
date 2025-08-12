@@ -1,7 +1,9 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "base_class/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_plot_job_truth"
+
+OUTPUT_DIR="${1:-"output"}/analysis_plot_job_truth"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -12,7 +14,3 @@ python  plots/makePlotsTruthStudy.py analysis/hists/testTruth.coffea -m plots/me
 echo "############### Checking if pdf files exist"
 ls ${OUTPUT_DIR}/RunII/pass4GenBJets00/fourTag/SR/otherGenJet00_pt.pdf
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

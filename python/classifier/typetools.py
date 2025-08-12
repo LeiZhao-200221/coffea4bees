@@ -77,15 +77,7 @@ class dict_proxy:
         for mapping in mappings:
             proxy = dict_proxy(mapping)
             for k in proxy:
-                v = proxy[k]
-                if (
-                    k in self
-                    and isinstance(self[k], Mapping)
-                    and isinstance(v, Mapping)
-                ):
-                    dict_proxy(self[k]).update(v)
-                else:
-                    self[k] = v
+                self[k] = proxy[k]
         return self
 
 

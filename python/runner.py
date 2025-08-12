@@ -21,7 +21,7 @@ import yaml
 from base_class.addhash import get_git_diff, get_git_revision_hash
 from coffea import processor
 from coffea.dataset_tools import rucio_utils
-from coffea.nanoevents import NanoAODSchema
+from coffea.nanoevents import NanoAODSchema, PFNanoAODSchema
 from coffea.util import save
 from dask.distributed import performance_report
 from distributed.diagnostics.plugin import WorkerPlugin
@@ -137,8 +137,6 @@ if __name__ == '__main__':
                         'HH4b', 'ZZ4b', 'ZH4b'], help="Name of dataset to run. Example if more than one: -d HH4b ZZ4b")
     parser.add_argument('-e', '--era', nargs='+', dest='era', default=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
                         help="For data only. To run only on one data era.")
-    parser.add_argument('--systematics', dest="systematics", action="store_true",
-                        default=False, help='Run Systematics for analysis processor')
     parser.add_argument('-s', '--skimming', dest="skimming", action="store_true",
                         default=False, help='Run skimming instead of analysis')
     parser.add_argument('--dask', dest="run_dask",
@@ -200,9 +198,13 @@ if __name__ == '__main__':
     config_runner.setdefault('override_top_reconstruction', None)
     config_runner.setdefault('uproot_xrootd_retry_delays', [5, 15, 45])
 
-    if args.systematics:
-        logging.info("Running with systematics")
-        configs['config']['run_systematics'] = True
+    if isinstance(config_runner['schema'], str):
+        if config_runner['schema'] == "NanoAODSchema":
+            config_runner['schema'] = NanoAODSchema
+        elif config_runner['schema'] == "PFNanoAODSchema":
+            config_runner['schema'] = PFNanoAODSchema
+        else:
+            raise ValueError(f"Unknown schema: {config_runner['schema']}")
 
     if 'all' in args.datasets:
         metadata['datasets'].pop("mixeddata")
@@ -650,13 +652,19 @@ if __name__ == '__main__':
             )
             friends: dict[str, Friend] = output.get("friends", None)
             if friend_base is not None and friends is not None:
+                from base_class.awkward.zip import NanoAOD
+
+                merge_kw = dict(
+                    step=config_runner["friend_merge_step"],
+                    base_path=friend_base,
+                    naming=_friend_merge_name,
+                    transform=NanoAOD(regular=False, jagged=True),
+                )
                 if args.run_dask:
                     merged_friends = client.compute(
                         {
                             k: friends[k].merge(
-                                step=config_runner["friend_merge_step"],
-                                base_path=friend_base,
-                                naming=_friend_merge_name,
+                                **merge_kw,
                                 clean=False,
                                 dask=True,
                             )
@@ -669,14 +677,12 @@ if __name__ == '__main__':
                     friends = merged_friends
                 else:
                     for k, v in friends.items():
-                        friends[k] = v.merge(
-                            step=config_runner["friend_merge_step"],
-                            base_path=friend_base,
-                            naming=_friend_merge_name,
-                        )
+                        friends[k] = v.merge(**merge_kw)
+
                 from base_class.system.eos import EOS
                 from base_class.utils.json import DefaultEncoder
-                metafile = f'{args.output_path}/{args.output_file.replace("coffea", "json")}'
+
+                metafile = (EOS(args.output_path) / str(args.output_file)).with_suffix(".json")
                 # metafile = EOS(friend_base) / f'{config_runner["friend_metafile"]}.json'
                 with fsspec.open(metafile, "wt") as f:
                     json.dump(friends, f, cls=DefaultEncoder)
