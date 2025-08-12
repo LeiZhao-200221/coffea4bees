@@ -24,7 +24,7 @@ from analysis.helpers.filling_histograms import (
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.candidates_selection_resonant import create_cand_jet_dijet_quadjet
+from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
 from analysis.helpers.topCandReconstruction import (
     adding_top_reco_to_event,
