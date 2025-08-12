@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 from copy import deepcopy
+from textwrap import indent
 from typing import (
     Callable,
     Generic,
@@ -25,6 +26,7 @@ from hist.axis import (
     Variable,
 )
 from packaging.version import Version
+from rich.pretty import pretty_repr
 from typing_extensions import Self  # DEPRECATE
 
 from .. import awkward as akext
@@ -136,12 +138,10 @@ AxisLike = (
 )
 
 
-class FillError(Exception):
-    __module__ = Exception.__module__
+class FillError(Exception): ...
 
 
-class HistError(Exception):
-    __module__ = Exception.__module__
+class HistError(Exception): ...
 
 
 HistType = TypeVar("HistType", bound=Hist)
@@ -213,10 +213,10 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
         _ak = self.__backend__.ak
         if hists is ...:
             if (hists := _Collection.current) is None:
-                raise FillError("No histogram collection is specified")
+                raise FillError("\nNo histogram collection is specified")
         if not isinstance(self, hists.__backend__.fill):
             raise FillError(
-                "Cannot fill a histogram collection with a different backend"
+                "\nCannot fill a histogram collection with a different backend."
             )
         fill_args = self._kwargs | fill_args
         mask_categories = []
@@ -238,18 +238,25 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
             if self.__backend__.check_empty_mask and len(masked) == 0:
                 continue
             for k, v in fill_args.items():
-                if (isinstance(v, str) and k in hists._categories) or isinstance(
-                    v, bool | RealNumber
-                ):
-                    fill_values[k] = v
-                elif check_type(v, FieldLike):
-                    fill_values[k] = self._get_fill_arg(lambda: get_field(masked, v))
-                elif isinstance(v, self.__backend__.anyarray):
-                    fill_values[k] = v if mask is None else v[mask]
-                elif isinstance(v, Callable):
-                    fill_values[k] = self._get_fill_arg(lambda: v(masked))
-                else:
-                    raise FillError(f'cannot fill "{k}" with "{v}"')
+                try:
+                    if (isinstance(v, str) and k in hists._categories) or isinstance(
+                        v, bool | RealNumber
+                    ):
+                        fill_values[k] = v
+                    elif check_type(v, FieldLike):
+                        fill_values[k] = self._get_fill_arg(
+                            lambda: get_field(masked, v)
+                        )
+                    elif isinstance(v, self.__backend__.anyarray):
+                        fill_values[k] = v if mask is None else v[mask]
+                    elif isinstance(v, Callable):
+                        fill_values[k] = self._get_fill_arg(lambda: v(masked))
+                    else:
+                        raise TypeError("Unsupported fill value.")
+                except Exception:
+                    raise FillError(
+                        f'\nWhile preparing fill value "{k}" from\n  {type(v)}\n{indent(pretty_repr(v), "    ")}\n the above error occurred.'
+                    )
             for name in self._fills:
                 hist_args = {}
                 try:
@@ -293,14 +300,12 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
                     ############################################################
                     hists._hists[name].fill(**hist_args)
                     hists._filled.add(name)
-                except Exception as e:
+                except Exception:
                     if hist_args:
-                        msg = f'filling histogram "{name}", with\n" + {indent(pretty_repr(hist_args))}'
+                        msg = f'filling histogram "{name}", with\n" + {indent(pretty_repr(hist_args), "    ")}'
                     else:
                         msg = f'preparing the arguments for histogram "{name}"'
-                    raise ValueError(
-                        f"While {msg}\n the above exception occurred."
-                    ) from e
+                    raise FillError(f"\nWhile {msg}\n the above exception occurred.")
 
 
 if sys.version_info >= (3, 11):
