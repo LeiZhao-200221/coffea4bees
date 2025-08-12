@@ -9,29 +9,29 @@ hists:
         HH4b:
                 process: GluGluToHHTo4B_cHHH1
                 tag: fourTag
-                label: HH4b (x100)
+                label: HH4b (x1)
                 edgecolor: "#e42536"
                 fillcolor: "#e42536"            
                 histtype: step
-                scalefactor: 100
+                scalefactor: 1
                 
         ZH4b:
                 process: [ZH4b, ggZH4b]
                 tag: fourTag
-                label: ZH4b (x100)
+                label: ZH4b (x1)
                 edgecolor: "#964a8b"
                 fillcolor: "#964a8b"            
                 histtype: step
-                scalefactor: 100
+                scalefactor: 1
 
         ZZ4b:
                 process: ZZ4b
                 tag: fourTag
-                label: ZZ4b (x100)
+                label: ZZ4b (x1)
                 edgecolor: "#7a21dd"
                 fillcolor: "#7a21dd"            
                 histtype: step
-                scalefactor: 100
+                scalefactor: 1
 
 
 stack:
