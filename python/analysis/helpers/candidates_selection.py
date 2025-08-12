@@ -292,6 +292,12 @@ def create_cand_jet_dijet_quadjet(
     selev["m4j_ZHSR"] = ak.where(~selev.quadJet_selected.ZHSR, -2, selev.m4j)
     selev["m4j_ZZSR"] = ak.where(~selev.quadJet_selected.ZZSR, -2, selev.m4j)
 
+    passSvBUpCut = 0.8
+    passSvB_hh = selev.SvB_MA.ps_hh > passSvBUpCut
+    selev["m4j_HHSR_passHH"]  = ak.where((~passSvB_hh), -2, selev.m4j_HHSR)
+    selev["m4j_ZHSR_passZH"]  = ak.where((selev.SvB_MA.ps_zh <= passSvBUpCut), -2, selev.m4j_ZHSR)
+    selev["m4j_ZZSR_passZZ"]  = ak.where((selev.SvB_MA.ps_zz <= passSvBUpCut), -2, selev.m4j_ZZSR)
+
     selev['leadStM_selected'] = selev.quadJet_selected.lead.mass
     selev['sublStM_selected'] = selev.quadJet_selected.subl.mass
 

@@ -91,6 +91,52 @@ class QuadJetHistsSRSingle(Template):
     lead_vs_subl_m   = H((50, 0, 250, ('lead_m', 'Lead Boson Candidate Mass')),
                          (50, 0, 250, ('subl_m', 'Subl Boson Candidate Mass')))
 
+class m4jVsPt4j(Template):
+    m4j_vs_pt4j = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                    ( 40, 0,  400, ("pt4j", "pt4j [GeV]")))
+
+class m4jVsSvB(Template):
+    m4j_SvBcut = H((200, 0, 2000, ("m4j" , "m4j [GeV]")))
+    m4j_vs_SvB = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                    ( 40, 0,  1, ("SvB", "SvB HH")))
+
+class m4jVsNSelJets(Template):
+    m4j_vs_nJetSel = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                    ( 40, 0,  20, ("nJetSel", "nJetSel")))
+
+class pt4jVsNSelJets(Template):
+    pt4j_vs_nJetSel = H(( 40, 0,  400, ("pt4j", "pt4j [GeV]")),  
+                    ( 40, 0,  20, ("nJetSel", "nJetSel")))
+
+class hTVsNSelJets(Template):
+    hT_vs_nJetSel = H(( 50, 0, 1500, ("hT", "hT [GeV]")),  
+                    ( 40, 0,  20, ("nJetSel", "nJetSel")))
+
+class hTVsPt4j(Template):
+    hT_vs_pt4j = H(( 50, 0, 1500, ("hT", "hT [GeV]")),  
+                    ( 40, 0,  400, ("pt4j", "pt4j [GeV]")))
+
+class m4jVsHt(Template):
+    m4j_vs_hT = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                    ( 50, 0, 1500, ("hT", "hT [GeV]")))
+
+class m4jVsJetPt(Template):
+    v4j_mass_vs_jet_pt = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                    ( 50, 0, 400, ("pt", "pt [GeV]")))
+
+
+class ptVsJetsDr(Template):
+    jet_pt_vs_jets_dr = H((40, 0, 400, ("pt", "pt [GeV]")),  
+                     ( 50, 0, 5, ("dr", "dr")))
+
+class svbVsJetsDr(Template):
+    svb_vs_jets_dr = H(( 40, 0,  1, ("SvB", "SvB HH")),  
+                     ( 50, 0, 5, ("dr", "dr")))
+
+class m4jVsJetsDr(Template):
+    v4j_mass_vs_jets_dr = H((200, 0, 2000, ("m4j" , "m4j [GeV]")),  
+                     ( 50, 0, 5, ("dr", "dr")))
+
 class WCandHists(Template):
 
     p  = LorentzVector.plot(('...', R'W Candidate'), 'p',  skip=['n'], bins={"mass": (60, 0, 600), "pt": (60, 0, 600)})
