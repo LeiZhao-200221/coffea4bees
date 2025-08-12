@@ -24,7 +24,7 @@ from analysis.helpers.filling_histograms import (
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from analysis.helpers.candidates_selection_resonant import create_cand_jet_dijet_quadjet
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
 from analysis.helpers.topCandReconstruction import (
     adding_top_reco_to_event,
@@ -77,7 +77,8 @@ class analysis(processor.ProcessorABC):
         SvB_MA: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
-        JCM_file: str = "analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        # JCM_file: str = "analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        JCM_file: str = "analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -604,6 +605,13 @@ class analysis(processor.ProcessorABC):
         # from analysis.helpers.write_debug_info import add_debug_info_to_output
         # add_debug_info_to_output(event, processOutput, weights, list_weight_names, analysis_selections)
 
+
+        #### Example on how to add additional selections
+        #### Include these cuts in analysis/metadata/*.yml under hist_cuts: [ passPreSel, passLSdr]
+        # passLSdrFlag = np.full(len(event), False)
+        # passLSdrFlag[ analysis_selections ] = selev.passLSdr
+        # selections.add('passLSdr', passLSdrFlag)
+        # allcuts.append('passLSdr')
 
         #
         # Blind data in fourTag SR
