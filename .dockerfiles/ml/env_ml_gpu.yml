@@ -9,6 +9,7 @@ dependencies:
   - pycurl
   - readchar
   - fsspec
+  - ndcctools # suppress coffea warning
   # numerical
   - numpy
   - scipy
