@@ -89,22 +89,23 @@ rule make_combine_inputs:
         injsonsyst = "output/histAll_signals_cHHHX.json",
         bkgsyst = "output/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/varrebin2/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_fine_varrebin2.pkl"
     output:
-        "output/datacards/datacard__HHbb.txt"
+        "output/datacards/datacard__{signal}.txt"
     params:
         variable = "SvB_MA.ps_hh_fine",
         rebin = 2,
         output_dir = "output/datacards/",
         variable_binning =  "--variable_binning",
         stat_only = "--stat_only",
-        signal = "HH4b",
+        channel = "HH4b",
+        signal = "",
         container_wrapper = config.get("container_wrapper", "./run_container combine")
     log:
         "logs/make_combine_inputs_{signal}.log"
     shell:
         """
         mkdir -p $(dirname {log})
-        echo "[$(date)] Starting make_combine_inputs for signal {params.signal}" > {log}
-        
+        echo "[$(date)] Starting make_combine_inputs for channel {params.channel}" > {log}
+
         echo "[$(date)] Making combine inputs with full stats" | tee -a {log}
         {params.container_wrapper} \
             python3 stats_analysis/make_combine_inputs.py \
@@ -115,16 +116,16 @@ rule make_combine_inputs:
             --output_dir {params.output_dir} \
             --rebin {params.rebin} \
             {params.variable_binning} \
-            --metadata stats_analysis/metadata/{params.signal}.yml \
+            --metadata stats_analysis/metadata/{params.channel}.yml \
             {params.stat_only} 2>&1 | tee -a {log}
             
         echo "[$(date)] Combining datacards" | tee -a {log}
         {params.container_wrapper} "cd {params.output_dir} && \
-            combineCards.py {params.signal}_2016=datacard_{params.signal}_2016.txt \
-            {params.signal}_2017=datacard_{params.signal}_2017.txt \
-            {params.signal}_2018=datacard_{params.signal}_2018.txt > datacard__{params.signal}.txt" 2>&1 | tee -a {log}
-            
-        echo "[$(date)] Completed make_combine_inputs for signal {params.signal}" >> {log}
+            combineCards.py {params.channel}_2016=datacard_{params.channel}_2016.txt \
+            {params.channel}_2017=datacard_{params.channel}_2017.txt \
+            {params.channel}_2018=datacard_{params.channel}_2018.txt > datacard__{params.signal}.txt" 2>&1 | tee -a {log}
+
+        echo "[$(date)] Completed make_combine_inputs for channel {params.channel}" >> {log}
         """
 
 rule make_syst_plots:
@@ -133,15 +134,23 @@ rule make_syst_plots:
     params:
         variable="{variable}",
         output_dir="{output_dir}",
+        channel="{channel}",
+        signal="{signal}",
         container_wrapper = config.get("container_wrapper", "./run_container combine")
     log: "logs/make_syst_plots_{variable}.log"
     shell:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting make_syst_plots for {params.variable}" > {log}
-        echo "Making syst plots" 2>&1 | tee -a ../{log}
+        echo "Making syst plots" 2>&1 | tee -a {log}
         {params.container_wrapper} \
-        python3 plots/make_syst_plots.py \
-        -i {params.output_dir}/shapes.root -o {params.output_dir}/systs/ -d {input} --variable {params.variable} 2>&1 | tee -a ../{log}
-        echo "[$(date)] Completed make_syst_plots for {params.variable}" >> ../{log}
+            python3 plots/make_syst_plots.py \
+            -i {params.output_dir}/shapes.root \
+            -o {params.output_dir}/systs/ \
+            -d {input} -c {params.channel} \
+            -s {params.signal} \
+            -m stats_analysis/metadata/{params.channel}.yml \
+            --variable {params.variable} 2>&1 | tee -a {log}
+        echo "[$(date)] Completed make_syst_plots for {params.variable}" >> {log}
         """
+
