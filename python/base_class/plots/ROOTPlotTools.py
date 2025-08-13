@@ -11,12 +11,73 @@ import random
 import collections
 import json
 from array import array
+import numpy as np
 from stats_analysis.make_variable_binning import rebin_histogram
 
 ROOT.gROOT.SetBatch(True)
 #ROOT.gStyle.SetErrorX(0)
 ROOT.gErrorIgnoreLevel = ROOT.kWarning
 #import PlotTools
+
+def rescale_x_axis(hist_old, xMin_old = 300, xMax_old = 1200, xMin_new = 0, xMax_new = 1, doOverUnderFlow = True):
+    n_bins_old = hist_old.GetNbinsX()
+    hist_name, hist_title = hist_old.GetName(), hist_old.GetTitle() 
+    underflow_old, overflow_old = hist_old.GetBinContent(0),       hist_old.GetBinContent(n_bins_old + 1)
+    underflow_err_old, overflow_err_old = hist_old.GetBinError(0), hist_old.GetBinError(n_bins_old + 1)
+    
+    xBinCenter_old_list   = [hist_old.GetXaxis().GetBinCenter(bin)  for bin in range(1, n_bins_old + 1)]
+    xBinLowEdge_old_list  = [hist_old.GetXaxis().GetBinLowEdge(bin) for bin in range(1, n_bins_old + 1)]
+    xBinHighEdge_old_list = [hist_old.GetXaxis().GetBinLowEdge(bin) + hist_old.GetXaxis().GetBinWidth(bin) for bin in range(1, n_bins_old + 1)]
+    content_old_list    = [hist_old.GetBinContent(bin)           for bin in range(1, n_bins_old + 1)]
+    error_old_list      = [hist_old.GetBinError(bin)             for bin in range(1, n_bins_old + 1)]
+
+    existing_hist = ROOT.gDirectory.Get(hist_name)
+    if existing_hist: # Delete existing histogram with same name to prevent memory leak
+        existing_hist.Delete()  
+
+    if doOverUnderFlow:
+        for bin in range(n_bins_old, 0, -1):  ### bins below lower cut are new underflow
+            xBinLowEdge_old = xBinLowEdge_old_list[bin-1]
+            if xBinLowEdge_old < xMin_old:
+                underflow_bin_new = bin-1
+                break
+        
+        for bin in range(1, n_bins_old + 1):  ### bins above higher cut are new overflow
+            xBinHighEdge_old = xBinHighEdge_old_list[bin-1]
+            if xBinHighEdge_old >= xMax_old:
+                overflow_bin_new = bin-1
+                break
+        
+        ### get new underflow and overflow
+        underflow_new = underflow_old + np.sum([content_old_list[bin-1] for bin in range(1, underflow_bin_new+1)])
+        overflow_new  = overflow_old  + np.sum([content_old_list[bin-1] for bin in range(overflow_bin_new, n_bins_old+1)])
+        underflow_err_new = np.sqrt(underflow_err_old**2 + np.sum([error_old_list[bin-1]**2 for bin in range(1, underflow_bin_new+1)]))
+        overflow_err_new  = np.sqrt(overflow_err_old**2  + np.sum([error_old_list[bin-1]**2 for bin in range(overflow_bin_new, n_bins_old+1)]))
+        underflow_err_new, overflow_err_new = np.sqrt(underflow_bin_new), np.sqrt(overflow_bin_new)
+        content_new_list = content_old_list[underflow_bin_new+1 : overflow_bin_new]
+        error_new_list   =   error_old_list[underflow_bin_new+1 : overflow_bin_new]    
+        n_bins_new = overflow_bin_new - underflow_bin_new - 1
+    else:
+        content_new_list = content_old_list
+        error_new_list   =   error_old_list
+        n_bins_new = n_bins_old
+
+    hist_new = ROOT.TH1F(hist_name, hist_title, n_bins_new, xMin_new, xMax_new)
+    
+    for bin in range(1, n_bins_new + 1):
+        hist_new.SetBinContent(bin, content_new_list[bin-1])
+        hist_new.SetBinError(bin, error_new_list[bin-1])
+        # xBinCenter_new = xMin_new + ((xBinCenter_old - xMin_old) * (xMax_new - xMin_new)/ (xMax_old - xMin_old))
+        # bin_new = hist_new.FindBin(xBinCenter_new)
+        # hist_new.Fill(xBinCenter_new, content_old)
+
+    if doOverUnderFlow:
+        hist_new.SetBinContent(             0, underflow_new)  
+        hist_new.SetBinContent(n_bins_new + 1,  overflow_new) 
+        hist_new.SetBinError(             0, underflow_err_new)
+        hist_new.SetBinError(n_bins_new + 1,  overflow_err_new)
+    return hist_new
+
 
 def subscript(text, lower=0.5,scale=0.5):
     return '#lower[%f]{#scale[%f]{%s}}'%(lower, scale, text)
@@ -326,7 +387,7 @@ def make_ratio(rPad, numer, denom, rMin, rMax, rTitle, rColor, lColor, ratioTObj
 
 
 #  Make the plot
-def plot(sampleDictionary, plotParameters,debug=False):
+def plot(sampleDictionary, plotParameters,debug=False, plotMix = False, rescaleXAxisRange = None):
     # with open('log.json', 'w') as log:
     #     dictionaries = [sampleDictionary, plotParameters]
     #     log.write(json.dumps(dictionaries))
@@ -514,6 +575,8 @@ def plot(sampleDictionary, plotParameters,debug=False):
             h = p+thisSample["TObject"] if "TObject" in thisSample else p#can take in more than just hists
             hists[f][p] = get(Files[f],h)
             thisHist = hists[f][p]
+            if rescaleXAxisRange:
+                thisHist = rescale_x_axis(thisHist, xMin_old = 0, xMax_old = 1, xMin_new = rescaleXAxisRange[0], xMax_new = rescaleXAxisRange[1], doOverUnderFlow = False)
             #hists[f][p] = thisHist
 
             if thisHist.InheritsFrom("TH2"):

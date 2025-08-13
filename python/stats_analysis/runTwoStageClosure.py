@@ -113,60 +113,6 @@ def mkpath(path, doExecute=True, debug=False):
         thisDir = thisDir + d + "/"
         mkdir(thisDir, doExecute)
 
-def rescale_x_axis(hist_old, xMin_old = 300, xMax_old = 1200, xMin_new = 0, xMax_new = 1):
-    n_bins_old = hist_old.GetNbinsX()
-    hist_name, hist_title = hist_old.GetName(), hist_old.GetTitle() 
-    underflow_old, overflow_old = hist_old.GetBinContent(0),       hist_old.GetBinContent(n_bins_old + 1)
-    underflow_err_old, overflow_err_old = hist_old.GetBinError(0), hist_old.GetBinError(n_bins_old + 1)
-
-    xBinCenter_old_list   = [hist_old.GetXaxis().GetBinCenter(bin)  for bin in range(1, n_bins_old + 1)]
-    xBinLowEdge_old_list  = [hist_old.GetXaxis().GetBinLowEdge(bin) for bin in range(1, n_bins_old + 1)]
-    xBinHighEdge_old_list = [hist_old.GetXaxis().GetBinLowEdge(bin) + hist_old.GetXaxis().GetBinWidth(bin) for bin in range(1, n_bins_old + 1)]
-    content_old_list    = [hist_old.GetBinContent(bin)           for bin in range(1, n_bins_old + 1)]
-    error_old_list      = [hist_old.GetBinError(bin)             for bin in range(1, n_bins_old + 1)]
-
-    existing_hist = ROOT.gDirectory.Get(hist_name)
-    if existing_hist: # Delete existing histogram with same name to prevent memory leak
-        existing_hist.Delete()  
-
-    for bin in range(n_bins_old, 0, -1):  ### bins below lower cut are new underflow
-        xBinLowEdge_old = xBinLowEdge_old_list[bin-1]
-        if xBinLowEdge_old < xMin_old:
-            underflow_bin_new = bin-1
-            break
-    
-    for bin in range(1, n_bins_old + 1):  ### bins above higher cut are new overflow
-        xBinHighEdge_old = xBinHighEdge_old_list[bin-1]
-        if xBinHighEdge_old >= xMax_old:
-            overflow_bin_new = bin-1
-            break
-    
-    ### get new underflow and overflow
-    underflow_new = underflow_old + np.sum([content_old_list[bin-1] for bin in range(1, underflow_bin_new+1)])
-    overflow_new  = overflow_old  + np.sum([content_old_list[bin-1] for bin in range(overflow_bin_new, n_bins_old+1)])
-    underflow_err_new = np.sqrt(underflow_err_old**2 + np.sum([error_old_list[bin-1]**2 for bin in range(1, underflow_bin_new+1)]))
-    overflow_err_new  = np.sqrt(overflow_err_old**2  + np.sum([error_old_list[bin-1]**2 for bin in range(overflow_bin_new, n_bins_old+1)]))
-    underflow_err_new, overflow_err_new = np.sqrt(underflow_bin_new), np.sqrt(overflow_bin_new)
-
-    content_new_list = content_old_list[underflow_bin_new+1 : overflow_bin_new]
-    error_new_list   =   error_old_list[underflow_bin_new+1 : overflow_bin_new]
-    
-    n_bins_new = overflow_bin_new - underflow_bin_new - 1
-    hist_new = ROOT.TH1F(hist_name, hist_title, n_bins_new, xMin_new, xMax_new)
-    
-    for bin in range(1, n_bins_new + 1):
-        hist_new.SetBinContent(bin, content_new_list[bin-1])
-        hist_new.SetBinError(bin, error_new_list[bin-1])
-        # xBinCenter_new = xMin_new + ((xBinCenter_old - xMin_old) * (xMax_new - xMin_new)/ (xMax_old - xMin_old))
-        # bin_new = hist_new.FindBin(xBinCenter_new)
-        # hist_new.Fill(xBinCenter_new, content_old)
-
-    hist_new.SetBinContent(             0, underflow_new)  
-    hist_new.SetBinContent(n_bins_new + 1,  overflow_new) 
-    hist_new.SetBinError(             0, underflow_err_new)
-    hist_new.SetBinError(n_bins_new + 1,  overflow_err_new)
-    return hist_new
-
 def combine_hists(input_file, hist_template, procs, years, debug=False):
     hist = None
 
@@ -184,6 +130,11 @@ def combine_hists(input_file, hist_template, procs, years, debug=False):
                 else:
                     if debug: print(f"getting {hist_name} from {input_file}")
                     if debug: input_file.ls()
+                    # print(type(input_file))
+                    # for key in input_file.GetListOfKeys():
+                    #     obj = key.ReadObj()
+                    #     if obj.InheritsFrom("TH1"):
+                    #         obj.Print()  
                     hist =  input_file.Get(hist_name).Clone()
             else:
                 # print(f"reading {hist_name}")
@@ -193,7 +144,7 @@ def combine_hists(input_file, hist_template, procs, years, debug=False):
                     hist.Add( input_file.Get(hist_name).Clone() )
 
     if 'm4j' in hist_template:
-        hist = rescale_x_axis(hist, xMin_old = float(args.m4j_xmin), xMax_old = float(args.m4j_xmax), xMin_new = 0, xMax_new = 1)
+        hist = ROOTPlotTools.rescale_x_axis(hist, xMin_old = float(args.m4j_xmin), xMax_old = float(args.m4j_xmax), xMin_new = 0, xMax_new = 1)
 
     return hist
 
@@ -1196,6 +1147,8 @@ class multijetEnsemble:
             'color' : 'ROOT.kBlue'}
 
         xTitle = 'P(Signal) #(Bin) + #(Bins)#(Mix) #cbar P(%s) is largest' % (self.channel.upper())
+        if 'm4j' in classifier:
+            xTitle = classifier + ' #(Bin) + #(Bins)#(Mix) #cbar P(%s) is largest' % (self.channel.upper())
 
         parameters = {'titleLeft'   : '#bf{CMS} Internal',
                       'titleCenter' : regionName[args.region],
@@ -1955,12 +1908,15 @@ class closure:
             'ratio' : 'denom A',
             'color' : color_TTbar}
         samples[closure_file_out]['%s/signal' % self.channel] = {
-            'label' : 'ZZ+ZH+HH(#times100)',
+            'label' : 'ZZ+ZH+HH(#times1)',
             'legend': 4,
-            'weight': 100,
+            'weight': 1,
             'color' : 'ROOT.kViolet'}
-
+        
         xTitle = f'{classifier} P(Signal) #cbar P({self.channel.upper()}) is largest'
+        if 'm4j' in classifier:
+            xTitle = f'{classifier} #cbar P({self.channel.upper()}) is largest'
+        
 
         parameters = {'titleLeft'   : '#bf{CMS} Internal',
                       'titleCenter' : regionName[args.region],
@@ -1986,7 +1942,7 @@ class closure:
 
         parameters['outputDir'] = output_dir
         # print('make ',parameters['outputDir'] + parameters['outputName']+'.pdf')
-        ROOTPlotTools.plot(samples, parameters, debug=False)
+        ROOTPlotTools.plot(samples, parameters, debug=False, rescaleXAxisRange = [float(args.m4j_xmin), float(args.m4j_xmax)])
 
     
     def plotFit(self, basis, plotSpuriousSignal=False):
@@ -2030,9 +1986,9 @@ class closure:
                 'ratio': 'denom A',
                 'color' : 'ROOT.kViolet'}
             samples[closure_file_out][f'{self.channel}/signal_closure'] = {
-                'label' : 'ZZ+ZH+HH(#times100)',
+                'label' : 'ZZ+ZH+HH(#times1)',
                 'legend': 7,
-                'weight': 100,
+                'weight': 1,
                 'color' : 'ROOT.kViolet+7'}
             # samples[closure_file_out]['%s/signal_orthogonal_TH1_basis%d'%(self.channel, basis)] = {
             #     'label' : 'Orthogonalized Signal(#times100)',
@@ -2041,6 +1997,8 @@ class closure:
             #     'color' : 'ROOT.kViolet-6'}
 
         xTitle = f'{classifier} P(Signal) Bin #cbar P({self.channel.upper()}) is largest'
+        if 'm4j' in classifier:
+            xTitle = f'{classifier} Bin #cbar P({self.channel.upper()}) is largest'
 
         ymaxScale = 1.4  # + max(0, (basis - 2)/4.0)
         if doSpuriousSignal:
@@ -2189,10 +2147,10 @@ if __name__ == "__main__":
         classifier = "SvB_MA"
     elif not args.var.find("SvB") == -1:
         classifier = "SvB"
-    else:
+    elif args.var.find("m4j") != -1:
         print(f"ERROR cannot parse classifier from {args.var}")
-        print(f"Defaulting to SvB")
-        classifier = "SvB"
+        classifier = args.var[0:args.var.find('Pass')]
+        print(f"Defaulting to {classifier}")
         # sys.exit(-1)
 
     rebin = int(args.rebin)
