@@ -2,7 +2,7 @@
 # 
 # To run:
 # (from coffea4bees/)
-# ./shell_combine source .ci-workflows/analysis-runTwoStageClosure-all-ROOT.sh hists/ hists/
+# ./shell_combine source python/scripts//analysis-runTwoStageClosure-all-ROOT.sh hists/ hists/
 # (first argument is input directory, second argument is output directory, both from the python directory)
 #
 

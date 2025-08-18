@@ -32,7 +32,7 @@ class clusteringTestCase(unittest.TestCase):
         #
         #  Read in the pdfs
         #
-        #  Make with ../.ci-workflows/synthetic-dataset-plot-job.sh
+        #  Make with ../python/scripts/synthetic-dataset-plot-job.sh
         # input_pdf_file_name = "analysis/plots_synthetic_datasets/clustering_pdfs.yml"
         #input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-07-00/clustering_pdfs_vs_pT.yml"
         input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_UL18.yml"
