@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/weights_trigger_analysis_job"
@@ -11,8 +11,8 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running dump cutflow test"
-python analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_trigWeight.coffea -o $OUTPUT_DIR/test_dump_cutflow_trigWeight.yml
+python python/analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_trigWeight.coffea -o $OUTPUT_DIR/test_dump_cutflow_trigWeight.yml
 echo "############### Running cutflow test"
-python analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_trigWeight.coffea --knownCounts analysis/tests/known_Counts_trigWeight.yml
+python python/analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_trigWeight.coffea --knownCounts python/analysis/tests/known_Counts_trigWeight.yml
 ls $OUTPUT_DIR/test_dump_cutflow_trigWeight.yml
 

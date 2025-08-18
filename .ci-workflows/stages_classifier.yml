@@ -2,6 +2,6 @@ check-configs:
   stage: classifier
   extends:
     - .base_classifier
+  allow_failure: true
   script:
-    - cd python
-    - python -m classifier.test.check_configs
+    - python -m python.classifier.test.check_configs

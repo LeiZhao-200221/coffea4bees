@@ -147,6 +147,7 @@ venv.bak/
 sync.sh
 *.code-workspace
 **/*.code-workspace
+.shell
 
 # mypy
 .mypy_cache/
@@ -186,9 +187,8 @@ proxy/
 python/analysis/hists/
 runCITests.sh
 .bashrc
-python/output/
-python/local_output/
-python/CI_output
+python/*output*/
+*output*
 
 .local/
 set_ROOT.sh

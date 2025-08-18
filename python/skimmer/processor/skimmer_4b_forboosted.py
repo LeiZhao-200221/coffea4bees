@@ -3,15 +3,16 @@ import logging
 import awkward as ak
 import numpy as np
 from coffea.util import load
-from skimmer.processor.picoaod import PicoAOD #, fetch_metadata, resize
-from analysis.helpers.event_selection import apply_event_selection
+from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
+from src.physics.event_selection import apply_event_selection
+
 
 
 class Skimmer(PicoAOD):
     def __init__(self, file_wEvents="", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.file_wEvents = load(file_wEvents)
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
 
     def select(self, events):
 

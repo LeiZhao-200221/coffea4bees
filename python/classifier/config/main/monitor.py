@@ -1,10 +1,10 @@
-from classifier.task import Main as _Main
+from python.classifier.task import Main as _Main
 
 
 class Main(_Main):
     def run(self, _):
-        from classifier.monitor import Monitor
-        from classifier.monitor.usage import Usage
+        from python.classifier.monitor import Monitor
+        from python.classifier.monitor.usage import Usage
 
         Usage.stop()
         try:

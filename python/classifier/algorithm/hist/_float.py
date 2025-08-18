@@ -1,11 +1,11 @@
 from numbers import Real
 from typing import Iterable
 
-import base_class.numpy as npext
+import src.numpy as npext
 import numpy as np
 import torch
 import torch.types as tt
-from base_class.typetools import check_type
+from src.typetools import check_type
 from torch import Tensor
 
 from ...utils import not_none

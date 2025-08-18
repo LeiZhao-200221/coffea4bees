@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 # Function to display usage
 usage() {
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
     echo "  --output-base DIR         Base output directory (default: output/)"
-    echo "  --processor PATH          Path to processor file (default: analysis/processors/processor_HH4b.py)"
-    echo "  --metadata PATH           Path to metadata file (default: metadata/datasets_HH4b.yml)"
-    echo "  --config PATH             Path to config file (default: analysis/metadata/HH4b.yml)"
-    echo "  --triggers PATH           Path to triggers file (default: metadata/triggers_HH4b.yml)"
-    echo "  --luminosities PATH       Path to luminosities file (default: metadata/luminosities_HH4b.yml)"
+    echo "  --processor PATH          Path to processor file (default: python/analysis/processors/processor_HH4b.py)"
+    echo "  --metadata PATH           Path to metadata file (default: python/metadata/datasets_HH4b.yml)"
+    echo "  --config PATH             Path to config file (default: python/analysis/metadata/HH4b.yml)"
+    echo "  --triggers PATH           Path to triggers file (default: python/metadata/triggers_HH4b.yml)"
+    echo "  --luminosities PATH       Path to luminosities file (default: python/metadata/luminosities_HH4b.yml)"
     echo "  --datasets \"DATASET1 DATASET2\"  Space-separated datasets (default: \"TTToSemiLeptonic\")"
     echo "  --year YEAR               Analysis year (default: UL18)"
     echo "  --output-filename FILE    Output filename (default: test.coffea)"
@@ -43,11 +43,11 @@ display_config() {
 # Default values
 declare -A DEFAULTS=(
     ["OUTPUT_BASE"]="output/"
-    ["PROCESSOR_PATH"]="analysis/processors/processor_HH4b.py"
-    ["METADATA_PATH"]="${DATASET:-metadata/datasets_HH4b_v1p1.yml}"
-    ["CONFIG_PATH"]="analysis/metadata/HH4b.yml"
-    ["TRIGGERS_PATH"]="metadata/triggers_HH4b.yml"
-    ["LUMINOSITIES_PATH"]="metadata/luminosities_HH4b.yml"
+    ["PROCESSOR_PATH"]="python/analysis/processors/processor_HH4b.py"
+    ["METADATA_PATH"]="${DATASET:-python/metadata/datasets_HH4b_v1p1.yml}"
+    ["CONFIG_PATH"]="python/analysis/metadata/HH4b.yml"
+    ["TRIGGERS_PATH"]="python/metadata/triggers_HH4b.yml"
+    ["LUMINOSITIES_PATH"]="python/metadata/luminosities_HH4b.yml"
     ["DATASETS"]="TTToSemiLeptonic"
     ["YEAR"]="UL18"
     ["OUTPUT_FILENAME"]="test.coffea"

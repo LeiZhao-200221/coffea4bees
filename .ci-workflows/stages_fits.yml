@@ -5,10 +5,10 @@ analysis-make-jcm-weights-job:
   needs: 
     - analysis-merge-test-job
   script:
-    - source scripts/analysis-make-jcm-weights-job.sh
+    - source python/scripts/analysis-make-jcm-weights-job.sh
   artifacts:
     paths:
-      - python/output/analysis_make_jcm_weights_job/testJCM_ROOT/jetCombinatoricModel_SB_.yml
+      - output/analysis_make_jcm_weights_job/testJCM_ROOT/jetCombinatoricModel_SB_.yml
 
 twoStageClosure-test-job:   
   stage: fits
@@ -17,5 +17,5 @@ twoStageClosure-test-job:
   needs: 
     - analysis-test-mixed-job
   script:
-    - source scripts/analysis-runTwoStageClosure-ROOT.sh
+    - source python/scripts/analysis-runTwoStageClosure-ROOT.sh
 

@@ -1,4 +1,4 @@
-from classifier.config.setting.cms import MC_HH_ggF
+from python.classifier.config.setting.cms import MC_HH_ggF
 
 from ..ggF import all_kl
 from ..ggF.all_kl import (
@@ -14,7 +14,7 @@ from ..ggF.all_kl import (
 class Train(all_kl.Train):
     @property
     def rocs(self):
-        from classifier.ml.benchmarks.multiclass import ROC
+        from python.classifier.ml.benchmarks.multiclass import ROC
 
         rocs = []
         for sig in _SIG:

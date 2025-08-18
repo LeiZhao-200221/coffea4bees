@@ -1136,7 +1136,7 @@ datasets:
         sumw_diff: 1453.1521577835083
         sumw: 26757.179077148438
         total_events: 1000000
-    top_reconstruction: slow
+
     xs: 0.03077*0.5824**2
 
 
@@ -1162,5 +1162,5 @@ datasets:
         sumw_diff: 1453.1521577835083
         sumw: 26757.179077148438
         total_events: 1000000
-    top_reconstruction: slow
+
     xs: 0.03077*0.5824**2

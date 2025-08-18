@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/analysis_test_job_unsup"
@@ -11,7 +11,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running test processor"
-python plots/makePlots_unsup.py $INPUT_DIR/test_unsup.coffea --doTest   -o $OUTPUT_DIR/ -m plots/metadata/plotsAll_unsup.yml 
+python python/plots/makePlots_unsup.py $INPUT_DIR/test_unsup.coffea --doTest   -o $OUTPUT_DIR/ -m python/plots/metadata/plotsAll_unsup.yml 
 echo "############### Checking if pdf files exist"
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/mix_v0/v4j_mass.pdf
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR_vs_SB/mix_v0/v4j_mass.pdf

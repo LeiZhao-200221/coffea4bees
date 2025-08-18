@@ -10,9 +10,9 @@ config:
   apply_boosted_veto: false
   run_SvB: true
   run_systematics: false
-  top_reconstruction_override: false
+  top_reconstruction: fast
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1_trigweights.json@@trigWeight"
+    trigWeight: "python/metadata/datasets_HH4b_2024_v1_trigweights.json@@trigWeight"
     FvT: root://cmseos.fnal.gov//store/user/chuyuanl/HH4b/friend/FvT/baseline_legacy/JCM/mixed-0/result.json@@analysis.0.merged
     FvT_3bDvTMix4bDvT_v{mix}_newSBDef:
       path: root://cmseos.fnal.gov//store/user/chuyuanl/HH4b/friend/FvT/baseline_legacy/JCM/mixed-{mix}/result.json@@analysis.0.merged

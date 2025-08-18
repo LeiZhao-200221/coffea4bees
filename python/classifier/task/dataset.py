@@ -6,7 +6,7 @@ from .special import interface
 from .task import Task
 
 if TYPE_CHECKING:
-    from classifier.nn.dataset.evaluation import EvalDatasetLike
+    from python.classifier.nn.dataset.evaluation import EvalDatasetLike
     from torch.utils.data import Dataset as TorchDataset
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/analysis_test_job_unsup"
@@ -11,11 +11,9 @@ if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
-echo "############### Running cutflow test"
-python analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_unsup.coffea --knownCounts analysis/tests/known_Counts_unsup.yml
-
 echo "############### Running dump cutflow test"
-python analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_unsup.coffea -o $OUTPUT_DIR/test_dump_cutflow_unsup.yml
+python python/analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_unsup.coffea -o $OUTPUT_DIR/test_dump_cutflow_unsup.yml
 ls $OUTPUT_DIR/test_dump_cutflow_unsup.yml
 
-
+echo "############### Running cutflow test"
+python python/analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_unsup.coffea --knownCounts python/analysis/tests/known_Counts_unsup.yml

@@ -10,7 +10,7 @@ import numpy as np
 from matplotlib.patches import Ellipse
 import collections
 sys.path.insert(0, os.getcwd())
-import base_class.plots.ROOTPlotTools as ROOTPlotTools
+import src.plotting.ROOTPlotTools as ROOTPlotTools
 
 def print_log(string):
     print(string)

@@ -26137,7 +26137,7 @@ data_2023_BPixD:
     diff: "diff --git a/python/analysis/helpers/selection_basic_4b.py b/python/analysis/helpers/selection_basic_4b.py\n\
       index 9568ca65..afa74942 100644\n--- a/python/analysis/helpers/selection_basic_4b.py\n\
       +++ b/python/analysis/helpers/selection_basic_4b.py\n@@ -12,6 +12,7 @@ from\
-      \ coffea.lumi_tools import LumiMask\n from base_class.math.random import Squares\n\
+      \ coffea.lumi_tools import LumiMask\n from src.math.random import Squares\n\
       \ from copy import copy\n import logging\n+from coffea.nanoevents.methods import\
       \ vector\n \n def apply_event_selection_4b( event, corrections_metadata, *,\
       \ cut_on_lumimask=True):\n \n@@ -130,9 +131,9 @@ def apply_object_selection_4b(event,\
@@ -33236,7 +33236,7 @@ data_2023_BPixE:
     diff: "diff --git a/python/analysis/helpers/selection_basic_4b.py b/python/analysis/helpers/selection_basic_4b.py\n\
       index 9568ca65..afa74942 100644\n--- a/python/analysis/helpers/selection_basic_4b.py\n\
       +++ b/python/analysis/helpers/selection_basic_4b.py\n@@ -12,6 +12,7 @@ from\
-      \ coffea.lumi_tools import LumiMask\n from base_class.math.random import Squares\n\
+      \ coffea.lumi_tools import LumiMask\n from src.math.random import Squares\n\
       \ from copy import copy\n import logging\n+from coffea.nanoevents.methods import\
       \ vector\n \n def apply_event_selection_4b( event, corrections_metadata, *,\
       \ cut_on_lumimask=True):\n \n@@ -130,9 +131,9 @@ def apply_object_selection_4b(event,\

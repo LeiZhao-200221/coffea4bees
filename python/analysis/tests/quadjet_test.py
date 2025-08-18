@@ -13,7 +13,7 @@ import time
 
 import os
 sys.path.insert(0, os.getcwd())
-from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from python.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 
 
 class quadJetTestCase(unittest.TestCase):

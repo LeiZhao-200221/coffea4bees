@@ -12,12 +12,11 @@ runner:
   condor_cores: 1
   condor_memory: 4GB
   condor_transfer_input_files:
-    - base_class
-    - analysis
-    - skimmer
-    - data
-    - jet_clustering        
-    - classifier
+    - src
+    - python/analysis
+    - python/skimmer
+    - python/jet_clustering        
+    - python/classifier
   allowlist_sites:
     - T2_US_Nebraska
     - T2_US_Purdue
@@ -27,10 +26,10 @@ runner:
 config:
   base_path: root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v2
   # base_path: skimmer/test/
-  clustering_pdfs_file: "jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_XXX.yml"
+  clustering_pdfs_file: "python/jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_XXX.yml"
   subtract_ttbar_with_weights: True
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
+    trigWeight: "python/metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
   declustering_rand_seed: 5
   step: 100000
   skip_collections:

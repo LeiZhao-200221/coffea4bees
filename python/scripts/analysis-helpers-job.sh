@@ -1,8 +1,8 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 echo "############### Running makeweights test"
-python analysis/tests/topCand_test.py
+python python/analysis/tests/topCand_test.py
 

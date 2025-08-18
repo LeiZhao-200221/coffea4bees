@@ -2,7 +2,7 @@ import importlib
 import logging
 from itertools import chain
 
-from classifier.task import main
+from python.classifier.task import main
 from rich.logging import RichHandler
 
 from .utils.import_check import ImportTracker, walk_packages

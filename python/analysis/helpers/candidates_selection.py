@@ -1,9 +1,9 @@
 import numpy as np
 import awkward as ak
 import logging
-from base_class.math.random import Squares
-from analysis.helpers.SvB_helpers import compute_SvB
-from analysis.helpers.FvT_helpers import compute_FvT
+from src.math.random import Squares
+from python.analysis.helpers.SvB_helpers import compute_SvB
+from python.analysis.helpers.FvT_helpers import compute_FvT
 from coffea.nanoevents.methods import vector
 from coffea.analysis_tools import Weights
 
@@ -407,11 +407,5 @@ def create_cand_jet_dijet_quadjet(
     if run_SvB:
         selev["passSvB"] = selev["SvB_MA"].ps > 0.80
         selev["failSvB"] = selev["SvB_MA"].ps < 0.05
-
-        passSvBUpCut = 0.8
-        passSvB_hh = selev.SvB_MA.ps_hh > passSvBUpCut
-        selev["m4j_HHSR_passHH"]  = ak.where((~passSvB_hh), -2, selev.m4j_HHSR)
-        selev["m4j_ZHSR_passZH"]  = ak.where((selev.SvB_MA.ps_zh <= passSvBUpCut), -2, selev.m4j_ZHSR)
-        selev["m4j_ZZSR_passZZ"]  = ak.where((selev.SvB_MA.ps_zz <= passSvBUpCut), -2, selev.m4j_ZZSR)
 
     return selev

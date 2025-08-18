@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
@@ -11,7 +11,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running JCM weights test"
-python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i analysis/tests/HistsFromROOTFile.coffea
-python analysis/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
-python analysis/tests/make_weights_test.py --path $OUTPUT_DIR
+python python/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i python/analysis/tests/HistsFromROOTFile.coffea
+python python/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
+python python/analysis/tests/make_weights_test.py --path $OUTPUT_DIR
 
