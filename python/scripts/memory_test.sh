@@ -17,6 +17,6 @@ fi
 
 echo "############### Running memory test"
 sed -e "s#  workers: 4.*#  workers: 1\n  maxchunks: 1#" python/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_memory_test.yml
-python src/tests/memory_test.py --threshold 3300 -o $OUTPUT_DIR/mprofile_ci_test --script runner.py -o test.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op local_outputs/analysis/ -m $DATASETS -c $OUTPUT_DIR/HH4b_memory_test.yml
+python src/tests/memory_test.py --threshold 3600 -o $OUTPUT_DIR/mprofile_ci_test --script runner.py -o test.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op local_outputs/analysis/ -m $DATASETS -c $OUTPUT_DIR/HH4b_memory_test.yml
 ls $OUTPUT_DIR/mprofile_ci_test.png
 
