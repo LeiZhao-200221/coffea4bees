@@ -57,6 +57,7 @@ stages:
 
 validation:
   before_script:
+    - ./generate_docs.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
@@ -67,6 +68,7 @@ validation:
 
 pages:
   before_script:
+    - ./generate_docs.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
