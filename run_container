@@ -60,7 +60,7 @@ run_coffea() {
                 curl -OL https://raw.githubusercontent.com/CoffeaTeam/lpcjobqueue/main/bootstrap.sh
                 bash bootstrap.sh
                 rm bootstrap.sh
-                sed -i -e 's|APPTAINER_SHELL.*|APPTAINER_SHELL=$(which bash) apptainer exec -B "$(dirname "$PWD")":/srv --pwd /srv/ \\|' -e 's|/srv/.bashrc|/srv/.bashrc|' shell
+                sed -i -e 's|APPTAINER_SHELL.*|APPTAINER_SHELL=$(which bash) apptainer exec -B "$PWD":/srv --pwd /srv/ \\|' -e 's|/srv/.bashrc|/srv/.bashrc|' shell
                 mv shell .shell
             fi
             # For htcondor jobs
