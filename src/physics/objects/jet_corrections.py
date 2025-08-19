@@ -36,8 +36,8 @@ def extract_jetmet_tar_files(tar_file_name: str=None,
                 member.name = os.path.basename(member.name)  # Remove any directory structure from the archive
 
                 new_file_name = member.name
-                if 'Puppi' in jet_type and jet_type in member.name:  ### this is only for Run3, temporary fix
-                    new_file_name = member.name.replace('_', '', 1)
+                if ('Puppi' in jet_type) and (jet_type in member.name) and ('Summer23' not in member.name): 
+                    new_file_name = member.name.replace('_', '', 1) #22 and 23 corrections seem to have different naming schemes
                     member.name = new_file_name
 
                 new_file_path = os.path.join(extract_path, new_file_name)

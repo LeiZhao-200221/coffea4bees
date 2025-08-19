@@ -245,8 +245,11 @@
   PU: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2022_Summer22/puWeights.json.gz'
   ele_sf: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22/electron.json.gz'
+    HLT: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22/electronHlt.json.gz'
     tag: 2022Re-recoBCD
-  mu_sf: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2022_Summer22/muon_Z.json.gz'
+  mu_sf: 
+    sf: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2022_Summer22/muon_Z.json.gz'
+    HLT: 'src/data/Muon/ScaleFactors_Muon_Z_HLT_2022_abseta_pt_schemaV2.json'
   jet_veto_maps: 
     file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2022_Summer22/jetvetomaps.json.gz
     tag: Summer22_23Sep2023_RunCD_V1
@@ -288,8 +291,11 @@
   PU: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2022_Summer22EE/puWeights.json.gz'
   ele_sf: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22EE/electron.json.gz'
+    HLT: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2022_Summer22EE/electronHlt.json.gz'
     tag:  2022Re-recoE+PromptFG
-  mu_sf: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2022_Summer22EE/muon_Z.json.gz'
+  mu_sf: 
+    sf: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2022_Summer22EE/muon_Z.json.gz'
+    HLT: 'src/data/Muon/ScaleFactors_Muon_Z_HLT_2022_EE_abseta_pt_schemaV2.json'
   jet_veto_maps: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2022_Summer22EE/jetvetomaps.json.gz'
     tag: 'Summer22EE_23Sep2023_RunEFG_V1'
@@ -331,8 +337,11 @@
   PU: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2023_Summer23/puWeights.json.gz'
   ele_sf: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23/electron.json.gz'
+    HLT: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23/electronHlt.json.gz'
     tag: 2023PromptC
-  mu_sf: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2023_Summer23/muon_Z.json.gz'
+  mu_sf: 
+    sf: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2023_Summer23/muon_Z.json.gz
+    HLT: 'src/data/Muon/ScaleFactors_Muon_Z_HLT_2023_abseta_pt_schemaV2.json'
   jet_veto_maps: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2023_Summer23/jetvetomaps.json.gz'
     tag: Summer23Prompt23_RunC_V1
@@ -379,8 +388,11 @@
     tag: Collisions2023_369803_370790_eraD_GoldenJson
   ele_sf: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23BPix/electron.json.gz'
+    HLT: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23BPix/electronHlt.json.gz'
     tag: 2023PromptD
-  mu_sf: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2023_Summer23BPix/muon_Z.json.gz'
+  mu_sf: 
+    sf: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/MUO/2023_Summer23BPix/muon_Z.json.gz
+    HLT: 'src/data/Muon/ScaleFactors_Muon_Z_HLT_2023_BPix_abseta_pt_schemaV2.json'
   jet_veto_maps: 
     file: /cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/JME/2023_Summer23BPix/jetvetomaps.json.gz
     tag: 'Summer23BPixPrompt23_RunD_V1'
