@@ -6,11 +6,11 @@ from functools import cached_property
 from itertools import chain
 from typing import TYPE_CHECKING
 
-from classifier.task import ArgParser, Dataset, EntryPoint, Main, TaskOptions, converter
-from classifier.task.dataset import TrainingSetLoader
+from python.classifier.task import ArgParser, Dataset, EntryPoint, Main, TaskOptions, converter
+from python.classifier.task.dataset import TrainingSetLoader
 
 if TYPE_CHECKING:
-    from classifier.monitor.progress import ProgressTracker
+    from python.classifier.monitor.progress import ProgressTracker
 
 
 class progress_advance:
@@ -38,7 +38,7 @@ class SelectDevice(Main):
 
     @cached_property
     def device(self):
-        from classifier.process.device import Device
+        from python.classifier.process.device import Device
 
         return Device(*self.opts.device)
 
@@ -60,9 +60,9 @@ class LoadTrainingSets(Main):
         from concurrent.futures import ProcessPoolExecutor
 
         import torch
-        from classifier.monitor.progress import Progress
-        from classifier.nn.dataset.sliceable import NamedTensorDataset
-        from classifier.process import pool, status
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.nn.dataset.sliceable import NamedTensorDataset
+        from python.classifier.process import pool, status
         from torch.utils.data import ConcatDataset, StackDataset
 
         # load datasets in parallel

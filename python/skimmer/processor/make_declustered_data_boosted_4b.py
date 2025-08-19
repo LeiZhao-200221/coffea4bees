@@ -1,16 +1,16 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD, fetch_metadata, resize
+from src.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 from collections import OrderedDict
 from analysis.helpers.cutflow import cutFlow
 
-from jet_clustering.declustering import make_synthetic_event
+from python.jet_clustering.declustering import make_synthetic_event
 
-from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
-from analysis.helpers.event_selection import apply_event_selection
+from src.math.random import Squares
+from src.physics.event_selection import apply_event_selection
 
-from base_class.root import Chunk, TreeReader
+
+from src.data_formats.root import Chunk, TreeReader
 from analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
@@ -18,7 +18,8 @@ from analysis.helpers.load_friend import (
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak
@@ -38,7 +39,7 @@ class DeClustererBoosted(PicoAOD):
 
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]

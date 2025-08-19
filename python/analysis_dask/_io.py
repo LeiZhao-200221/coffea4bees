@@ -11,8 +11,8 @@ from typing import Any, Callable, Optional
 import fsspec
 import psutil
 import yaml
-from base_class.config._io import FileIORegistry
-from base_class.system.eos import EOS
+from src.config._io import FileIORegistry
+from src.storage.eos import EOS
 
 _DEFAULT_TIME_FORMAT = "%Y-%m-%dT%H-%M-%S"
 

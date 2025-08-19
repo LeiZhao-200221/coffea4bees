@@ -6,12 +6,12 @@ import warnings
 from typing import TYPE_CHECKING, Literal
 
 import fsspec
-from classifier.task.state import GlobalSetting, _share_global_state
+from python.classifier.task.state import GlobalSetting, _share_global_state
 
 from ..state import System
 
 if TYPE_CHECKING:
-    from base_class.system.eos import EOS
+    from src.storage.eos import EOS
 
 
 class save(GlobalSetting):
@@ -77,7 +77,7 @@ class IO(GlobalSetting):
 
     @classmethod
     def get__output(cls, value: str):
-        from base_class.system.eos import EOS
+        from src.storage.eos import EOS
 
         if isinstance(value, str):
             value = value.format(
@@ -221,7 +221,7 @@ class ROOT(GlobalSetting):
 
     @classmethod
     def set__friend_allow_missing(cls, value: bool):
-        from base_class.root import Friend
+        from src.data_formats.root import Friend
 
         Friend.allow_missing.set(value)
         return NotImplemented

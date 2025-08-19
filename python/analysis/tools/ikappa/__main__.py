@@ -15,7 +15,7 @@ from typing import Literal
 import cloudpickle
 import fsspec
 import yaml
-from base_class.system.eos import EOS
+from src.storage.eos import EOS
 from bokeh.document import Document
 from bokeh.layouts import column, row
 from bokeh.models import Button, Select, Tooltip

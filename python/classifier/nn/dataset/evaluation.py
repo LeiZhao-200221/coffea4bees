@@ -16,9 +16,9 @@ from typing import (
     overload,
 )
 
-from classifier.config.setting.ml import DataLoader as cfg
-from classifier.monitor.progress import MessageType, Progress
-from classifier.process import status
+from python.classifier.config.setting.ml import DataLoader as cfg
+from python.classifier.monitor.progress import MessageType, Progress
+from python.classifier.process import status
 
 if sys.version_info >= (3, 11):
     from typing import TypeVarTuple, Unpack
@@ -32,7 +32,7 @@ _ChainResultT = TypeVarTuple("_ChainResultT")
 _OtherChainResultT = TypeVarTuple("_OtherChainResultT")
 
 if TYPE_CHECKING:
-    from classifier.ml import BatchType
+    from python.classifier.ml import BatchType
 
     BatchLoader = Callable[[], BatchType]
 

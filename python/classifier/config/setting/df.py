@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.task import GlobalSetting
+from python.classifier.task import GlobalSetting
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike

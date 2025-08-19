@@ -62,11 +62,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--signal', dest='signal',
                         default='GluGluToHHTo4B_cHHH1', help="Signal to plot")
     parser.add_argument('-m', '--metadata', dest='metadata',
-                        default='stats_analysis/metadata/HH4b.yml', help="Metadata file")
-    parser.add_argument('-t', '--type_of_fit', dest='type_of_fit', 
-                        choices=['prefit', 'fit_b', 'fit_s'], 
-                        nargs='+', default=['prefit', 'fit_b', 'fit_s'],
-                        help="Type of fit to plot, choices: prefit, fit_b, fit_s")
+                        default='stats_analysis/python/metadata/HH4b.yml', help="Metadata file")
+    parser.add_argument('-t', '--type_of_fit', dest='type_of_fit', choices=['prefit', 'fit_b', 'fit_s'],
+                        default='prefit', help="Type of fit to plot, choices: prefit, fit_b, fit_s")
     parser.add_argument('--make_bkg_covariance', dest='make_bkg_covariance', action='store_true', 
                         default=False, help="Flag to make background covariance matrix")
     args = parser.parse_args()
@@ -126,106 +124,104 @@ if __name__ == '__main__':
         CMS.SaveCanvas(canv, f"{output_file}.C")
 
     # channels = [ 'HHbb_2018' ]
-    for itype in args.type_of_fit:
-        print(f"Creating {itype} plot")
-        for i, ichannel in enumerate(channels):
-            tmp_folder = f'shapes_{itype}/{ichannel}'
-            if i==0:
-                hists['data'] = convert_tgraph_to_th1(infile.Get(f'{tmp_folder}/data'), f'data{ichannel}')
-                hists[mj] = infile.Get(f'{tmp_folder}/{mj}')
-                hists[tt] = infile.Get(f'{tmp_folder}/{tt}')
-                hists['TotalBkg'] = infile.Get(f'{tmp_folder}/total_background')
-                hists[signal] = infile.Get(f'{tmp_folder}/{signal}')
-                hists['cov_matrix'] = infile.Get(f'{tmp_folder}/total_covar')
-            else: 
-                hists['data'].Add( convert_tgraph_to_th1(infile.Get(f'{tmp_folder}/data'), f'data{ichannel}') )
-                hists[mj].Add( infile.Get(f'{tmp_folder}/{mj}') )
-                hists[tt].Add( infile.Get(f'{tmp_folder}/{tt}') )
-                hists['TotalBkg'].Add( infile.Get(f'{tmp_folder}/total_background') )
-                hists[signal].Add( infile.Get(f'{tmp_folder}/{signal}') )
-                hists['cov_matrix'].Add( infile.Get(f'{tmp_folder}/total_covar') )
+    for i, ichannel in enumerate(channels):
+        tmp_folder = f'shapes_{args.type_of_fit}/{ichannel}'
+        if i==0:
+            hists['data'] = convert_tgraph_to_th1(infile.Get(f'{tmp_folder}/data'), f'data{ichannel}')
+            hists[mj] = infile.Get(f'{tmp_folder}/{mj}')
+            hists[tt] = infile.Get(f'{tmp_folder}/{tt}')
+            hists['TotalBkg'] = infile.Get(f'{tmp_folder}/total_background')
+            hists[signal] = infile.Get(f'{tmp_folder}/{signal}')
+            hists['cov_matrix'] = infile.Get(f'{tmp_folder}/total_covar')
+        else: 
+            hists['data'].Add( convert_tgraph_to_th1(infile.Get(f'{tmp_folder}/data'), f'data{ichannel}') )
+            hists[mj].Add( infile.Get(f'{tmp_folder}/{mj}') )
+            hists[tt].Add( infile.Get(f'{tmp_folder}/{tt}') )
+            hists['TotalBkg'].Add( infile.Get(f'{tmp_folder}/total_background') )
+            hists[signal].Add( infile.Get(f'{tmp_folder}/{signal}') )
+            hists['cov_matrix'].Add( infile.Get(f'{tmp_folder}/total_covar') )
 
-        ## Rescaling histogram
-        for _, ih in hists.items():
-            # ih.Rebin(2)
-            ax = ih.GetXaxis()
-            ax.Set( ax.GetNbins(), 0, 1.0 )
-            ih.ResetStats()
-        print(f"NUmber of bkg events in last bin: {hists['TotalBkg'].GetBinContent(hists['TotalBkg'].GetNbinsX())}")
-        #print(hists['TotalBkg'].GetNbinsX())
-        
-        # Remove data points in hists['data'] that are higher than 0.5 in X
-        # for bin_idx in range(1, hists['data'].GetNbinsX() + 1):
-        #     if hists['data'].GetBinCenter(bin_idx) > 0.12:
-        #         hists['data'].SetBinContent(bin_idx, 0)
-        #         hists['data'].SetBinError(bin_idx, 0)
-        
-        xmax = hists['TotalBkg'].GetXaxis().GetXmax()
-        ymax = hists['TotalBkg'].GetMaximum()*1.2
-        # Styling
-        CMS.SetExtraText("Preliminary")
-        iPos = 0
-        CMS.SetLumi("")
-        CMS.SetEnergy("13")
-        CMS.ResetAdditionalInfo()
-        nominal_can = CMS.cmsDiCanvas('nominal_can',0,xmax,0.1,ymax,0.5,1.5,
-                                    "SvB MA Classifier Regressed P(Signal) | P(HH) is largest",
-                                    "Events", 'Data/Pred.',
-                                    square=CMS.kSquare, extraSpace=0.05, iPos=iPos)
-        nominal_can.cd(1)
-        leg = CMS.cmsLeg(0.70, 0.89 - 0.05 * 4, 0.99, 0.89, textSize=0.04)
+    ## Rescaling histogram
+    for _, ih in hists.items():
+        # ih.Rebin(2)
+        ax = ih.GetXaxis()
+        ax.Set( ax.GetNbins(), 0, 1.0 )
+        ih.ResetStats()
+    print(f"NUmber of bkg events in last bin: {hists['TotalBkg'].GetBinContent(hists['TotalBkg'].GetNbinsX())}")
+    #print(hists['TotalBkg'].GetNbinsX())
+    
+    # Remove data points in hists['data'] that are higher than 0.5 in X
+    # for bin_idx in range(1, hists['data'].GetNbinsX() + 1):
+    #     if hists['data'].GetBinCenter(bin_idx) > 0.12:
+    #         hists['data'].SetBinContent(bin_idx, 0)
+    #         hists['data'].SetBinError(bin_idx, 0)
+    
+    xmax = hists['TotalBkg'].GetXaxis().GetXmax()
+    ymax = hists['TotalBkg'].GetMaximum()*1.2
+    # Styling
+    CMS.SetExtraText("Preliminary")
+    iPos = 0
+    CMS.SetLumi("")
+    CMS.SetEnergy("13")
+    CMS.ResetAdditionalInfo()
+    nominal_can = CMS.cmsDiCanvas('nominal_can',0,xmax,0.1,ymax,0.5,1.5,
+                                  "SvB MA Classifier Regressed P(Signal) | P(HH) is largest",
+                                  "Events", 'Data/Pred.',
+                                  square=CMS.kSquare, extraSpace=0.05, iPos=iPos)
+    nominal_can.cd(1)
+    leg = CMS.cmsLeg(0.70, 0.89 - 0.05 * 4, 0.99, 0.89, textSize=0.04)
 
-        stack = ROOT.THStack()
-        CMS.cmsDrawStack(stack, leg, {'ttbar': hists[tt], 'Multijet': hists[mj] }, data= hists['data'], palette=['#85D1FBff', '#FFDF7Fff'] )
-        if 'mixed' in args.input_file: 
-            leg.Clear()
-            leg.AddEntry( hists[mj], 'Multijet', 'f' )
-            leg.AddEntry( hists[tt], 'ttbar', 'f' )
-            leg.AddEntry( hists['data'], 'Mixed-Data', 'lp' )
-        CMS.GetcmsCanvasHist(nominal_can.cd(1)).GetYaxis().SetTitleOffset(1.5)
-        CMS.GetcmsCanvasHist(nominal_can.cd(1)).GetYaxis().SetTitleSize(0.05)
-        CMS.GetcmsCanvasHist(nominal_can.cd(1)).Draw('AXISSAME')
+    stack = ROOT.THStack()
+    CMS.cmsDrawStack(stack, leg, {'ttbar': hists[tt], 'Multijet': hists[mj] }, data= hists['data'], palette=['#85D1FBff', '#FFDF7Fff'] )
+    if 'mixed' in args.input_file: 
+        leg.Clear()
+        leg.AddEntry( hists[mj], 'Multijet', 'f' )
+        leg.AddEntry( hists[tt], 'ttbar', 'f' )
+        leg.AddEntry( hists['data'], 'Mixed-Data', 'lp' )
+    CMS.GetcmsCanvasHist(nominal_can.cd(1)).GetYaxis().SetTitleOffset(1.5)
+    CMS.GetcmsCanvasHist(nominal_can.cd(1)).GetYaxis().SetTitleSize(0.05)
+    CMS.GetcmsCanvasHist(nominal_can.cd(1)).Draw('AXISSAME')
 
-        hsignal = hists[signal].Clone("hsignal")
-        hsignal.Scale( 100 )
-        leg.AddEntry( hsignal, 'HH4b (x100)', 'lp' )
-        CMS.cmsDraw( hsignal, 'histsame', fstyle=0, marker=1, alpha=1, lcolor=ROOT.TColor.GetColor("#e42536" ), fcolor=ROOT.TColor.GetColor("#e42536"))
-        nominal_can.cd(1).SetLogy(True)
+    hsignal = hists[signal].Clone("hsignal")
+    hsignal.Scale( 100 )
+    leg.AddEntry( hsignal, 'HH4b (x100)', 'lp' )
+    CMS.cmsDraw( hsignal, 'histsame', fstyle=0, marker=1, alpha=1, lcolor=ROOT.TColor.GetColor("#e42536" ), fcolor=ROOT.TColor.GetColor("#e42536"))
+    nominal_can.cd(1).SetLogy(True)
 
-        nominal_can.cd(2)
+    nominal_can.cd(2)
 
-        bkg_syst = hists['TotalBkg'].Clone("bkg_syst")
-        bkg_syst.Reset()
-        for ibin in range(1, bkg_syst.GetXaxis().GetNbins()+1):
-            bkg_syst.SetBinContent(ibin, 1.0)
-            bkg_syst.SetBinError(ibin, np.sqrt(hists['cov_matrix'].GetBinContent(ibin, ibin)) / hists['TotalBkg'].GetBinContent(ibin))
-        CMS.cmsDraw( bkg_syst, 'E2', fstyle=3004, fcolor=ROOT.kBlack, marker=0 )
+    bkg_syst = hists['TotalBkg'].Clone("bkg_syst")
+    bkg_syst.Reset()
+    for ibin in range(1, bkg_syst.GetXaxis().GetNbins()+1):
+        bkg_syst.SetBinContent(ibin, 1.0)
+        bkg_syst.SetBinError(ibin, np.sqrt(hists['cov_matrix'].GetBinContent(ibin, ibin)) / hists['TotalBkg'].GetBinContent(ibin))
+    CMS.cmsDraw( bkg_syst, 'E2', fstyle=3004, fcolor=ROOT.kBlack, marker=0 )
 
-        print(hists[signal].GetBinContent(hists[signal].GetNbinsX()), hists['TotalBkg'].GetBinContent(hists['TotalBkg'].GetNbinsX()))
-        ratio = hists['data'].Clone()
-        denom = hists['TotalBkg'].Clone("denom")
-        if itype == 'fit_s': denom.Add(hists[signal].Clone("signal"))
-        print(f"Data: {ratio.GetBinContent(ratio.GetNbinsX())}, denom: {denom.GetBinContent(denom.GetNbinsX())}, ")
-        ratio.Divide( denom )
-        print(f"Ratio: {ratio.GetBinContent(ratio.GetNbinsX())}, ratio.GetBinError(ratio.GetNbinsX()): {ratio.GetBinError(ratio.GetNbinsX())}")
-        # CMS.cmsDraw( ratio, 'PE same', mcolor=ROOT.kBlack )
-        ratio.Draw("PE same")
-        oldSize = ratio.GetMarkerSize()
-        ratio.SetMarkerSize(0)
-        ratio.DrawCopy("same e0")
-        ratio.SetMarkerSize(oldSize)
-        ratio.Draw("PE same")
+    print(hists[signal].GetBinContent(hists[signal].GetNbinsX()), hists['TotalBkg'].GetBinContent(hists['TotalBkg'].GetNbinsX()))
+    ratio = hists['data'].Clone()
+    denom = hists['TotalBkg'].Clone("denom")
+    if args.type_of_fit == 'fit_s': denom.Add(hists[signal].Clone("signal"))
+    print(f"Data: {ratio.GetBinContent(ratio.GetNbinsX())}, denom: {denom.GetBinContent(denom.GetNbinsX())}, ")
+    ratio.Divide( denom )
+    print(f"Ratio: {ratio.GetBinContent(ratio.GetNbinsX())}, ratio.GetBinError(ratio.GetNbinsX()): {ratio.GetBinError(ratio.GetNbinsX())}")
+    # CMS.cmsDraw( ratio, 'PE same', mcolor=ROOT.kBlack )
+    ratio.Draw("PE same")
+    oldSize = ratio.GetMarkerSize()
+    ratio.SetMarkerSize(0)
+    ratio.DrawCopy("same e0")
+    ratio.SetMarkerSize(oldSize)
+    ratio.Draw("PE same")
 
-        
-        ref_line = ROOT.TLine(0, 1, 1, 1)
-        CMS.cmsDrawLine(ref_line, lcolor=ROOT.kBlack, lstyle=ROOT.kDotted)
-        CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetXaxis().SetTitleSize(0.095)
-        CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetYaxis().SetTitleSize(0.09)
-        CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetXaxis().SetTitleOffset(1.5)
-        CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetYaxis().SetTitleOffset(0.8)
+    
+    ref_line = ROOT.TLine(0, 1, 1, 1)
+    CMS.cmsDrawLine(ref_line, lcolor=ROOT.kBlack, lstyle=ROOT.kDotted)
+    CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetXaxis().SetTitleSize(0.095)
+    CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetYaxis().SetTitleSize(0.09)
+    CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetXaxis().SetTitleOffset(1.5)
+    CMS.GetcmsCanvasHist(nominal_can.cd(2)).GetYaxis().SetTitleOffset(0.8)
 
-        # output_file = f"{args.output}/SvB_MA_postfitplots_{channels[0]}_{itype}"
-        output_file = f"{args.output}/postfitplots__{signal}__{itype}"
-        CMS.SaveCanvas(nominal_can, f"{output_file}.pdf", close=False )
-        CMS.SaveCanvas(nominal_can, f"{output_file}.png", close=False )
-        CMS.SaveCanvas(nominal_can, f"{output_file}.C" )
+    # output_file = f"{args.output}/SvB_MA_postfitplots_{channels[0]}_{args.type_of_fit}"
+    output_file = f"{args.output}/SvB_MA_postfitplots_{args.signal}_{args.type_of_fit}"
+    CMS.SaveCanvas(nominal_can, f"{output_file}.pdf", close=False )
+    CMS.SaveCanvas(nominal_can, f"{output_file}.png", close=False )
+    CMS.SaveCanvas(nominal_can, f"{output_file}.C" )

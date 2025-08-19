@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, Optional
 
-import base_class.numpy as npext
+import src.numpy as npext
 import numpy as np
 import torch
 import torch.types as tt

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
@@ -11,7 +11,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running test processor"
-python plots/makePlots.py $INPUT_DIR/test.coffea --doTest -o $OUTPUT_DIR -m plots/metadata/plotsAll.yml
+python python/plots/makePlots.py $INPUT_DIR/test.coffea --doTest -o $OUTPUT_DIR -m python/plots/metadata/plotsAll.yml
 
 echo "############### Checking if pdf files exist"
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.pdf
@@ -27,7 +27,7 @@ ls $OUTPUT_DIR/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_oth
 
 
 echo "############### check making the plots from yaml "
-python plots/plot_from_yaml.py --input_yaml $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.yaml \
+python python/plots/plot_from_yaml.py --input_yaml $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_hh.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR_vs_SB/data/SvB_MA_ps.yaml \

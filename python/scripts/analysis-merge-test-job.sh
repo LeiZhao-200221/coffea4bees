@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 OUTPUT_DIR="${1:-"output"}/analysis_merge_test_job"
@@ -10,7 +10,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Merging coffea files"
-python analysis/tools/merge_coffea_files.py -f ${1:-"output"}/analysis_test_job/test_databkgs.coffea ${1:-"output"}/analysis_signals_test_job/test_signal.coffea  -o $OUTPUT_DIR/test.coffea
+python python/analysis/tools/merge_coffea_files.py -f ${1:-"output"}/analysis_test_job/test_databkgs.coffea ${1:-"output"}/analysis_signals_test_job/test_signal.coffea  -o $OUTPUT_DIR/test.coffea
 
 ls $OUTPUT_DIR
 

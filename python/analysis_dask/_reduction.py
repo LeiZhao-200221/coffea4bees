@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 import dask
 
-from base_class.dask.functions import reduction
+from src.dask.functions import reduction
 
 if TYPE_CHECKING:
     from hist import Hist

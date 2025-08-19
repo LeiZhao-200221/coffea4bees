@@ -11,7 +11,7 @@ from threading import Lock
 from typing import Callable, NamedTuple, TypeVar
 
 import fsspec
-from classifier.config import setting as cfg
+from python.classifier.config import setting as cfg
 
 from ..process import pipe_address
 from ..process.initializer import status

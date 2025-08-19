@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.config.setting.df import Columns
-from classifier.df.tools import _type_str
+from python.classifier.config.setting.df import Columns
+from python.classifier.df.tools import _type_str
 
 if TYPE_CHECKING:
     import pandas as pd

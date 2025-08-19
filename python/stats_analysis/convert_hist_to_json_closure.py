@@ -17,10 +17,7 @@ if __name__ == '__main__':
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--hist_key', nargs="+",
                         default=['ps_zz',      'ps_zh',      'ps_hh',
-                                 'ps_zz_fine', 'ps_zh_fine', 'ps_hh_fine', 
-                                 'm4j_hh', 'm4j_zh', 'm4j_zz', 
-                                 'm4j_hh_passHH', 'm4j_zh_passZH', 'm4j_zz_passZZ',
-                                 ],
+                                 'ps_zz_fine', 'ps_zh_fine', 'ps_hh_fine', 'm4j'],
                         help='List of histograms to convert')
 
     parser.add_argument('-o', '--output', dest="output",

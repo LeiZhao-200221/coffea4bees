@@ -4,7 +4,7 @@ import logging
 import math
 
 import fsspec
-from classifier.task import ArgParser, Dataset, EntryPoint, parse
+from python.classifier.task import ArgParser, Dataset, EntryPoint, parse
 
 from ..setting import ResultKey
 
@@ -26,7 +26,7 @@ class cache(Dataset):
     )
 
     def train(self):
-        from base_class.system.eos import EOS
+        from src.storage.eos import EOS
 
         metafile = EOS(self.opts.input)
         base = metafile.parent

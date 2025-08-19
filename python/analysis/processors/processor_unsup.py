@@ -15,22 +15,23 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea.nanoevents.methods import vector
 from coffea import processor
 
-from base_class.hist import Collection, Fill
-from base_class.hist import H, Template
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
+from src.hist import Collection, Fill
+from src.hist import H, Template
+from src.hist.object import LorentzVector, Jet, Muon, Elec
 
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, dumpTopCandidateTestVectors, buildTop
-from analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
+from python.analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, dumpTopCandidateTestVectors, buildTop
+from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
 from functools import partial
 from multiprocessing import Pool
 
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_btag_sf, update_events
-from analysis.helpers.event_selection import apply_4b_selection, apply_event_selection
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from src.physics.common import apply_btag_sf, update_events
+from src.physics.event_selection import apply_event_selection
+from python.analysis.helpers.event_selection import apply_4b_selection
 import logging
 
 
@@ -64,7 +65,7 @@ ak.behavior.update(vector.behavior)
 
 
 class analysis(processor.ProcessorABC):
-    def __init__(self, JCM='', threeTag = True, corrections_metadata='analysis/metadata/corrections.yml', run_systematics=[], SRno = '4',make_classifier_input=None):
+    def __init__(self, JCM='', threeTag = True, corrections_metadata='src/physics/corrections.yml', run_systematics=[], SRno = '4',make_classifier_input=None):
         logging.debug('\nInitialize Analysis Processor')
         self.histCuts = ['passPreSel']
         self.tags = ['threeTag', 'fourTag'] if threeTag else ['fourTag']

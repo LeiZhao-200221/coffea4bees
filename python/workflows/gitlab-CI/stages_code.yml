@@ -1,0 +1,39 @@
+analysis-helpers-job:    
+  stage: code
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/analysis-helpers-job.sh
+
+kappa-framework:
+  stage: code
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/baseclass-kappa-framework.sh
+
+jet-clustering:
+  stage: code
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/jet-clustering-tests.sh
+
+trig-emulator:
+  stage: code
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/trig-emulator-tests.sh
+
+memory-test:
+  stage: code
+  needs:
+    - voms_proxy
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/memory_test.sh
+  artifacts:
+    paths:
+      - output/memory_test/mprofile_ci_test.png

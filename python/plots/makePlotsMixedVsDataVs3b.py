@@ -12,12 +12,12 @@ from coffea.util import load
 import numpy as np
 
 sys.path.insert(0, os.getcwd())
-import base_class.plots.helpers as plot_helpers
-import base_class.plots.helpers_make_plot_dict as plot_helpers_make_plot_dict
-import base_class.plots.helpers_make_plot as plot_helpers_make_plot
+import src.plotting.helpers as plot_helpers
+import src.plotting.helpers_make_plot_dict as plot_helpers_make_plot_dict
+import src.plotting.helpers_make_plot as plot_helpers_make_plot
 
-from base_class.plots.plots import parse_args, load_config, load_hists, read_axes_and_cuts
-import base_class.plots.iPlot_config as cfg
+from src.plotting.plots import parse_args, load_config, load_hists, read_axes_and_cuts
+import src.plotting.iPlot_config as cfg
 
 np.seterr(divide='ignore', invalid='ignore')
 

@@ -18,9 +18,9 @@ import yaml
 import mplhep as hep  # HEP (CMS) extensions/styling on top of mpl
 
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args
-import base_class.plots.iPlot_config as cfg
-import base_class.plots.helpers as plot_helpers
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args
+import src.plotting.iPlot_config as cfg
+import src.plotting.helpers as plot_helpers
 import copy
 np.seterr(divide='ignore', invalid='ignore')
 

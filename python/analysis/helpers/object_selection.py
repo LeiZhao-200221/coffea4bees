@@ -1,12 +1,8 @@
 import numpy as np
 import awkward as ak
 import logging
-from analysis.helpers.common import (
-    drClean,
-    apply_jet_veto_maps,
-    apply_jerc_corrections,
-    compute_puid
-)
+from src.physics.common import drClean, compute_puid
+from src.physics.objects.jet_corrections import apply_jet_veto_maps, apply_jerc_corrections
 from copy import copy
 from typing import Dict, Any
 

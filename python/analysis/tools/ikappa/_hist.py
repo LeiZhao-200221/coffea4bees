@@ -20,8 +20,8 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
-from base_class.physics import di_higgs
-from base_class.physics.di_higgs import Coupling, Diagram
+from src.physics.dihiggs import di_higgs
+from src.physics.dihiggs.di_higgs import Coupling, Diagram
 from bokeh.layouts import column, row
 from bokeh.models import (
     AutocompleteInput,

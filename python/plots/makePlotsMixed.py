@@ -12,8 +12,8 @@ from coffea.util import load
 import numpy as np
 
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, get_value_nested_dict, get_hist, _plot, _savefig, _colors, _plot_ratio
-import base_class.plots.iPlot_config as cfg
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, get_value_nested_dict, get_hist, _plot, _savefig, _colors, _plot_ratio
+import src.plotting.iPlot_config as cfg
 
 np.seterr(divide='ignore', invalid='ignore')
 

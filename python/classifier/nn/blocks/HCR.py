@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from classifier.algorithm.statistics.variance import TensorVariance
+from python.classifier.algorithm.statistics.variance import TensorVariance
 from rich import box as BoxStyle
 from rich.table import Table
 

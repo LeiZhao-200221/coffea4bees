@@ -9,10 +9,10 @@ from itertools import chain
 
 import fsspec
 import yaml
-from base_class.root import Chunk, Friend
-from base_class.system.eos import EOS
-from base_class.utils.json import DefaultEncoder
-from classifier.process.pool import CallbackExecutor
+from src.data_formats.root import Chunk, Friend
+from src.storage.eos import EOS
+from src.utils.json import DefaultEncoder
+from python.classifier.process.pool import CallbackExecutor
 from rich.pretty import pprint
 from rich.progress import (
     BarColumn,
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-m",
         "--metadata",
-        default="metadata/datasets_HH4b.yml",
+        default="python/metadata/datasets_HH4b.yml",
         help="metadata path",
     )
     parser.add_argument(

@@ -4,8 +4,8 @@ from itertools import chain
 from typing import TypedDict
 
 import pandas as pd
-from base_class.hist import Label, LabelLike
-from base_class.utils import unique
+from src.hist import Label, LabelLike
+from src.utils import unique
 from bokeh.layouts import column, row
 from bokeh.models import (
     ColumnDataSource,

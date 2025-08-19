@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import parse_args, init_config, makePlot
+from src.plotting.plots import parse_args, init_config, makePlot
 import numpy as np
 import yaml
 

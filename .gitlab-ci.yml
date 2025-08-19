@@ -29,13 +29,13 @@ variables:
   GIT_SUBMODULE_FORCE_HTTPS: "true"
   MKDOCS_VERSION: '1.5.3'
   MATERIAL_VERSION: '9.5.3'
-  DATASET: metadata/datasets_HH4b_v1p1.yml
-  DATASET_RUN3: metadata/datasets_synthetic_test_Run3.yml
+  DATASET: python/metadata/datasets_HH4b_v1p1.yml
+  DATASET_RUN3: python/metadata/datasets_synthetic_test_Run3.yml
   # DATASET: metadata/datasets_HH4b_cernbox.yml
   # DATASET_RUN3: metadata/datasets_HH4b_Run3_cernbox.yml
 
 include:
-  - local: '.ci-workflows/stages_*.yml'
+  - local: 'python/workflows/gitlab-CI/stages_*.yml'
   - project: 'authoring/documentation/mkdocs-ci'
     file: 'mkdocs-gitlab-pages.gitlab-ci.yml'
 
@@ -49,7 +49,7 @@ stages:
   - fits
   - plot
   - cutflow
-  - classifier
+  - classifier  ### needs to be fixed
   - reana
   - deploy
   - validation
@@ -60,17 +60,20 @@ validation:
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    - changes:
-      - docs/**
+    # Only run on pushes to main branch when docs have changed
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
+      changes:
+        - docs/**
 
 pages:
   before_script:
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    - changes:
-      - docs/**
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Only run on pushes to main branch when docs have changed
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
+      changes:
+        - docs/**
 
 .base_analysis:
   needs:
@@ -82,8 +85,6 @@ pages:
     expire_in: 1 day
     paths:
       - 'template'
-  before_script:
-    - cd python/
   retry: 2
 
 .base_combine:
@@ -93,7 +94,6 @@ pages:
     - cd /home/cmsusr/CMSSW_11_3_4/
     - cmsenv || true
     - cd -
-    - cd python/
   tags:
     - k8s-cvmfs
 

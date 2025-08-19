@@ -5,15 +5,15 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Iterable, Protocol
 
 import numpy as np
-from base_class.root import Chain, Chunk, Friend
+from src.data_formats.root import Chain, Chunk, Friend
 
 from ..monitor.progress import Progress, ProgressTracker
 from ..process import status
 from ..process.pool import CallbackExecutor
 
 if TYPE_CHECKING:
-    from base_class.root.chain import NameMapping
-    from base_class.system.eos import PathLike
+    from src.data_formats.root.chain import NameMapping
+    from src.storage.eos import PathLike
 
 
 class MergeMethod(Protocol):

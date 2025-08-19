@@ -5,14 +5,14 @@ import yaml
 from analysis.helpers.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
 from coffea.analysis_tools import PackedSelection, Weights
-from skimmer.processor.picoaod import PicoAOD
+from src.skimmer.picoaod import PicoAOD
 import awkward as ak
 from analysis.helpers.truth_tools import find_genpart
 
 class Skimmer(PicoAOD):
     def __init__(self, loosePtForSkim=False, mc_outlier_threshold:int|None=200, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
         self.mc_outlier_threshold = mc_outlier_threshold
 
         self.skip_collections = kwargs["skip_collections"]

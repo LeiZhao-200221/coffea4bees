@@ -1,9 +1,9 @@
 import awkward as ak
-import base_class.awkward as akext
+import src.awkward as akext
 import numpy as np
-from base_class.root import Chunk, Friend
-from base_class.system.eos import PathLike
-from base_class.aktools import has_record, get_field
+from src.data_formats.root import Chunk, Friend
+from src.storage.eos import PathLike
+from src.aktools import has_record, get_field
 
 _NAMING = "{path1}/{name}_{uuid}_{start}_{stop}_{path0}"
 

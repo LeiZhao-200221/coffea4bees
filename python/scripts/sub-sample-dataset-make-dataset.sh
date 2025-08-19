@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy
@@ -13,13 +13,13 @@ fi
 
 echo "############### Changing metadata"
 if [[ $(hostname) = *fnal* ]]; then
-    sed -e "s#base_path.*#base_path: \/srv\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 5/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 100000/"  skimmer/metadata/sub_sampling_MC.yml > ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml
+    sed -e "s#base_path.*#base_path: \/srv\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 5/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 100000/"  python/skimmer/metadata/sub_sampling_MC.yml > ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml
 else
-    sed -e "s#base_.*#base_path: \/builds\/${CI_PROJECT_PATH}\/python\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/T3_US_FNALLPC/T3_CH_PSI/" skimmer/metadata/sub_sampling_MC.yml > ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml
+    sed -e "s#base_.*#base_path: /builds/${CI_PROJECT_PATH}/${OUTPUT_DIR}/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/T3_US_FNALLPC/T3_CH_PSI/" python/skimmer/metadata/sub_sampling_MC.yml > ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml
 fi
 cat ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml
 
 echo "############### Running test processor"
-time python runner.py -s -p skimmer/processor/sub_sample_MC.py -c ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml -y UL18  -d TTToHadronic -op ${OUTPUT_DIR} -o picoaod_datasets_TTToHadronic_pseudodata_test_UL18.yml -m metadata/datasets_HH4b.yml
+time python runner.py -s -p python/skimmer/processor/sub_sample_MC.py -c ${OUTPUT_DIR}/sub_sampling_MC_for_test.yml -y UL18  -d TTToHadronic -op ${OUTPUT_DIR} -o picoaod_datasets_TTToHadronic_pseudodata_test_UL18.yml -m python/metadata/datasets_HH4b.yml
 ls -R ${OUTPUT_DIR}
 

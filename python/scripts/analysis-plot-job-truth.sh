@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 OUTPUT_DIR="${1:-"output"}/analysis_plot_job_truth"
@@ -10,7 +10,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running test processor"
-python  plots/makePlotsTruthStudy.py analysis/hists/testTruth.coffea -m plots/metadata/plotsSignal.yml --out ${OUTPUT_DIR}
+python  python/plots/makePlotsTruthStudy.py python/analysis/hists/testTruth.coffea -m python/plots/metadata/plotsSignal.yml --out ${OUTPUT_DIR}
 echo "############### Checking if pdf files exist"
 ls ${OUTPUT_DIR}/RunII/pass4GenBJets00/fourTag/SR/otherGenJet00_pt.pdf
 

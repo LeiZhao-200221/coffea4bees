@@ -2,10 +2,10 @@ import json
 from argparse import ArgumentParser
 
 import fsspec
-from base_class.root import Friend
-from base_class.system.eos import EOS, PathLike
-from base_class.utils.argparser import DefaultFormatter
-from base_class.utils.json import DefaultEncoder
+from src.data_formats.root import Friend
+from src.storage.eos import EOS, PathLike
+from src.utils.argparser import DefaultFormatter
+from src.utils.json import DefaultEncoder
 
 
 def merge_friend_metas(output: PathLike, *metafiles: PathLike, cleanup: bool = True):
