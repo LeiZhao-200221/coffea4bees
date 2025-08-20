@@ -119,3 +119,4 @@ nav:
         - Workflows: bbbb/workflows.md
     - bbWW Analysis:
         - Overview: bbWW/index.md
+    - Documentation: readme.md
