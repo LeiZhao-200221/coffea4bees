@@ -295,17 +295,17 @@ rule postfit:
         pwd -LP
 
         {params.container_wrapper} "cd $(dirname {input}) &&\
-            python3 plots/make_postfit_plot.py \
+            python3 python/plots/make_postfit_plot.py \
             -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
             -o $(basename {input} .root)/plots/ -t prefit
 
         {params.container_wrapper} "cd $(dirname {input}) &&\
-            python3 plots/make_postfit_plot.py \
+            python3 python/plots/make_postfit_plot.py \
             -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
             -o $(basename {input} .root)/plots/ -t fit_b
 
         {params.container_wrapper} "cd $(dirname {input}) &&\
-            python3 plots/make_postfit_plot.py \
+            python3 python/plots/make_postfit_plot.py \
             -i fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
             -o $(basename {input} .root)/plots/ -t fit_s
 
