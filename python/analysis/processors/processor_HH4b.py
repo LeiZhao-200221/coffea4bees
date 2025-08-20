@@ -96,7 +96,7 @@ class analysis(processor.ProcessorABC):
         run_SvB: bool = True,
         corrections_metadata: str = "src/physics/corrections.yml",
         top_reconstruction: str | None = None,
-        run_systematics: list = [],
+        run_systematics: list = [],  #### Way of splitting systematics. It can be event_weights, jes, btag
         make_classifier_input: str = None,
         make_top_reconstruction: str = None,
         make_friend_JCM_weight: str = None,
@@ -122,7 +122,7 @@ class analysis(processor.ProcessorABC):
         with open(corrections_metadata, "r") as f:
             self.corrections_metadata = yaml.safe_load(f)
 
-        self.run_systematics = run_systematics
+        self.run_systematics = ['others', 'jes'] if 'all' in run_systematics else run_systematics
         self.make_top_reconstruction = make_top_reconstruction
         self.make_classifier_input = make_classifier_input
         self.make_friend_JCM_weight = make_friend_JCM_weight
@@ -294,7 +294,8 @@ class analysis(processor.ProcessorABC):
 
         ### adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights(
-            event, target=target,
+            event, 
+            target=target,
             do_MC_weights=self.config["do_MC_weights"],
             dataset=self.dataset,
             year_label=self.year_label,
@@ -332,25 +333,30 @@ class analysis(processor.ProcessorABC):
         # Calculate and apply Jet Energy Calibration
         #
         if self.config["do_jet_calibration"]:
-            jets = apply_jerc_corrections(event,
-                                          corrections_metadata=self.corrections_metadata[self.year],
-                                          isMC=self.config["isMC"],
-                                          run_systematics=self.run_systematics,
-                                          dataset=self.dataset
-                                          )
+            jets = apply_jerc_corrections(
+                event,
+                corrections_metadata=self.corrections_metadata[self.year],
+                isMC=self.config["isMC"],
+                run_systematics= True if 'jes' in self.run_systematics else False,
+                dataset=self.dataset
+            )
         else:
             jets = event.Jet
 
 
-        shifts = [({"Jet": jets}, None)]
-        if self.run_systematics:
+        # Determine which shifts to run
+        if 'jes' in self.run_systematics:
+            shifts = [({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")]
+
             for jesunc in self.corrections_metadata[self.year]["JES_uncertainties"]:
                 shifts.extend( [ ({"Jet": jets[f"JES_{jesunc}"].up}, f"CMS_scale_j_{jesunc}Up"),
                                  ({"Jet": jets[f"JES_{jesunc}"].down}, f"CMS_scale_j_{jesunc}Down"), ] )
+            
+        else:
+            # Only nominal
+            shifts = [({"Jet": jets}, None)]
 
-            shifts.extend( [({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")] )
-
-            logging.info(f"\nJet variations {[name for _, name in shifts]}")
+        logging.info(f"\nJet variations {[name for _, name in shifts]}")
 
         return processor.accumulate( self.process_shift(update_events(event, collections), name, weights, list_weight_names, target) for collections, name in shifts )
 
@@ -493,12 +499,14 @@ class analysis(processor.ProcessorABC):
         #
         if self.config["isMC"] and self.apply_btagSF:
 
-            weights, list_weight_names = add_btagweights( event, weights,
-                                                         list_weight_names=list_weight_names,
-                                                         shift_name=shift_name,
-                                                         use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
-                                                         run_systematics=self.run_systematics,
-                                                         corrections_metadata=self.corrections_metadata[self.year]
+            weights, list_weight_names = add_btagweights( 
+                event, 
+                weights,
+                list_weight_names=list_weight_names,
+                shift_name=shift_name,
+                use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
+                run_systematics=True if 'others' in self.run_systematics else False,
+                corrections_metadata=self.corrections_metadata[self.year]
             )
             logging.debug( f"Btag weight {weights.partial_weight(include=['CMS_btag'])[:10]}\n" )
             event["weight"] = weights.weight()
@@ -597,7 +605,7 @@ class analysis(processor.ProcessorABC):
             apply_FvT=self.apply_FvT,
             classifier_FvT=self.classifier_FvT,
             run_SvB=self.run_SvB,
-            run_systematics=self.run_systematics,
+            run_systematics=True if self.run_systematics else False,
             classifier_SvB=self.classifier_SvB,
             classifier_SvB_MA=self.classifier_SvB_MA,
             processOutput = processOutput,

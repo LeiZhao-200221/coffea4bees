@@ -2,30 +2,23 @@
 # Source common functions
 source "src/scripts/common.sh"
 
-# Setup proxy if needed
-setup_proxy
-
-display_section_header "Input Datasets"
-DATASETS=${DATASET:-"python/metadata/datasets_HH4b.yml"}
-echo "Using datasets file: $DATASETS"
-
-OUTPUT_DIR="${1:-"output"}/analysis_systematics_test_job"
-echo "############### Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output/" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory."
+    exit 1
 fi
 
-echo "############### Modifying corrections for ci"
-sed -e "/Absolute_/d" -e "/BBEC1/d" -e "/EC2/d" -e "/- HF/d" -e "/- Relative/d" -e "/- hf/d" -e "/- lf/d" src/physics/corrections.yml > $OUTPUT_DIR/corrections_ci.yml
-cat $OUTPUT_DIR/corrections_ci.yml
+# Create output directory
+create_output_directory "$OUTPUT_BASE_DIR/analysis_systematics_test_job"
 
-echo "############### Modifying config"
-sed -e "s#corrections_metadata:.*#corrections_metadata: $OUTPUT_DIR/corrections_ci.yml#" python/analysis/metadata/HH4b_systematics.yml > $OUTPUT_DIR/HH4b_systematics_ci.yml
-cat $OUTPUT_DIR/HH4b_systematics_ci.yml
-
-echo "############### Running test processor"
-python runner.py -t -o test_systematics.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
-#python runner.py -t -o test_systematics_preUL.coffea -d HH4b -p python/analysis/processors/processor_HH4b.py -y 2018 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
-#python python/analysis/merge_coffea_files.py -f $OUTPUT_DIR/test_systematics_UL.coffea $OUTPUT_DIR/test_systematics_preUL.coffea -o $OUTPUT_DIR/test_systematics.coffea
-ls $OUTPUT_DIR
-
+# Call the main run_analysis_processor.sh script
+bash python/scripts/run_analysis_processor.sh \
+    --output-base "$OUTPUT_BASE_DIR" \
+    --datasets "GluGluToHHTo4B_cHHH1" \
+    --year "UL18" \
+    --output-filename "test_systematics.coffea" \
+    --output-subdir "analysis_systematics_test_job" \
+    --config python/analysis/metadata/HH4b_signals.yml \
+    --additional-flags "--systematics others"
+    # --additional-flags "--debug"

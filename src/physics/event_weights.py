@@ -12,8 +12,70 @@ def add_weights(event, do_MC_weights: bool = True,
                 friend_trigWeight: callable = None,
                 isTTForMixed: bool = False,
                 target: callable = None,
+                run_systematics: bool = False
                 ):
-    """Add weights to the event.
+    """
+    Add event weights for physics analysis, including generator weights, trigger weights,
+    pileup reweighting, L1 prefiring corrections, and parton shower variations.
+
+    This function constructs a Weights object containing all relevant scale factors and
+    systematic uncertainties for Monte Carlo simulation events, or unity weights for data.
+
+    Parameters
+    ----------
+    event : awkward.Array
+        Event data containing fields like genWeight, trigWeight, Pileup, L1PreFiringWeight, etc.
+    do_MC_weights : bool, default True
+        Whether to apply Monte Carlo specific weights (genWeight, trigger, pileup, etc.).
+        Set to False for data events.
+    dataset : str, optional
+        Name of the dataset being processed (currently unused but kept for future extensions).
+    year_label : str, optional
+        Year identifier for year-dependent corrections (e.g., "2018", "2022").
+        Required when applying pileup or L1 prefiring weights.
+    corrections_metadata : dict, optional
+        Dictionary containing paths to correction files, particularly for pileup reweighting.
+        Expected to have a "PU" key pointing to the pileup correction file.
+    apply_trigWeight : bool, default True
+        Whether to apply trigger efficiency scale factors.
+    friend_trigWeight : callable, optional
+        Function to retrieve trigger weights from friend trees when not available in main event.
+    isTTForMixed : bool, default False
+        Special flag for ttbar mixed samples to skip pileup reweighting.
+    target : callable, optional
+        Target function for friend tree access (used with friend_trigWeight).
+    run_systematics : bool, default False
+        Whether to include systematic uncertainty variations in addition to nominal weights.
+        When True, adds up/down variations for trigger, pileup, prefiring, and PS weights.
+
+    Returns
+    -------
+    weights : coffea.analysis_tools.Weights
+        Weights object containing all computed scale factors and their systematic variations.
+        Can be used to extract nominal weights with weights.weight() or partial weights.
+    list_weight_names : list of str
+        List of weight names that were added to the Weights object, useful for tracking
+        which corrections were applied.
+
+    Notes
+    -----
+    - Generator weights are normalized by cross-section, luminosity, k-factor, and sum of weights
+    - Trigger weights use CMS naming convention "CMS_bbbb_resolved_ggf_triggerEffSF"
+    - Pileup weights are applied using correctionlib with year-specific corrections
+    - L1 prefiring weights are only available for certain years (2016-2017)
+    - Parton shower weights (ISR/FSR) are only added when run_systematics=True
+    - For data events (do_MC_weights=False), only unity weights are applied
+
+    Examples
+    --------
+    >>> weights, weight_names = add_weights(
+    ...     event, 
+    ...     year_label="2018",
+    ...     corrections_metadata={"PU": "/path/to/pileup.json"},
+    ...     run_systematics=True
+    ... )
+    >>> nominal_weight = weights.weight()
+    >>> pileup_up = weights.partial_weight(include=["CMS_pileup_2018"], modifier="up")
     """
 
     weights = Weights(len(event), storeIndividual=True)
@@ -33,34 +95,58 @@ def add_weights(event, do_MC_weights: bool = True,
         if apply_trigWeight:
             trigWeight = event.trigWeight if "trigWeight" in event.fields else friend_trigWeight.arrays(target) if friend_trigWeight else logging.error(f"No friend tree for trigWeight found.")
 
-            hlt = ak.where(event.passHLT, 1., 0.)
-            weights.add( "CMS_bbbb_resolved_ggf_triggerEffSF",
-                        trigWeight.Data, ##* ak.where(trigWeight.MC != 0, hlt / trigWeight.MC, 1) ### uncomment for new data.
-                        trigWeight.MC,
-                        hlt )
+            if run_systematics:
+                hlt = ak.where(event.passHLT, 1., 0.) # type: ignore
+                weights.add( 
+                    "CMS_bbbb_resolved_ggf_triggerEffSF",
+                    trigWeight.Data, ##* ak.where(trigWeight.MC != 0, hlt / trigWeight.MC, 1) ### uncomment for new data.
+                    trigWeight.MC,
+                    hlt
+                )
+            else:
+                weights.add( 
+                    "CMS_bbbb_resolved_ggf_triggerEffSF", 
+                    trigWeight.Data
+                )
             list_weight_names.append('CMS_bbbb_resolved_ggf_triggerEffSF')
             logging.debug( f"trigWeight {weights.partial_weight(include=['CMS_bbbb_resolved_ggf_triggerEffSF'])[:10]}\n" )
 
-        # puWeight (to be checked)
+        # puWeight
         if not isTTForMixed:
             puWeight = list( correctionlib.CorrectionSet.from_file( corrections_metadata["PU"] ).values() )[0]
-            weights.add( f"CMS_pileup_{year_label}",
-                            puWeight.evaluate(event.Pileup.nTrueInt, "nominal"),
-                            puWeight.evaluate(event.Pileup.nTrueInt, "up"),
-                            puWeight.evaluate(event.Pileup.nTrueInt, "down"), )
+            if run_systematics:
+                weights.add(
+                    f"CMS_pileup_{year_label}",
+                    puWeight.evaluate(event.Pileup.nTrueInt, "nominal"),
+                    puWeight.evaluate(event.Pileup.nTrueInt, "up"),
+                    puWeight.evaluate(event.Pileup.nTrueInt, "down"),
+                )
+            else:
+                weights.add(
+                    f"CMS_pileup_{year_label}",
+                    puWeight.evaluate(event.Pileup.nTrueInt, "nominal")
+                )
             list_weight_names.append(f"CMS_pileup_{year_label}")
             logging.debug( f"PU weight {weights.partial_weight(include=[f'CMS_pileup_{year_label}'])[:10]}\n" )
 
         # L1 prefiring weight
-        if ( "L1PreFiringWeight" in event.fields ):  #### AGE: this should be temprorary (field exists in UL)
-            weights.add( f"CMS_prefire_{year_label}",
-                            event.L1PreFiringWeight.Nom,
-                            event.L1PreFiringWeight.Up,
-                            event.L1PreFiringWeight.Dn, )
+        if ( "L1PreFiringWeight" in event.fields ):
+            if run_systematics:
+                weights.add( 
+                    f"CMS_prefire_{year_label}",
+                    event.L1PreFiringWeight.Nom,
+                    event.L1PreFiringWeight.Up,
+                    event.L1PreFiringWeight.Dn,
+                )
+            else:
+                weights.add(
+                    f"CMS_prefire_{year_label}",
+                    event.L1PreFiringWeight.Nom,
+                )
             logging.debug( f"L1Prefire weight {weights.partial_weight(include=[f'CMS_prefire_{year_label}'])[:10]}\n" )
             list_weight_names.append(f"CMS_prefire_{year_label}")
 
-        if ( "PSWeight" in event.fields ):  #### AGE: this should be temprorary (field exists in UL)
+        if run_systematics:
             nom      = np.ones(len(weights.weight()))
             up_isr   = np.ones(len(weights.weight()))
             down_isr = np.ones(len(weights.weight()))

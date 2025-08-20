@@ -749,6 +749,13 @@ if __name__ == '__main__':
         default=False,
         help='Run in test mode with limited number of files'
     )
+    mode_group.add_argument(
+        '--systematics',
+        nargs='+',
+        dest="systematics",
+        default=None,
+        help='List of systematics to apply (e.g., "others jes all")'
+    )
 
     # Execution environment options
     exec_group = parser.add_argument_group('Execution Environment')
@@ -823,7 +830,11 @@ if __name__ == '__main__':
     # Add corrections_metadata to configs
     logging.info("Loading corrections metadata from: src/physics/corrections.yml")
     configs['corrections_metadata'] = corrections_metadata
-    
+
+    if args.systematics:
+        logging.info(f"Systematics to run: {args.systematics}")
+        configs['run_systematics'] = args.systematics
+
     logging.info(f"Loading datasets metadata from: {args.metadata}")
     datasets = yaml.safe_load(open(args.metadata, 'r'))
     
@@ -868,12 +879,6 @@ if __name__ == '__main__':
             xsec = calculate_cross_section(matched_dataset, dataset_type, metadata)
             logging.info(f"Dataset type: {dataset_type}, Cross-section: {xsec}")
 
-            top_reconstruction = config_runner["override_top_reconstruction"] 
-                #or (
-                # metadata['datasets'][matched_dataset]['top_reconstruction']
-                # if "top_reconstruction" in metadata['datasets'][matched_dataset]
-                # else None)
-            logging.info(f"top construction configured as {top_reconstruction} ")
 
             metadata_dataset[matched_dataset] = {
                 'year': year,
@@ -881,7 +886,6 @@ if __name__ == '__main__':
                 'xs': xsec,
                 'lumi': float(metadata['luminosities'][year]),
                 'trigger': metadata['triggers'][year],
-                'top_reconstruction': top_reconstruction
             }
             # Main dataset processing logic            
             if dataset_type == 'mc':

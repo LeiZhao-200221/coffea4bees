@@ -15,7 +15,6 @@ config:
   apply_btagSF: false
   apply_boosted_veto: false
   run_SvB: false
-  run_systematics: false
   top_reconstruction: fast
   friends:
     trigWeight: "python/metadata/datasets_HH4b_2024_v2_trigweights.json@@trigWeight" 

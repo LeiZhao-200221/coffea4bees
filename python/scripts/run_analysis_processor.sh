@@ -176,8 +176,8 @@ cmd=(python runner.py
     -p "$PROCESSOR_PATH" 
     -m "$METADATA_PATH" 
     -c "$CONFIG_PATH" 
-    # --triggers "$TRIGGERS_PATH"
-    # --luminosities "$LUMINOSITIES_PATH"
+    --triggers "$TRIGGERS_PATH"
+    --luminosities "$LUMINOSITIES_PATH"
     -d $DATASETS 
     -y $YEAR
     -op "$OUTPUT_DIR" 
