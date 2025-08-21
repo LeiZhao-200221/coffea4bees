@@ -87,6 +87,30 @@ monitor.checkpoint("after_analysis")
 monitor.summary()
 ```
 
+### ✅ **memory_test.py** - Automated Memory Testing & Validation
+**For automated testing and CI/CD memory validation**
+
+Runs scripts with memory profiling and validates they stay within memory thresholds.
+
+```bash
+# Test that a script stays within memory limits
+src/scripts/memory/memory_test.py \
+  --threshold 3000 \
+  --tolerance 10 \
+  --output test_results \
+  --script your_analysis.py --your-args
+
+# Returns exit code 0 if within threshold, 1 if exceeded
+# Automatically generates memory plots and extracts peak usage
+```
+
+**Key Features:**
+- Automated `mprof` execution with plot generation
+- Peak memory extraction and threshold validation
+- Tolerance checking (threshold ± percentage)
+- Proper exit codes for CI/CD integration
+- Output files: `test_results.dat`, `test_results.png`
+
 ## Common Use Cases
 
 ### 🚀 **Testing Container Workflows**
@@ -117,6 +141,22 @@ src/scripts/memory/memory_limited_run.sh --max-memory 2000 --check-interval 5 --
 
 # 3. Check the logs
 tail -f memory_monitor.log
+```
+
+### ✅ **Automated Memory Testing**
+```bash
+# Test that analysis stays within memory limits (for CI/CD)
+src/scripts/memory/memory_test.py \
+  --threshold 4000 \
+  --tolerance 10 \
+  --output analysis_test \
+  --script python/analysis/processors/processor_HH4b.py your_input.root
+
+# Check if test passed (exit code 0 = success, 1 = failure)
+echo "Test result: $?"
+
+# View generated memory plot
+ls analysis_test.png
 ```
 
 ## Memory Sizing Guidelines
