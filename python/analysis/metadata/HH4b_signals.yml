@@ -1,8 +1,6 @@
 runner:
   workers: 4
   condor_memory: 2GB
-  chunksize: 10000
-  # dashboard_address: 10200
   condor_transfer_input_files:
     - 'src/'
     - 'python/'

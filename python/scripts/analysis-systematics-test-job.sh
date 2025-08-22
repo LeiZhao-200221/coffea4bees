@@ -10,7 +10,13 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create output directory
-create_output_directory "$OUTPUT_BASE_DIR/analysis_systematics_test_job"
+OUTPUT=$OUTPUT_BASE_DIR/analysis_systematics_test_job
+create_output_directory "$OUTPUT"
+
+display_section_header "Modifying HH4b_signals.yml"
+sed -e "s|condor_memory: 2GB|chunksize: 10000|g" \
+    python/analysis/metadata/HH4b_signals.yml > $OUTPUT/HH4b_signals_modified.yml
+
 
 # Call the main run_analysis_processor.sh script
 bash python/scripts/run_analysis_processor.sh \
@@ -20,6 +26,6 @@ bash python/scripts/run_analysis_processor.sh \
     --year "UL18" \
     --output-filename "test_systematics.coffea" \
     --output-subdir "analysis_systematics_test_job" \
-    --config python/analysis/metadata/HH4b_signals.yml \
+    --config $OUTPUT/HH4b_signals_modified.yml \
     --additional-flags "--systematics others"
     # --additional-flags "--debug"
