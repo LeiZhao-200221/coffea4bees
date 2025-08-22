@@ -30,6 +30,7 @@ class DeClustererBoosted(PicoAOD):
     def __init__(self, clustering_pdfs_file = "None",
                 declustering_rand_seed=5,
                 friends: dict[str, str|FriendTemplate] = None,
+                corrections_metadata: dict = None,
                 *args, **kwargs):
         kwargs["pico_base_name"] = f'picoAOD_seed{declustering_rand_seed}'
         super().__init__(*args, **kwargs)
@@ -39,7 +40,7 @@ class DeClustererBoosted(PicoAOD):
 
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]

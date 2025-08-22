@@ -9,10 +9,10 @@ from src.physics.event_selection import apply_event_selection
 
 
 class Skimmer(PicoAOD):
-    def __init__(self, file_wEvents="", *args, **kwargs):
+    def __init__(self, file_wEvents="", corrections_metadata: dict = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.file_wEvents = load(file_wEvents)
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
     def select(self, events):
 

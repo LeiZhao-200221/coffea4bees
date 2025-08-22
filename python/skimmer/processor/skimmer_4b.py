@@ -13,13 +13,13 @@ from src.skimmer.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):
-    def __init__(self, loosePtForSkim=False, skim4b=False, mc_outlier_threshold:int|None=200, *args, **kwargs):
+    def __init__(self, loosePtForSkim=False, skim4b=False, mc_outlier_threshold:int|None=200, corrections_metadata: dict = None, *args, **kwargs):
         if skim4b:
             kwargs["pico_base_name"] = f'picoAOD_fourTag'
         super().__init__(*args, **kwargs)
         self.loosePtForSkim = loosePtForSkim
         self.skim4b = skim4b
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
         self.mc_outlier_threshold = mc_outlier_threshold
 
 

@@ -42,11 +42,11 @@ class analysis(processor.ProcessorABC):
     def __init__(
         self,
         *,
-        corrections_metadata="src/physics/corrections.yml",
+        corrections_metadata: dict = None,
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
         self.histCuts = ["pass4GenBJets00",    "pass4GenBJets20",    "pass4GenBJets40",
                          "pass4GenBJets00_1j", "pass4GenBJets20_1j", "pass4GenBJets40_1j",

@@ -29,7 +29,7 @@ class analysis(processor.ProcessorABC):
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
         self.make_classifier_input = make_classifier_input
 
         self.cutFlowCuts = [

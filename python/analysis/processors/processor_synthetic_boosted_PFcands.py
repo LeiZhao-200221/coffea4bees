@@ -30,12 +30,12 @@ class analysis(processor.ProcessorABC):
     def __init__(
             self,
             *,
-            corrections_metadata="src/physics/corrections.yml",
+            corrections_metadata: dict = None,
             **kwargs
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
     def process(self, event):
 
