@@ -156,7 +156,7 @@ rule trig_emulator:
 rule memory_test:
     container: analysis_container
     log: f"{output_dir}/memory_test.log"
-    shell: "source python/scripts/memory_test.sh {output_dir}/ 2>&1 | tee -a {log}"
+    shell: "source python/scripts/memory_test.sh --output-base {output_dir}/ 2>&1 | tee -a {log}"
 
 rule skimmer_test_job:
     container: analysis_container

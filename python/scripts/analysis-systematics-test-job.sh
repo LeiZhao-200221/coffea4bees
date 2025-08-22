@@ -15,6 +15,7 @@ create_output_directory "$OUTPUT_BASE_DIR/analysis_systematics_test_job"
 # Call the main run_analysis_processor.sh script
 bash python/scripts/run_analysis_processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
+    --dataset-metadata "python/metadata/datasets_HH4b_v1p2.yml" \
     --datasets "GluGluToHHTo4B_cHHH1" \
     --year "UL18" \
     --output-filename "test_systematics.coffea" \

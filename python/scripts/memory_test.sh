@@ -14,7 +14,7 @@ OUTPUT_DIR="$OUTPUT_BASE_DIR/memory_test"
 create_output_directory "$OUTPUT_DIR"
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET:-"python/metadata/datasets_HH4b.yml"}
+DATASETS="python/metadata/datasets_HH4b_v1p2.yml"
 echo "Using datasets file: $DATASETS"
 
 python src/scripts/memory/memory_test.py \

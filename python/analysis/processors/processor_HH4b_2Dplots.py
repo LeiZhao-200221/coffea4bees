@@ -61,7 +61,7 @@ class analysis(processor.ProcessorABC):
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         fill_histograms: bool = True,
-        corrections_metadata: str = "src/physics/corrections.yml",
+        corrections_metadata: dict = None,
         friends: dict[str, str|FriendTemplate] = None,
     ):
 
@@ -69,8 +69,7 @@ class analysis(processor.ProcessorABC):
         self.apply_trigWeight = apply_trigWeight
         self.apply_btagSF = apply_btagSF
         self.fill_histograms = fill_histograms
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
+        self.corrections_metadata = corrections_metadata
         self.friends = parse_friends(friends)
 
 

@@ -465,7 +465,6 @@ def setup_config_defaults(config_runner, args):
         'friend_metafile': 'friends',
         'friend_merge_step': 100_000,
         'write_coffea_output': True,
-        'override_top_reconstruction': None,
         'uproot_xrootd_retry_delays': [5, 15, 45]
     }
     
@@ -829,11 +828,11 @@ if __name__ == '__main__':
     
     # Add corrections_metadata to configs
     logging.info("Loading corrections metadata from: src/physics/corrections.yml")
-    configs['corrections_metadata'] = corrections_metadata
+    configs['config']['corrections_metadata'] = corrections_metadata
 
     if args.systematics:
         logging.info(f"Systematics to run: {args.systematics}")
-        configs['run_systematics'] = args.systematics
+        configs['config']['run_systematics'] = args.systematics
 
     logging.info(f"Loading datasets metadata from: {args.metadata}")
     datasets = yaml.safe_load(open(args.metadata, 'r'))
