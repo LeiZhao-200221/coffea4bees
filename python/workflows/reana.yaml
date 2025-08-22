@@ -1,24 +1,24 @@
 version: 0.9.4
 inputs:
   directories:
-    - analysis/
-    - base_class/
-    - data/
-    - metadata/
-    - plots/
-    - skimmer/processor/
-    - stats_analysis/
-    - classifier/
-    - workflows/
+    - src/
+    - python/analysis/
+    - python/data/
+    - python/metadata/
+    - python/plots/
+    - python/skimmer/processor/
+    - python/stats_analysis/
+    - python/classifier/
+    - python/workflows/
   parameters:
-    input: workflows/inputs_reana.yaml
+    input: python/workflows/inputs_reana.yaml
   files:
     - gitdiff.txt
     - runner.py
     - run_container
 workflow:
   type: snakemake
-  file: workflows/Snakefile_reana
+  file: python/workflows/Snakefile_reana
   resources:
     cvmfs:
       - cms.cern.ch
