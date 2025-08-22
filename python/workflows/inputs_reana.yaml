@@ -48,7 +48,7 @@ channels:
     signallabel: "ZH_bbbb"
     othersignal: ""
 
-extra_arguments: "--gitdiff In_gitdiff.txt_file --githash 20250822_7df8442"
+extra_arguments: "--gitdiff In_gitdiff.txt_file --githash 20250822_a1cc8d2"
 analysis_container: "gitlab-registry.cern.ch/cms-cmu/coffea4bees:20250714_44f08ac8"   ### actual tag for reproducibility
 combine_container: "gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"
 container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv || true && cd - && eval"
@@ -59,4 +59,4 @@ container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsu
 
 output_path: "output"
 # output_path: "hists/coffea4bees_20250808_1e803886"
-dataset_location: "metadata/datasets_HH4b_v1p2.yml"
+dataset_location: "python/metadata/datasets_HH4b_v1p2.yml"
