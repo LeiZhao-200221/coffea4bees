@@ -1,6 +1,6 @@
 import re
 
-from base_class.system.eos import EOS
+from src.storage.eos import EOS
 
 
 class FailedSkimCleaner:

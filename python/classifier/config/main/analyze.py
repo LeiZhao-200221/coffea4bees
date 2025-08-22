@@ -6,8 +6,8 @@ from datetime import datetime
 from itertools import chain
 
 import fsspec
-from classifier.task import Analysis, ArgParser, EntryPoint, TaskOptions, main
-from classifier.task.analysis import Analyzer
+from python.classifier.task import Analysis, ArgParser, EntryPoint, TaskOptions, main
+from python.classifier.task.analysis import Analyzer
 
 from .. import setting as cfg
 from ._utils import progress_advance
@@ -51,9 +51,9 @@ def _analyze(analyzer: Analyzer):
 def run_analyzer(parser: EntryPoint, results: list[dict]):
     from concurrent.futures import ProcessPoolExecutor
 
-    from classifier.monitor import Index
-    from classifier.monitor.progress import Progress
-    from classifier.process import pool, status
+    from python.classifier.monitor import Index
+    from python.classifier.monitor.progress import Progress
+    from python.classifier.process import pool, status
 
     analysis: list[Analysis] = parser.tasks[TaskOptions.analysis.name]
     analyzers = [*chain(*(a.analyze(results) for a in analysis))]

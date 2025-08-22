@@ -2,8 +2,8 @@ from collections import defaultdict
 from itertools import chain, cycle
 
 import fsspec
-from classifier.config.setting import IO, ResultKey
-from classifier.task import Analysis, ArgParser
+from python.classifier.config.setting import IO, ResultKey
+from python.classifier.task import Analysis, ArgParser
 
 
 class LossROC(Analysis):
@@ -71,7 +71,7 @@ class _collect_loss_roc:
         return styles
 
     def __new__(cls, results: list, inline_resources=False):
-        import base_class.numpy as npext
+        import src.numpy as npext
         import pandas as pd
 
         # fetch variables
@@ -187,14 +187,14 @@ class _plot_loss_auc:
 
     @property
     def plot(self):
-        from classifier.monitor.plot.basic import plot_multiphase_scalar
+        from python.classifier.monitor.plot.basic import plot_multiphase_scalar
 
         return plot_multiphase_scalar
 
     def __call__(self):
         from bokeh.embed import file_html
         from bokeh.resources import CDN, INLINE
-        from classifier.monitor import Index
+        from python.classifier.monitor import Index
 
         resources = INLINE if self._inline else CDN
         path = IO.report / "HCR" / self.filename.format(group=self._group)
@@ -216,7 +216,7 @@ class _list_loss_auc(_plot_loss_auc):
 
     @property
     def plot(self):
-        from classifier.monitor.plot.basic import list_last_scalar
+        from python.classifier.monitor.plot.basic import list_last_scalar
 
         return list_last_scalar
 
@@ -227,6 +227,6 @@ class _plot_roc(_plot_loss_auc):
 
     @property
     def plot(self):
-        from classifier.monitor.plot.basic import plot_multiphase_curve
+        from python.classifier.monitor.plot.basic import plot_multiphase_curve
 
         return plot_multiphase_curve

@@ -1,18 +1,19 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD #, fetch_metadata, resize
+from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
 from analysis.helpers.event_selection import apply_4b_selection
 from coffea.nanoevents import NanoEventsFactory
 
-from jet_clustering.clustering   import cluster_bs
-from jet_clustering.declustering import make_synthetic_event, clean_ISR
+from python.jet_clustering.clustering   import cluster_bs
+from python.jet_clustering.declustering import make_synthetic_event, clean_ISR
 from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
 from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
+from src.math.random import Squares
+from analysis.helpers.event_weights import add_btagweights
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_event_selection
+from src.physics.event_selection import apply_event_selection
+from src.physics.event_weights import add_weights
 
-from base_class.root import Chunk, TreeReader
+from src.data_formats.root import Chunk, TreeReader
 from analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
@@ -20,7 +21,8 @@ from analysis.helpers.load_friend import (
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak
@@ -41,7 +43,7 @@ class DeClusterer(PicoAOD):
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]
@@ -96,7 +98,6 @@ class DeClusterer(PicoAOD):
 
         ## adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights( event, config["do_MC_weights"], dataset, year_label,
-                                                  estart, estop,
                                                   self.corrections_metadata[year],
                                                   isTTForMixed=False,
                                                   target=target,

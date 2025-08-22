@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import fsspec
-from classifier.task import ArgParser, EntryPoint, converter
+from python.classifier.task import ArgParser, EntryPoint, converter
 
 from ...utils import MemoryViewIO
 from ..setting import IO as IOSetting
@@ -15,7 +15,7 @@ from ._utils import LoadTrainingSets, progress_advance
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    from base_class.system.eos import EOS
+    from src.storage.eos import EOS
     from torch.utils.data import StackDataset
 
 
@@ -62,8 +62,8 @@ class Main(LoadTrainingSets):
         from concurrent.futures import ProcessPoolExecutor
 
         import numpy as np
-        from classifier.monitor.progress import Progress
-        from classifier.process import pool, status
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.process import pool, status
 
         # cache states
         states = dict.fromkeys(self.opts.states, None)
@@ -127,8 +127,8 @@ class _save_cache:
 
     def __call__(self, chunk: int, indices: npt.ArrayLike):
         import torch
-        from classifier.nn.dataset import skim_loader, subset
-        from classifier.nn.dataset.sliceable import NamedTensorDataset
+        from python.classifier.nn.dataset import skim_loader, subset
+        from python.classifier.nn.dataset.sliceable import NamedTensorDataset
 
         dataset = subset(self.dataset, indices)
         if isinstance(dataset, NamedTensorDataset):

@@ -2,7 +2,7 @@ import numpy as np
 import awkward as ak
 import sys
 try:
-    from base_class.math.random import Squares
+    from src.math.random import Squares
 except:
     print("Warning ... Squares not availible")
     pass

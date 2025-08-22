@@ -6,17 +6,17 @@ from functools import cached_property, reduce
 from itertools import chain
 from typing import TYPE_CHECKING, Iterable
 
-from base_class.utils import unique
-from classifier.config.main._utils import progress_advance
-from classifier.task import ArgParser, Dataset, converter, parse
+from src.utils import unique
+from python.classifier.config.main._utils import progress_advance
+from python.classifier.task import ArgParser, Dataset, converter, parse
 
 from ..setting import IO as IOSetting
 
 if TYPE_CHECKING:
     import pandas as pd
-    from base_class.root import Chunk, Friend
-    from classifier.df.io import FromRoot, ToTensor
-    from classifier.df.tools import DFProcessor
+    from src.data_formats.root import Chunk, Friend
+    from python.classifier.df.io import FromRoot, ToTensor
+    from python.classifier.df.tools import DFProcessor
 
 
 class LoadRoot(ABC, Dataset):
@@ -77,7 +77,7 @@ class LoadRoot(ABC, Dataset):
     )
 
     def __init__(self):
-        from classifier.df.io import ToTensor
+        from python.classifier.df.io import ToTensor
 
         self._to_tensor = ToTensor()
         self._preprocessors: list[DFProcessor] = []
@@ -105,7 +105,7 @@ class LoadRoot(ABC, Dataset):
         )
 
     def _parse_friends(self, friends: list[str]) -> list[Friend]:
-        from base_class.root import Friend
+        from src.data_formats.root import Friend
 
         return [Friend.from_json(parse.mapping(f, "file")) for f in friends]
 
@@ -134,10 +134,10 @@ class LoadRoot(ABC, Dataset):
             )
         from concurrent.futures import ProcessPoolExecutor
 
-        from base_class.root import Chunk
-        from classifier.monitor.progress import Progress
-        from classifier.process import pool, status
-        from classifier.root.dataset import FriendTreeEvalDataset
+        from src.data_formats.root import Chunk
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.process import pool, status
+        from python.classifier.root.dataset import FriendTreeEvalDataset
 
         from_roots = [*self._from_root()]
         with ProcessPoolExecutor(
@@ -242,7 +242,7 @@ class _fetch:
         self._tree = tree
 
     def __call__(self, path: str | Chunk):
-        from base_class.root import Chunk
+        from src.data_formats.root import Chunk
 
         if isinstance(path, Chunk):
             return path
@@ -276,9 +276,9 @@ class _load_root:
         from concurrent.futures import ProcessPoolExecutor
 
         import pandas as pd
-        from base_class.root import Chunk
-        from classifier.monitor.progress import Progress
-        from classifier.process import pool, status
+        from src.data_formats.root import Chunk
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.process import pool, status
 
         with ProcessPoolExecutor(
             max_workers=self._max_workers,

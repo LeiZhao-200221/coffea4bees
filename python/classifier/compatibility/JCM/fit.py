@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 
 import numpy as np
-from classifier.df.tools import _iter_str, _map_str, _type_str
-from classifier.task import parse
-from classifier.typetools import new_TypedDict
+from python.classifier.df.tools import _iter_str, _map_str, _type_str
+from python.classifier.task import parse
+from python.classifier.typetools import new_TypedDict
 
 if TYPE_CHECKING:
     import pandas as pd

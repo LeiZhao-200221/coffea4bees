@@ -1,4 +1,4 @@
-from classifier.task import ArgParser, main
+from python.classifier.task import ArgParser, main
 
 
 class Main(main.Main):

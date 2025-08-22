@@ -1,8 +1,8 @@
 import logging
 import os
 
-from classifier.task import ArgParser, EntryPoint, converter
-from classifier.task.special import WorkInProgress
+from python.classifier.task import ArgParser, EntryPoint, converter
+from python.classifier.task.special import WorkInProgress
 
 from .. import setting as cfg
 from ._utils import LoadTrainingSets, SelectDevice
@@ -49,7 +49,7 @@ class Main(WorkInProgress, SelectDevice, LoadTrainingSets):
         import numpy as np
         import torch.nn.functional as F
         import torch.optim as optim
-        from classifier.nn.blocks.HCR import HCR
+        from python.classifier.nn.blocks.HCR import HCR
         from torch.profiler import ProfilerActivity, profile, schedule
         from torch.utils.data import DataLoader, Subset
 

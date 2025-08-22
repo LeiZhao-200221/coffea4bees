@@ -2,20 +2,21 @@ import logging
 
 import numpy as np
 import yaml
-from analysis.helpers.common import apply_jerc_corrections
+from src.physics.objects.jet_corrections import apply_jerc_corrections
 from analysis.helpers.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_event_selection, apply_boosted_4b_selection
+from analysis.helpers.event_selection import apply_boosted_4b_selection
+from src.physics.event_selection import apply_event_selection
 
 from coffea.analysis_tools import PackedSelection, Weights
-from skimmer.processor.picoaod import PicoAOD
+from src.skimmer.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):
     def __init__(self, mc_outlier_threshold:int|None=200, *args, **kwargs):
         
         super().__init__(*args, **kwargs)
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
         self.cutFlowCuts = [
             "all",
             "passHLT",

@@ -9,7 +9,7 @@ from functools import partial
 from glob import glob
 from typing import Any, Callable, Optional, TypeVar, overload
 
-from base_class.typetools import check_type
+from src.typetools import check_type
 from bokeh.document import Document
 from bokeh.events import ButtonClick
 from bokeh.layouts import row

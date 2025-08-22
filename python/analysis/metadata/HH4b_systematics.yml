@@ -2,27 +2,28 @@ runner:
   workers: 100
   condor_memory: 2GB
   chunksize: 10000
+  dashboard_address: 10200
   condor_transfer_input_files:
     - 'analysis/'
-    - 'base_class/'
+    - 'src/'
     - 'classifier/'
     - 'data/'
     - 'skimmer/'
-    - 'metadata/'
+    - 'python/metadata/'
 
 config:
-  corrections_metadata: 'analysis/metadata/corrections.yml'
+
   apply_FvT: false
   apply_trigWeight: true
   apply_btagSF: true
   apply_boosted_veto: false
   run_SvB: true
   run_systematics: true
-  top_reconstruction_override: false
-  SvB: "analysis/weights/pytorch_models/2024_HHUL/SvB_HCR_8_np753_seed13_lr0.01_epochs20_offset*_epoch20.pkl"
-  SvB_MA: "analysis/weights/pytorch_models/2024_HHUL/SvB_MA_HCR+attention_8_np1061_seed13_lr0.01_epochs20_offset*_epoch20.pkl"
+  top_reconstruction: fast
+  SvB: "python/analysis/weights/pytorch_models/2024_HHUL/SvB_HCR_8_np753_seed13_lr0.01_epochs20_offset*_epoch20.pkl"
+  SvB_MA: "python/analysis/weights/pytorch_models/2024_HHUL/SvB_MA_HCR+attention_8_np1061_seed13_lr0.01_epochs20_offset*_epoch20.pkl"
   # SvB_MA:
-  #   - path: 'analysis/weights/pytorch_models/2024_HHUL_all_kl/result.json'
+  #   - path: 'python/analysis/weights/pytorch_models/2024_HHUL_all_kl/result.json'
   #     name: Final
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
+    trigWeight: "python/metadata/datasets_HH4b_2024_v1p2_trigweights.json@@trigWeight"

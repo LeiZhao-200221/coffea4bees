@@ -4,4 +4,4 @@ runner:
   # data_tier: nanoAOD
 
 config:
-  corrections_metadata: "analysis/metadata/corrections.yml"
+

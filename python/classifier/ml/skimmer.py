@@ -6,8 +6,8 @@ from typing import Callable
 
 import numpy.typing as npt
 import torch
-from base_class.math.random import SeedLike, Squares
-from classifier.config.setting import ml as cfg
+from src.math.random import SeedLike, Squares
+from python.classifier.config.setting import ml as cfg
 from torch import BoolTensor
 from torch.utils.data import Dataset
 

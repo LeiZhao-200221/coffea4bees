@@ -12,8 +12,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 sys.path.insert(0, os.getcwd())
-import base_class.plots.ROOTPlotTools as ROOTPlotTools
-from stats_analysis.make_variable_binning import make_variable_binning, rebin_histogram
+import src.plotting.ROOTPlotTools as ROOTPlotTools
+from python.stats_analysis.make_variable_binning import make_variable_binning, rebin_histogram
 
 CMURED = '#d34031'
 # https://xkcd.com/color/rgb/

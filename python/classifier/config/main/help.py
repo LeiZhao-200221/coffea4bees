@@ -3,10 +3,10 @@ import re
 from textwrap import indent
 
 import fsspec
-from classifier.task import ArgParser, EntryPoint, Task, main, parse
-from classifier.task.special import Deprecated, WorkInProgress
-from classifier.task.task import _INDENT
-from classifier.test.utils.import_check import walk_packages
+from python.classifier.task import ArgParser, EntryPoint, Task, main, parse
+from python.classifier.task.special import Deprecated, WorkInProgress
+from python.classifier.task.task import _INDENT
+from python.classifier.test.utils.import_check import walk_packages
 
 from .. import setting as cfg
 from ..state import Flags

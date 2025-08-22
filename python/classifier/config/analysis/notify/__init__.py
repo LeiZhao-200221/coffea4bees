@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from classifier.task import Analysis, ArgParser, parse
+from python.classifier.task import Analysis, ArgParser, parse
 
 from ...setting import monitor as cfg
 
@@ -66,6 +66,6 @@ class _send_gmail:
     subtype: str
 
     def __call__(self):
-        from classifier.monitor.notification.smtp_gmail import gmail_send_text
+        from python.classifier.monitor.notification.smtp_gmail import gmail_send_text
 
         gmail_send_text(self.title, self.body, self.subtype)

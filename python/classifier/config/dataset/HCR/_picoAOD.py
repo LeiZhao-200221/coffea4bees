@@ -5,9 +5,9 @@ from functools import cached_property
 from inspect import getmro
 from typing import Callable, Iterable
 
-from classifier.config.setting.cms import CollisionData, MC_HH_ggF, MC_TTbar
-from classifier.config.state import Flags
-from classifier.task import ArgParser, Dataset, parse
+from python.classifier.config.setting.cms import CollisionData, MC_HH_ggF, MC_TTbar
+from python.classifier.config.state import Flags
+from python.classifier.task import ArgParser, Dataset, parse
 
 
 class _PicoAOD(Dataset):
@@ -112,7 +112,7 @@ class _ggF(_MCDataset):
         return ",".join(f"{k}:{v:.6g}" for k, v in couplings.items())
 
     def __new__(cls, self: MC, metadata: str):
-        from base_class.physics.kappa_framework import Coupling
+        from src.physics.dihiggs.kappa_framework import Coupling
 
         filelists = []
         datasets = {}
@@ -171,7 +171,7 @@ def _mixeddata(self: Data, metadata: str):
 def _synthetic(self: Data, metadata: str):
     files = []
     if "synthetic" in self.data_sources:
-        from base_class.system.eos import EOS
+        from src.storage.eos import EOS
 
         samples = parse.intervals(self.opts.data_synthetic_samples)
         for year, eras in CollisionData.eras.items():

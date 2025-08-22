@@ -3,9 +3,9 @@ from collections import defaultdict
 
 import fsspec
 import yaml
-from classifier.task import ArgParser, EntryPoint, main
-from classifier.task.parse._dict import _mapping_schema, mapping
-from classifier.utils import YamlIndentSequence
+from python.classifier.task import ArgParser, EntryPoint, main
+from python.classifier.task.parse._dict import _mapping_schema, mapping
+from python.classifier.utils import YamlIndentSequence
 from yaml.representer import Representer
 
 from .. import setting as cfg
@@ -63,7 +63,7 @@ class Main(main.Main):
         cfg.Monitor.enable = False
 
     def run(self, parser: EntryPoint):
-        from base_class.system.eos import EOS
+        from src.storage.eos import EOS
 
         output = EOS(self.opts.path)
         workflow = defaultdict(list)

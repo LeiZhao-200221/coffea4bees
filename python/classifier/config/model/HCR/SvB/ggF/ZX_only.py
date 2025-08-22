@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.config.setting.HCR import Input
-from classifier.config.state.label import MultiClass
-from classifier.task import ArgParser
+from python.classifier.config.setting.HCR import Input
+from python.classifier.config.state.label import MultiClass
+from python.classifier.task import ArgParser
 
 from . import _remove_sig
 
 if TYPE_CHECKING:
-    from classifier.ml import BatchType
+    from python.classifier.ml import BatchType
 
 
 class _keep_ZX:

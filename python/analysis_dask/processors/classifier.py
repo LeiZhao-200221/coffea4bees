@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from typing import Callable, Iterable, Optional
 
 import awkward as ak
-import base_class.dask.awkward as dakext
+import src.dask.awkward as dakext
 import dask_awkward as dak
 import numpy as np
-from base_class.dask.hist import Collection, Fill, Template
-from base_class.physics.object import Jet
+from src.dask.hist import Collection, Fill, Template
+from src.physics.object import Jet
 
 from ._utils import selection_to_label
 

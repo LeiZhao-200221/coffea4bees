@@ -1,8 +1,8 @@
 from collections import defaultdict
 
 import fsspec
-from base_class.system.eos import EOS, PathLike
-from classifier.config.setting import IO
+from src.storage.eos import EOS, PathLike
+from python.classifier.config.setting import IO
 
 from ..core import MonitorProxy, post_to_monitor
 

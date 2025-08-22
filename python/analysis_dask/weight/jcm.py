@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import awkward as ak
-import base_class.dask.awkward as dakext
+import src.dask.awkward as dakext
 import numpy as np
 
 

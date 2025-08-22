@@ -33,7 +33,7 @@ counts4:
         SR: 76.0
         SB: 190.0
         passSvB: 0.0
-        failSvB: 944.0
+        failSvB: 943.0
 
     data_2023_preBPixB:
         passJetMult: 1006.0
@@ -291,7 +291,7 @@ counts4_unit:
         SR: 76.0
         SB: 190.0
         passSvB: 0.0
-        failSvB: 944.0
+        failSvB: 943.0
 
     data_2023_preBPixB:
         passJetMult: 1006.0

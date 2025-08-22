@@ -1,4 +1,4 @@
-from classifier.task import GlobalSetting
+from python.classifier.task import GlobalSetting
 
 
 class CollisionData(GlobalSetting):

@@ -1,7 +1,7 @@
 import sys
 
-from classifier.config.dataset import _root
-from classifier.task import ArgParser, converter
+from python.classifier.config.dataset import _root
+from python.classifier.task import ArgParser, converter
 
 
 class LoadGroupedRootForTest(_root.LoadGroupedRoot):
@@ -28,8 +28,8 @@ class LoadGroupedRootForTest(_root.LoadGroupedRoot):
     def _from_root(self):
         from concurrent.futures import ProcessPoolExecutor
 
-        from classifier.monitor.progress import Progress
-        from classifier.process import pool, status
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.process import pool, status
 
         files = self.files
         with ProcessPoolExecutor(

@@ -5,8 +5,8 @@ import hist
 import matplotlib.pyplot as plt
 from hist.intervals import ratio_uncertainty
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, print_cfg
-import base_class.plots.iPlot_config as cfg
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, print_cfg
+import src.plotting.iPlot_config as cfg
 
 
 

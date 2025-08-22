@@ -15,7 +15,6 @@ runner:
     - base_class
     - analysis
     - skimmer
-    - data
     - jet_clustering        
     - classifier
   allowlist_sites:
@@ -27,55 +26,16 @@ runner:
 config:
   base_path: root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v2
   # base_path: skimmer/test/
-  clustering_pdfs_file: "jet_clustering/jet-splitting-PDFs-boosted-00-00-01/clustering_pdfs_vs_pT_XXX.yml"
+  clustering_pdfs_file: "jet_clustering/jet-splitting-PDFs-boosted-00-02-00/clustering_pdfs_vs_pT_XXX.yml"
   friends:
     trigWeight: "metadata/datasets_HH4b_2024_v1p1_trigweights.json@@trigWeight"
   declustering_rand_seed: 5
   step: 100000
   skip_collections:
-    - notCanJet
-    - canJet0
+    - boostedTau
     - canJet1
     - canJet2
     - canJet3        
   skip_branches:
     - "btagWeight_.*"
-    - HHSR
-    - ZZSR
-    - ZHSR
-    - SR
-    - st
-    - d01TruthMatch
-    - nMuon_selected
-    - fourTag
-    - threeTag
-    - xW
-    - leadStM
-    - nSelJets
-    - d02TruthMatch
-    - d12TruthMatch    
-    - truthMatch
-    - pseudoTagWeight
-    - ttbarWeight
-    - nIsoMuons
-    - xt
-    - weight
-    - aveAbsEtaOth
-    - xWbW
-    - nAllNotCanJets
-    - dRjjOther
-    - xWt
-    - nPSTJets
-    - passXWt
-    - d03TruthMatch
-    - xbW
-    - mcPseudoTagWeight
-    - d23TruthMatch
-    - m4j
-    - sublStM
-    - dRjjClose
-    - aveAbsEta
-    - stNotCan
-    - SB
-    - selectedViewTruthMatch
-    - d13TruthMatch
+    - "nboostedTau_.*"

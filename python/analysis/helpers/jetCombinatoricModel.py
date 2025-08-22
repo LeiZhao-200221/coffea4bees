@@ -3,7 +3,7 @@ import logging
 import awkward as ak
 import numpy as np
 import yaml
-from base_class.math.random import Squares
+from src.math.random import Squares
 from scipy.special import comb
 
 

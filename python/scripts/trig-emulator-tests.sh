@@ -1,11 +1,9 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"}
+# Source common functions
+source "src/scripts/common.sh"
+
 
 echo "############### Running trigger emulator test"
-python -m unittest base_class.tests.test_trigger_emulator
+python -m unittest python.analysis.tests.test_trigger_emulator
 cd ../
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

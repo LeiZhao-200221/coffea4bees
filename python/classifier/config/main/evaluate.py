@@ -7,7 +7,7 @@ from functools import reduce
 from itertools import chain
 from typing import TYPE_CHECKING
 
-from classifier.task import (
+from python.classifier.task import (
     ArgParser,
     Dataset,
     EntryPoint,
@@ -16,14 +16,14 @@ from classifier.task import (
     converter,
     main,
 )
-from classifier.task.model import ModelRunner
+from python.classifier.task.model import ModelRunner
 
 from ..setting import ResultKey
 from ._utils import SelectDevice, progress_advance
 
 if TYPE_CHECKING:
-    from classifier.nn.dataset.evaluation import EvalDatasetLike
-    from classifier.process.device import Device
+    from python.classifier.nn.dataset.evaluation import EvalDatasetLike
+    from python.classifier.process.device import Device
 
 
 class _eval_model:
@@ -62,8 +62,8 @@ class Main(SelectDevice, main.Main):
     def run(self, parser: EntryPoint):
         from concurrent.futures import ProcessPoolExecutor
 
-        from classifier.monitor.progress import Progress
-        from classifier.process import pool, status
+        from python.classifier.monitor.progress import Progress
+        from python.classifier.process import pool, status
 
         # prepare datasets
         tasks: list[Dataset] = parser.tasks[TaskOptions.dataset.name]

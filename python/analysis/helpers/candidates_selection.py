@@ -1,9 +1,9 @@
 import numpy as np
 import awkward as ak
 import logging
-from base_class.math.random import Squares
-from analysis.helpers.SvB_helpers import compute_SvB
-from analysis.helpers.FvT_helpers import compute_FvT
+from src.math.random import Squares
+from python.analysis.helpers.SvB_helpers import compute_SvB
+from python.analysis.helpers.FvT_helpers import compute_FvT
 from coffea.nanoevents.methods import vector
 from coffea.analysis_tools import Weights
 

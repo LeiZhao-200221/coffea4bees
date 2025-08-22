@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from classifier.task import GlobalSetting
+from python.classifier.task import GlobalSetting
 
 
 class DataLoader(GlobalSetting):
