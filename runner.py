@@ -826,6 +826,7 @@ if __name__ == '__main__':
     logging.info(f"Loading configs from: {args.configs}")
     configs = yaml.safe_load(open(args.configs, 'r'))
     
+    if not 'config' in configs: configs['config'] = {}
     # Add corrections_metadata to configs
     logging.info("Loading corrections metadata from: src/physics/corrections.yml")
     configs['config']['corrections_metadata'] = corrections_metadata
