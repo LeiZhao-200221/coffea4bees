@@ -698,3 +698,30 @@ datasets:
         - root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v2/data_2023_preBPixF/picoAOD_seedXXX.chunk0.root
         - root://cmseos.fnal.gov//store/user/jda102/XX4b/2024_v2/data_2023_preBPixF/picoAOD_seedXXX.chunk1.root
     nSamples: 1
+  TTToSemiLeptonic:
+    2022_preEE:
+      nanoAOD: /TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5_ext1-v2/NANOAODSIM
+    2022_EE:
+      nanoAOD: /TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM
+    2023_preBPix:
+      nanoAOD: /TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM
+    2023_BPix: 
+      nanoAOD: /TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM
+  TTTo2L2Nu:
+    2022_preEE:
+      nanoAOD: /TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5_ext1-v2/NANOAODSIM
+    2022_EE:
+      nanoAOD: /TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM
+    2023_preBPix:
+      nanoAOD: /TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM
+    2023_BPix:
+      nanoAOD: /TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM
+  TTToHadronic:
+    2022_preEE:
+      nanoAOD: /TTto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5_ext1-v2/NANOAODSIM
+    2022_EE:
+      nanoAOD: /TTto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM
+    2023_preBPix:
+      nanoAOD: /TTto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM
+    2023_BPix: 
+      nanoAOD: /TTto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM
