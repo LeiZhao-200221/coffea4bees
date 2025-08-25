@@ -149,7 +149,7 @@ class analysis(processor.ProcessorABC):
             memory_info = process.memory_info()
             rss_mb = memory_info.rss / 1024 / 1024  # MB
             vms_mb = memory_info.vms / 1024 / 1024  # MB
-            logging.info(f"MEMORY [{stage_name}]: RSS={rss_mb:.1f}MB, VMS={vms_mb:.1f}MB")
+            logging.info(f"MEMORY: RSS={rss_mb:.1f}MB, VMS={vms_mb:.1f}MB {stage_name}")
         except Exception as e:
             logging.warning(f"Memory monitoring failed at {stage_name}: {e}")
 
@@ -386,7 +386,7 @@ class analysis(processor.ProcessorABC):
 
         return processor.accumulate( self.process_shift(update_events(event, collections), name, weights, list_weight_names, target) for collections, name in shifts )
 
-    @profile
+    # @profile
     def process_shift(self, event, shift_name, weights, list_weight_names, target):
         """For different jet variations. It computes event variations for the nominal case."""
 
@@ -809,8 +809,8 @@ class analysis(processor.ProcessorABC):
             hist_size = sys.getsizeof(hist) / 1024 / 1024  # MB
             output_size = sys.getsizeof(processOutput) / 1024 / 1024  # MB
             friends_size = sys.getsizeof(friends) / 1024 / 1024  # MB
-            print(f"Return object sizes - hist: {hist_size:.1f}MB, output: {output_size:.1f}MB, friends: {friends_size:.1f}MB")
-        
+            logging.info(f"Return object sizes - hist: {hist_size:.1f}MB, output: {output_size:.1f}MB, friends: {friends_size:.1f}MB")
+
         # Explicit cleanup before returning
         del selev, event, weights, analysis_selections
         gc.collect()

@@ -16,8 +16,8 @@ import logging
 import os
 import time
 import warnings
+from memory_profiler import profile
 from concurrent.futures import ProcessPoolExecutor
-from copy import copy
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -195,7 +195,7 @@ def process_sample_based_dataset(dataset_type, name_prefix, dataset, year, metad
         sample_name = f"{name_prefix}_v{v}"
         idataset = f'{sample_name}_{year}'
         
-        metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+        metadata_dataset[idataset] = metadata_dataset[dataset]
         metadata_dataset[idataset]['processName'] = sample_name
         
         # Apply extra metadata if provided
@@ -223,7 +223,7 @@ def process_data_for_mix(dataset, year, metadata, metadata_dataset, fileset, arg
     logging.info(f"Using ZZandZHinSB? {use_ZZandZHinSB}")
 
     idataset = f'{dataset}_{year}'
-    metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+    metadata_dataset[idataset] = metadata_dataset[dataset]
     metadata_dataset[idataset]['JCM_loads'] = [
         data_3b_mix_config['JCM_load_template'].replace("XXX", str(v)) 
         for v in range(nMixedSamples)
@@ -266,7 +266,7 @@ def process_tt_for_mixed(dataset, year, metadata, metadata_dataset, fileset, arg
     logging.info(f"Number of mixed samples is {nMixedSamples}")
 
     idataset = f'{dataset}_{year}'
-    metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+    metadata_dataset[idataset] = metadata_dataset[dataset]
     metadata_dataset[idataset]['FvT_files'] = [
         TT_3b_mix_config['FvT_file_template'].replace("XXX", str(v)) 
         for v in range(nMixedSamples)
@@ -291,7 +291,7 @@ def process_data_dataset(dataset, year, metadata, metadata_dataset, fileset, arg
         if iera not in args.era:
             continue
         idataset = f'{dataset}_{year}{iera}'
-        meta = copy(metadata_dataset[dataset])
+        meta = metadata_dataset[dataset]
         meta['era'] = iera
         files = ifile['files'] if config_runner['data_tier'].startswith('pico') else ifile
         fileset[idataset] = create_fileset_entry(idataset, files, meta, args, config_runner)

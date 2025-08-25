@@ -13,6 +13,7 @@ import os
 import psutil
 import time
 import gc
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 
 def monitor_memory_simple():
     """Simple memory monitoring function"""
