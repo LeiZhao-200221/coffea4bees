@@ -187,6 +187,7 @@ runCITests.sh
 .bashrc
 python/*output*/
 *output*
+gitdiff.txt
 
 .local/
 set_ROOT.sh

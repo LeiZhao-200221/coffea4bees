@@ -58,25 +58,25 @@ stages:
 
 validation:
   before_script:
-    - ./generate_docs.sh
+    - bash docs/sync_readmes.sh
+    - bash docs/update_mkdocs_nav.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    # Only run on pushes to main branch when docs have changed
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
-      changes:
-        - docs/**
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: never
 
 pages:
   before_script:
-    - ./generate_docs.sh
+    - bash docs/sync_readmes.sh
+    - bash docs/update_mkdocs_nav.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    # Only run on pushes to main branch when docs have changed
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
-      changes:
-        - docs/**
+      when: always
+    - when: never
 
 .base_analysis:
   needs:

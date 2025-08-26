@@ -59,7 +59,7 @@ rule run_two_stage_closure:
         outputPath = "output/closureFits/ULHH_kfold",
         rebin = "2",
         variable = "SvB_MA_ps_hh_fine",
-        variable_binning = "--variable_binning",
+        extra_arguments = "",
         container_wrapper = config.get("container_wrapper", "./run_container combine")
     log:
         "logs/run_two_stage_closure_{variable}.log"
@@ -71,8 +71,8 @@ rule run_two_stage_closure:
         
         {params.container_wrapper} \
             python3 python/stats_analysis/runTwoStageClosure.py  \
-            --var {params.variable} --rebin {params.rebin} --use_kfold \
-            {params.variable_binning} \
+            --var {params.variable} --rebin {params.rebin} \
+            {params.extra_arguments} \
             --outputPath {params.outputPath} \
             --input_file_TT {input.file_TT} \
             --input_file_mix {input.file_mix} \
