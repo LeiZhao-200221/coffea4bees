@@ -9,6 +9,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Setup proxy if needed
+setup_proxy 
+
 # Create output directory
 OUTPUT_DIR="$OUTPUT_BASE_DIR/memory_test"
 create_output_directory "$OUTPUT_DIR"
