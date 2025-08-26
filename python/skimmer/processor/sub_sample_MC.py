@@ -20,14 +20,14 @@ import awkward as ak
 import uproot
 
 class SubSampler(PicoAOD):
-    def __init__(self, sub_sampling_rand_seed=5, *args, **kwargs):
+    def __init__(self, sub_sampling_rand_seed=5, corrections_metadata: dict = None, *args, **kwargs):
         kwargs["pico_base_name"] = f'picoAOD_PSData'
         super().__init__(*args, **kwargs)
 
         logging.info(f"\nRunning SubSampler with these parameters: sub_sampling_rand_seed = {sub_sampling_rand_seed} args = {args}, kwargs = {kwargs}")
 
         self.sub_sampling_rand_seed = sub_sampling_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
     def select(self, event):
 

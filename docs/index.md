@@ -4,7 +4,8 @@
 
 This is the repository for the 4b analyses at CMU based in coffea.
 
-There is a website dopcumenting what this package does on this link [https://coffea4bees.docs.cern.ch/].
+There is a website dopcumenting what this package does on this link [https://coffea4bees.docs.cern.ch/](https://coffea4bees.docs.cern.ch/).
+
 Information about the analysis steps can be found in the [README](python/analysis/README.md) of the analysis folder.
 
 ## Installation
@@ -76,4 +77,4 @@ For those interested in Snakemake, the `Snakefile_testCI` defines "rules" (jobs)
 
 ## Information about the container
 
-This packages uses its own container. It is based on `coffeateam/coffea-base-almalinux8:0.7.23-py3.10` including some additional python packages. This container is created automatically in the gitlab CI step **IF** the name of the branch (and the merging branch in the case of a pull request to the master) starts with `container_`. Additionally, one can take a look at the file [.dockerfiles/Dockerfile_analysis](.dockerfiles/Dockerfile_analysis) which is the one used to create the container.
+This packages uses its own container. It is based on `coffeateam/coffea-base-almalinux8:0.7.23-py3.10` including some additional python packages. This container is created automatically in the gitlab CI step **IF** the name of the branch (and the merging branch in the case of a pull request to the master) starts with `container_`. Additionally, one can take a look at the file [software/dockerfiles/Dockerfile_analysis](software/dockerfiles/Dockerfile_analysis) which is the one used to create the container.

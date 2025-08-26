@@ -16,8 +16,8 @@ import logging
 import os
 import time
 import warnings
+from memory_profiler import profile
 from concurrent.futures import ProcessPoolExecutor
-from copy import copy
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -195,7 +195,7 @@ def process_sample_based_dataset(dataset_type, name_prefix, dataset, year, metad
         sample_name = f"{name_prefix}_v{v}"
         idataset = f'{sample_name}_{year}'
         
-        metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+        metadata_dataset[idataset] = metadata_dataset[dataset]
         metadata_dataset[idataset]['processName'] = sample_name
         
         # Apply extra metadata if provided
@@ -223,7 +223,7 @@ def process_data_for_mix(dataset, year, metadata, metadata_dataset, fileset, arg
     logging.info(f"Using ZZandZHinSB? {use_ZZandZHinSB}")
 
     idataset = f'{dataset}_{year}'
-    metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+    metadata_dataset[idataset] = metadata_dataset[dataset]
     metadata_dataset[idataset]['JCM_loads'] = [
         data_3b_mix_config['JCM_load_template'].replace("XXX", str(v)) 
         for v in range(nMixedSamples)
@@ -266,7 +266,7 @@ def process_tt_for_mixed(dataset, year, metadata, metadata_dataset, fileset, arg
     logging.info(f"Number of mixed samples is {nMixedSamples}")
 
     idataset = f'{dataset}_{year}'
-    metadata_dataset[idataset] = copy(metadata_dataset[dataset])
+    metadata_dataset[idataset] = metadata_dataset[dataset]
     metadata_dataset[idataset]['FvT_files'] = [
         TT_3b_mix_config['FvT_file_template'].replace("XXX", str(v)) 
         for v in range(nMixedSamples)
@@ -291,7 +291,7 @@ def process_data_dataset(dataset, year, metadata, metadata_dataset, fileset, arg
         if iera not in args.era:
             continue
         idataset = f'{dataset}_{year}{iera}'
-        meta = copy(metadata_dataset[dataset])
+        meta = metadata_dataset[dataset]
         meta['era'] = iera
         files = ifile['files'] if config_runner['data_tier'].startswith('pico') else ifile
         fileset[idataset] = create_fileset_entry(idataset, files, meta, args, config_runner)
@@ -465,7 +465,6 @@ def setup_config_defaults(config_runner, args):
         'friend_metafile': 'friends',
         'friend_merge_step': 100_000,
         'write_coffea_output': True,
-        'override_top_reconstruction': None,
         'uproot_xrootd_retry_delays': [5, 15, 45]
     }
     
@@ -749,6 +748,13 @@ if __name__ == '__main__':
         default=False,
         help='Run in test mode with limited number of files'
     )
+    mode_group.add_argument(
+        '--systematics',
+        nargs='+',
+        dest="systematics",
+        default=None,
+        help='List of systematics to apply (e.g., "others jes all")'
+    )
 
     # Execution environment options
     exec_group = parser.add_argument_group('Execution Environment')
@@ -820,10 +826,15 @@ if __name__ == '__main__':
     logging.info(f"Loading configs from: {args.configs}")
     configs = yaml.safe_load(open(args.configs, 'r'))
     
+    if not 'config' in configs: configs['config'] = {}
     # Add corrections_metadata to configs
     logging.info("Loading corrections metadata from: src/physics/corrections.yml")
-    configs['corrections_metadata'] = corrections_metadata
-    
+    configs['config']['corrections_metadata'] = corrections_metadata
+
+    if args.systematics:
+        logging.info(f"Systematics to run: {args.systematics}")
+        configs['config']['run_systematics'] = args.systematics
+
     logging.info(f"Loading datasets metadata from: {args.metadata}")
     datasets = yaml.safe_load(open(args.metadata, 'r'))
     
@@ -868,12 +879,6 @@ if __name__ == '__main__':
             xsec = calculate_cross_section(matched_dataset, dataset_type, metadata)
             logging.info(f"Dataset type: {dataset_type}, Cross-section: {xsec}")
 
-            top_reconstruction = config_runner["override_top_reconstruction"] 
-                #or (
-                # metadata['datasets'][matched_dataset]['top_reconstruction']
-                # if "top_reconstruction" in metadata['datasets'][matched_dataset]
-                # else None)
-            logging.info(f"top construction configured as {top_reconstruction} ")
 
             metadata_dataset[matched_dataset] = {
                 'year': year,
@@ -881,7 +886,6 @@ if __name__ == '__main__':
                 'xs': xsec,
                 'lumi': float(metadata['luminosities'][year]),
                 'trigger': metadata['triggers'][year],
-                'top_reconstruction': top_reconstruction
             }
             # Main dataset processing logic            
             if dataset_type == 'mc':

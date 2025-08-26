@@ -55,24 +55,28 @@ def apply_btag_sf( jets,
     btagSF = correctionlib.CorrectionSet.from_file(correction_file)[correction_type]
 
     weights = {}
-    j, nj = ak.flatten(jets), ak.num(jets)
-    hf, eta, pt, tag = ak.to_numpy(j.hadronFlavour), ak.to_numpy(abs(j.eta)), ak.to_numpy(j.pt), ak.to_numpy(j.btagScore)
+    nj = ak.num(jets)
 
-    cj_bl = jets[jets.hadronFlavour!=4]
-    nj_bl = ak.num(cj_bl)
-    cj_bl = ak.flatten(cj_bl)
-    hf_bl, eta_bl, pt_bl, tag_bl = ak.to_numpy(cj_bl.hadronFlavour), ak.to_numpy(abs(cj_bl.eta)), ak.to_numpy(cj_bl.pt), ak.to_numpy(cj_bl.btagScore)
-    SF_bl= btagSF.evaluate(sys_value, hf_bl, eta_bl, pt_bl, tag_bl)
-    SF_bl = ak.unflatten(SF_bl, nj_bl)
-    SF_bl = np.prod(SF_bl, axis=1)
+    def get_sf(jets, sys):
+        flat_jets = ak.flatten(jets)
+        return np.prod(
+            ak.unflatten(
+                btagSF.evaluate(
+                    sys,
+                    ak.to_numpy(flat_jets.hadronFlavour),
+                    ak.to_numpy(np.abs(flat_jets.eta)),
+                    ak.to_numpy(flat_jets.pt),
+                    ak.to_numpy(flat_jets.btagScore)
+                ),
+                ak.num(jets)
+            ), axis=1
+        )
 
-    cj_c = jets[jets.hadronFlavour==4]
-    nj_c = ak.num(cj_c)
-    cj_c = ak.flatten(cj_c)
-    hf_c, eta_c, pt_c, tag_c = ak.to_numpy(cj_c.hadronFlavour), ak.to_numpy(abs(cj_c.eta)), ak.to_numpy(cj_c.pt), ak.to_numpy(cj_c.btagScore)
-    SF_c= btagSF.evaluate(sys_value, hf_c, eta_c, pt_c, tag_c)
-    SF_c = ak.unflatten(SF_c, nj_c)
-    SF_c = np.prod(SF_c, axis=1)
+    jets_bl = jets[jets.hadronFlavour != 4]
+    SF_bl = get_sf(jets_bl, sys_value)
+
+    jets_c = jets[jets.hadronFlavour == 4]
+    SF_c = get_sf(jets_c, sys_value)
 
     ### btag norm
     try:
@@ -82,32 +86,24 @@ def apply_btag_sf( jets,
     except FileNotFoundError:
         btagSF_norm = 1.0
 
-    btag_var = [ sys_value ]
+
+    btag_var = [sys_value]
     if btag_uncertainties:
-        btag_var += [ f'{updown}_{btagvar}' for updown in ['up', 'down',] for btagvar in btag_uncertainties ]
+        btag_var += [f'{updown}_{btagvar}' for updown in ['up', 'down'] for btagvar in btag_uncertainties]
     for sf in btag_var:
         if sf == 'central':
-            SF = btagSF.evaluate('central', hf, eta, pt, tag)
-            SF = ak.unflatten(SF, nj)
-            # hf = ak.unflatten(hf, nj)
-            # pt = ak.unflatten(pt, nj)
-            # eta = ak.unflatten(eta, nj)
-            # tag = ak.unflatten(tag, nj)
-            # for i in range(len(selev)):
-            #     for j in range(nj[i]):
-            #         print(f'jetPt/jetEta/jetTagScore/jetHadronFlavour/SF = {pt[i][j]}/{eta[i][j]}/{tag[i][j]}/{hf[i][j]}/{SF[i][j]}')
-            #     print(np.prod(SF[i]))
-            SF = np.prod(SF, axis=1)
-        if '_cf' in sf:
-            SF = btagSF.evaluate(sf, hf_c, eta_c, pt_c, tag_c)
-            SF = ak.unflatten(SF, nj_c)
-            SF = SF_bl * np.prod(SF, axis=1) # use central value for b,l jets
-        if '_hf' in sf or '_lf' in sf or '_jes' in sf:
-            SF = btagSF.evaluate(sf, hf_bl, eta_bl, pt_bl, tag_bl)
-            SF = ak.unflatten(SF, nj_bl)
-            SF = SF_c * np.prod(SF, axis=1) # use central value for charm jets
-
+            SF = get_sf(jets, 'central')
+        elif '_cf' in sf:
+            SF = get_sf(jets_c, sf)
+            SF = SF_bl * SF  # use central value for b,l jets
+        elif any(x in sf for x in ['_hf', '_lf', '_jes']):
+            SF = get_sf(jets_bl, sf)
+            SF = SF_c * SF  # use central value for charm jets
+        else:
+            SF = get_sf(jets, sf)
         weights[f'btagSF_{sf}'] = SF * btagSF_norm
+
+
 
     logging.debug(weights)
     return weights

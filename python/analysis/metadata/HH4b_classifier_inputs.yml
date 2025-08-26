@@ -12,7 +12,6 @@ config:
   apply_btagSF: true
   apply_boosted_veto: false
   run_SvB: false 
-  run_systematics: false
   top_reconstruction: fast
   fill_histograms: false 
   friends:

@@ -287,7 +287,7 @@ def create_cand_jet_dijet_quadjet(
     if run_SvB:
 
         if (classifier_SvB is not None) | (classifier_SvB_MA is not None):
-
+            
             if run_systematics: tmp_mask = (selev.fourTag & quadJet[quadJet.selected][:, 0].SR)
             else: tmp_mask = np.full(len(selev), True)
             compute_SvB(selev,
@@ -402,10 +402,36 @@ def create_cand_jet_dijet_quadjet(
     ###     processOutput[out_k] = {}
     ###     processOutput[out_k][selev.metadata['dataset']] = list(out_v)
 
-
-
     if run_SvB:
         selev["passSvB"] = selev["SvB_MA"].ps > 0.80
         selev["failSvB"] = selev["SvB_MA"].ps < 0.05
+
+    # After building canJet_idx and notCanJet_idx
+    del sorted_idx
+    if include_lowptjets:
+        del sorted_idx_lowpt
+    del canJet_idx, notCanJet_idx
+
+    # After building canJet and notCanJet
+    del canJet, notCanJet
+
+    # After building diJet, diJetDr, pairing
+    del diJet, diJetDr, pairing
+
+    # After building quadJet and all quadJet selection logic
+    del quadJet
+
+    # After Run3 selection logic
+    if isRun3:
+        del quadJet_min_dhh_mask, quadJet_min_dhh, quadJet_min2_dhh_mask, quadJet_min2_dhh
+        del dhh_sorted, dhh_sorted_arg, delta_dhh
+        del boost_vec_v4j, quadJet_min_dhh_lead_CM, quadJet_min2_dhh_lead_CM, use_dhh2_mask
+
+    # After region/CR selection
+    del arg_min_close_dr
+
+    # Final cleanup
+    import gc
+    gc.collect()
 
     return selev

@@ -41,7 +41,7 @@ rule convert_json_to_root:
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting convert_json_to_root for {input}" > {log}
         {params.container_wrapper} \
-            python3 stats_analysis/convert_json_to_root.py \
+            python3 python/stats_analysis/convert_json_to_root.py \
             -f {input} \
             --output {params.output_dir} 2>&1 | tee -a {log}
 
@@ -70,7 +70,7 @@ rule run_two_stage_closure:
         echo "[$(date)] Input files: TT={input.file_TT}, mix={input.file_mix}, sig={input.file_sig}, data3b={input.file_data3b}" >> {log}
         
         {params.container_wrapper} \
-            python3 stats_analysis/runTwoStageClosure.py  \
+            python3 python/stats_analysis/runTwoStageClosure.py  \
             --var {params.variable} --rebin {params.rebin} --use_kfold \
             {params.variable_binning} \
             --outputPath {params.outputPath} \
@@ -107,7 +107,7 @@ rule make_combine_inputs:
         
         echo "[$(date)] Making combine inputs with full stats" | tee -a {log}
         {params.container_wrapper} \
-            python3 stats_analysis/make_combine_inputs.py \
+            python3 python/stats_analysis/make_combine_inputs.py \
             --var {params.variable} \
             -f {input.injson} \
             --syst_file {input.injsonsyst} \
@@ -141,7 +141,7 @@ rule make_syst_plots:
         echo "[$(date)] Starting make_syst_plots for {params.variable}" > {log}
         echo "Making syst plots" 2>&1 | tee -a ../{log}
         {params.container_wrapper} \
-        python3 plots/make_syst_plots.py \
+        python3 python/plots/make_syst_plots.py \
         -i {params.output_dir}/shapes.root -o {params.output_dir}/systs/ -d {input} --variable {params.variable} 2>&1 | tee -a ../{log}
         echo "[$(date)] Completed make_syst_plots for {params.variable}" >> ../{log}
         """

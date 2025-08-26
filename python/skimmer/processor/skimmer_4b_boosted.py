@@ -13,10 +13,10 @@ from src.skimmer.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):
-    def __init__(self, mc_outlier_threshold:int|None=200, *args, **kwargs):
-        
+    def __init__(self, mc_outlier_threshold:int|None=200, corrections_metadata: dict = None, *args, **kwargs):
+
         super().__init__(*args, **kwargs)
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
         self.cutFlowCuts = [
             "all",
             "passHLT",

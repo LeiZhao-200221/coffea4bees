@@ -13,7 +13,6 @@ Author: Coffea4bees team
 import sys
 import argparse
 import logging
-from copy import copy
 import numpy as np
 import os
 import matplotlib.pyplot as plt
