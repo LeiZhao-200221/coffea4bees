@@ -80,6 +80,54 @@ def _init_classfier_FvT(path: str | list[HCRModelMetadata]):
     return Legacy_HCREnsemble_FvT(path)
 
 class analysis(processor.ProcessorABC):
+    """
+    Coffea processor for HH→4b analysis workflows.
+
+    This class orchestrates the event selection, object reconstruction, friend tree loading, weight calculation,
+    systematic variations, and histogram filling for the HH→4b analysis. It supports both nominal and systematic
+    processing, including jet energy corrections, b-tagging scale factors, trigger weights, and classifier outputs
+    (FvT, SvB, etc.).
+
+    Key Features:
+        - Loads and applies friend trees (FvT, SvB, JCM, top reconstruction, etc.)
+        - Handles MC and data workflows, including blinding and mixed data selection
+        - Applies event selection, object selection, and cutflows
+        - Calculates and applies event weights (MC, btag, pseudotag, trigger, resonance, etc.)
+        - Supports systematic variations (JES, others)
+        - Fills histograms and optionally dumps friend trees for classifier inputs and weights
+        - Supports top candidate reconstruction (slow/fast algorithms or friend trees)
+        - Memory usage logging (optional)
+
+    Args:
+        SvB (str | list[HCRModelMetadata], optional): Path or metadata for SvB classifier.
+        SvB_MA (str | list[HCRModelMetadata], optional): Path or metadata for SvB_MA classifier.
+        FvT (str | list[HCRModelMetadata], optional): Path or metadata for FvT classifier.
+        blind (bool): Whether to blind data in signal region.
+        apply_JCM (bool): Whether to apply Jet Combinatoric Model weights.
+        JCM_file (str): Path to JCM weight file.
+        corrections_metadata (dict): Metadata for corrections (JES, etc.).
+        apply_trigWeight (bool): Whether to apply trigger weights.
+        apply_btagSF (bool): Whether to apply b-tagging scale factors.
+        apply_FvT (bool): Whether to apply FvT classifier/friend tree.
+        apply_boosted_veto (bool): Whether to apply boosted event veto.
+        run_dilep_ttbar_crosscheck (bool): Whether to run dilepton ttbar crosscheck selection.
+        fill_histograms (bool): Whether to fill histograms.
+        hist_cuts (list): List of cut names for histogram filling.
+        run_SvB (bool): Whether to run SvB classifier/friend tree.
+        top_reconstruction (str | None): Top candidate reconstruction mode ('slow', 'fast', or None).
+        run_systematics (list): List of systematics to run (e.g., ['jes', 'others']).
+        make_classifier_input (str): Path for dumping classifier input friend tree.
+        make_top_reconstruction (str): Path for dumping top reconstruction friend tree.
+        make_friend_JCM_weight (str): Path for dumping JCM weight friend tree.
+        make_friend_FvT_weight (str): Path for dumping FvT weight friend tree.
+        make_friend_SvB (str): Path for dumping SvB friend tree.
+        subtract_ttbar_with_weights (bool): Whether to subtract ttbar using weights.
+        apply_mixeddata_sel (bool): Whether to apply mixed data selection.
+        friends (dict): Dictionary of friend tree templates or paths.
+
+    Returns:
+        dict: Output containing histograms, cutflow, and optionally dumped friend trees.
+    """
     def __init__(
         self,
         *,
@@ -106,6 +154,7 @@ class analysis(processor.ProcessorABC):
         make_friend_FvT_weight: str = None,
         make_friend_SvB: str = None,
         subtract_ttbar_with_weights: bool = False,
+        apply_mixeddata_sel: bool = False,  #### apply HIG-22-011 sel for mixeddata
         friends: dict[str, str|FriendTemplate] = None,
     ):
 
@@ -135,6 +184,7 @@ class analysis(processor.ProcessorABC):
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.histCuts = hist_cuts
+        self.apply_mixeddata_sel = apply_mixeddata_sel
         
         # Memory monitoring
         self.debug_memory = False  # Set to False to disable memory monitoring
@@ -215,8 +265,15 @@ class analysis(processor.ProcessorABC):
                 if self.config["isMixedData"]:
 
                     FvT_name = event.metadata["FvT_name"]
-                    event["FvT"] = getattr( NanoEventsFactory.from_root( f'{event.metadata["FvT_file"]}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                            FvT_name )
+                    event["FvT"] = getattr( 
+                        NanoEventsFactory.from_root( 
+                            f'{event.metadata["FvT_file"]}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop,
+                            schemaclass=FriendTreeSchema, 
+                        ).events(),
+                        FvT_name 
+                    )
 
                     event["FvT", "FvT"] = getattr(event["FvT"], FvT_name)
 
@@ -232,8 +289,15 @@ class analysis(processor.ProcessorABC):
                     #
                     # Use the first to define the FvT weights
                     #
-                    event["FvT"] = getattr( NanoEventsFactory.from_root( f'{event.metadata["FvT_files"][0]}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                            event.metadata["FvT_names"][0], )
+                    event["FvT"] = getattr( 
+                        NanoEventsFactory.from_root( 
+                            f'{event.metadata["FvT_files"][0]}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop, 
+                            schemaclass=FriendTreeSchema, 
+                        ).events(),
+                        event.metadata["FvT_names"][0], 
+                    )
 
                     event["FvT", "FvT"] = getattr( event["FvT"], event.metadata["FvT_names"][0] )
 
@@ -246,13 +310,27 @@ class analysis(processor.ProcessorABC):
 
                     for _FvT_name, _FvT_file in zip( event.metadata["FvT_names"], event.metadata["FvT_files"] ):
 
-                        event[_FvT_name] = getattr( NanoEventsFactory.from_root( f"{_FvT_file}", entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                                    _FvT_name, )
+                        event[_FvT_name] = getattr( 
+                            NanoEventsFactory.from_root( 
+                                f"{_FvT_file}", 
+                                entry_start=self.estart, 
+                                entry_stop=self.estop, 
+                                schemaclass=FriendTreeSchema, 
+                            ).events(),
+                            _FvT_name, 
+                        )
 
                         event[_FvT_name, _FvT_name] = getattr(event[_FvT_name], _FvT_name)
 
                 else:
-                    event["FvT"] = ( NanoEventsFactory.from_root( f'{fname.replace("picoAOD", "FvT")}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema).events().FvT )
+                    event["FvT"] = ( 
+                        NanoEventsFactory.from_root( 
+                            f'{fname.replace("picoAOD", "FvT")}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop, 
+                            schemaclass=FriendTreeSchema
+                        ).events().FvT 
+                    )
 
                 if "std" not in event.FvT.fields:
                     event["FvT", "std"] = np.ones(len(event))
@@ -276,11 +354,20 @@ class analysis(processor.ProcessorABC):
 
             self._log_memory("after_friend_trees_loaded")
 
+            if self.apply_mixeddata_sel: SvB_suffix = '_newSBDef'
+            else: SvB_suffix = '_ULHH'
+
             if "SvB" not in self.friends and self.classifier_SvB is None:
                 # SvB_file = f'{path}/SvB_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB")}'
-                SvB_file = f'{path}/SvB_ULHH.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_ULHH")}'
-                event["SvB"] = ( NanoEventsFactory.from_root( SvB_file,
-                                                              entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema).events().SvB )
+                SvB_file = f'{path}/SvB{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB{SvB_suffix}")}'
+                event["SvB"] = ( 
+                    NanoEventsFactory.from_root( 
+                        SvB_file,
+                        entry_start=self.estart, 
+                        entry_stop=self.estop, 
+                        schemaclass=FriendTreeSchema
+                    ).events().SvB 
+                )
 
                 if not ak.all(event.SvB.event == event.event):
                     raise ValueError("ERROR: SvB events do not match events ttree")
@@ -289,9 +376,15 @@ class analysis(processor.ProcessorABC):
 
             if "SvB_MA" not in self.friends and self.classifier_SvB_MA is None:
                 # SvB_MA_file = f'{path}/SvB_MA_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA")}'
-                SvB_MA_file = f'{path}/SvB_MA_ULHH.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA_ULHH")}'
-                event["SvB_MA"] = ( NanoEventsFactory.from_root( SvB_MA_file,
-                                                                 entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema ).events().SvB_MA )
+                SvB_MA_file = f'{path}/SvB_MA{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA{SvB_suffix}")}'
+                event["SvB_MA"] = ( 
+                    NanoEventsFactory.from_root( 
+                        SvB_MA_file,
+                        entry_start=self.estart, 
+                        entry_stop=self.estop, 
+                        schemaclass=FriendTreeSchema
+                    ).events().SvB_MA
+                )
 
                 if not ak.all(event.SvB_MA.event == event.event):
                     raise ValueError("ERROR: SvB_MA events do not match events ttree")
@@ -312,10 +405,11 @@ class analysis(processor.ProcessorABC):
         # Event selection
         #
         self._log_memory("before_event_selection")
-        event = apply_event_selection( event,
-                                        self.corrections_metadata[self.year],
-                                        cut_on_lumimask=self.config["cut_on_lumimask"]
-                                        )
+        event = apply_event_selection( 
+            event,
+            self.corrections_metadata[self.year],
+            cut_on_lumimask=self.config["cut_on_lumimask"]
+        )
         self._log_memory("after_event_selection")
 
 
@@ -394,16 +488,19 @@ class analysis(processor.ProcessorABC):
         weights = copy.copy(weights)
 
         # Apply object selection (function does not remove events, adds content to objects)
-        event = apply_4b_selection( event, self.corrections_metadata[self.year],
-                                    dataset=self.dataset,
-                                    doLeptonRemoval=self.config["do_lepton_jet_cleaning"],
-                                    override_selected_with_flavor_bit=self.config["override_selected_with_flavor_bit"],
-                                    do_jet_veto_maps=self.config["do_jet_veto_maps"],
-                                    isRun3=self.config["isRun3"],
-                                    isMC=self.config["isMC"], ### temporary
-                                    isSyntheticData=self.config["isSyntheticData"],
-                                    isSyntheticMC=self.config["isSyntheticMC"],
-                                    )
+        event = apply_4b_selection( 
+            event, 
+            self.corrections_metadata[self.year],
+            dataset=self.dataset,
+            doLeptonRemoval=self.config["do_lepton_jet_cleaning"],
+            override_selected_with_flavor_bit=self.config["override_selected_with_flavor_bit"],
+            do_jet_veto_maps=self.config["do_jet_veto_maps"],
+            isRun3=self.config["isRun3"],
+            isMC=self.config["isMC"], ### temporary
+            isSyntheticData=self.config["isSyntheticData"],
+            isSyntheticMC=self.config["isSyntheticMC"],
+            apply_mixeddata_sel=self.apply_mixeddata_sel,
+        )
 
         if self.run_dilep_ttbar_crosscheck:
             event['passDilepTtbar'] = apply_dilep_ttbar_selection(event, isRun3=self.config["isRun3"])

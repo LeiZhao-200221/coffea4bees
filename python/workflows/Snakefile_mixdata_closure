@@ -23,9 +23,9 @@ include: "helpers/common.smk"
 
 rule final_rule:
     input: 
-        f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl",
-        f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl",
-        # f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl",
+        # f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl",
+        # f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl",
+        f"{config['output_path']}/closureFits/ULHH_kfold/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.pkl",
 
 use rule analysis_processor from analysis as mixed_bkg_tt with:
     output: f"{config['output_path']}/histMixedBkg_TT.coffea"
@@ -162,7 +162,7 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_hh wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_hh",
-        variable_binning = "",
+        extra_arguments = "--use_kfold",
         container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_hh.log"
 
@@ -177,7 +177,7 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zz wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_zz",
-        variable_binning = "",
+        extra_arguments = "",
         container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_zz.log"
 
@@ -192,6 +192,6 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_zh wi
         outputPath = f"{config['output_path']}/closureFits/ULHH_kfold",
         rebin = "1",
         variable = "SvB_MA_ps_zh",
-        variable_binning = "",
+        extra_arguments = "",
         container_wrapper = './run_container combine'
     log: f"{config['output_path']}/logs/run_two_stage_closure_zh.log"

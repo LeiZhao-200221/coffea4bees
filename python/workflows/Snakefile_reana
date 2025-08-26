@@ -199,6 +199,7 @@ use rule analysis_databkgs as analysis_signals with:
         username=USERNAME
     log: "output/logs/analysis_histsignal__{sample_signal}-{year}.log"
 
+### mixdata for HH
 use rule analysis_databkgs as analysis_mixedbkg_data3b with:
     output: "output/histMixedBkg_data_3b_for_mixed.coffea"
     params:
@@ -242,6 +243,50 @@ use rule analysis_databkgs as analysis_mixeddata with:
         username=USERNAME
     log: "output/logs/analysis_mixeddata.log"
 
+
+### mixeddata for ZZ/ZH
+use rule analysis_databkgs as analysis_mixedbkg_data3b_ZZZH with:
+    output: "output/histMixedBkg_ZZZH_data_3b_for_mixed.coffea"
+    params:
+        datasets="data_3b_for_mixed",
+        years=config['year_preUL'],
+        metadata="python/analysis/metadata/HH4b_mixed_data_ZZZH.yml",
+        processor="python/analysis/processors/processor_HH4b.py",
+        datasets_file=config['dataset_location'],
+        blind=False,
+        run_performance=True,
+        extra_arguments=config['extra_arguments'],
+        username=USERNAME
+    log: "output/logs/analysis_mixedbkg_data3b_ZZZH.log"
+
+
+use rule analysis_databkgs as analysis_mixedbkg_ZZZH with:
+    output: "output/histMixedBkg_ZZZH_TT.coffea"
+    params:
+        datasets=config['dataset_for_mixed'],
+        years=config['year'],
+        metadata="python/analysis/metadata/HH4b_mixed_data_ZZZH.yml",
+        processor="python/analysis/processors/processor_HH4b.py",
+        datasets_file=config['dataset_location'],
+        blind=False,
+        run_performance=True,
+        extra_arguments=config['extra_arguments'],
+        username=USERNAME
+    log: "output/logs/analysis_mixedbkg_TT_ZZZH.log"
+
+use rule analysis_databkgs as analysis_mixeddata_ZZZH with:
+    output: "output/histMixedData_ZZZH.coffea"
+    params:
+        datasets="mixeddata",
+        years=config['year_preUL'],
+        metadata="python/analysis/metadata/HH4b_mixed_data_ZZZH.yml",
+        processor="python/analysis/processors/processor_HH4b.py",
+        datasets_file=config['dataset_location'],
+        blind=False,
+        run_performance=True,
+        extra_arguments=config['extra_arguments'],
+        username=USERNAME
+    log: "output/logs/analysis_mixeddata.log"
 
 use rule analysis_databkgs as analysis_systematics_others with:
     # input: "output/JCM/jetCombinatoricModel_SB_reana.yml"
@@ -348,6 +393,21 @@ use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixdata with:
     output: "output/histMixedData.json"
     log: "output/logs/convert_hist_to_json_mixdata.log"
 
+use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixdata3b_ZZZH with:
+    input: "output/histMixedBkg_ZZZH_data_3b_for_mixed.coffea"
+    output: "output/histMixedBkg_ZZZH_data_3b_for_mixed.json"
+    log: "output/logs/convert_hist_to_json_mixdata3b_ZZZH.log"
+
+use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixbkgtt_ZZZH with:
+    input: "output/histMixedBkg_ZZZH_TT.coffea"
+    output: "output/histMixedBkg_ZZZH_TT.json"
+    log: "output/logs/convert_hist_to_json_mixbkgtt_ZZZH.log"
+
+use rule convert_hist_to_json_mixdata3b as convert_hist_to_json_mixdata_ZZZH with:
+    input: "output/histMixedData_ZZZH.coffea"
+    output: "output/histMixedData_ZZZH.json"
+    log: "output/logs/convert_hist_to_json_mixdata_ZZZH.log"
+
 use rule convert_json_to_root from stat_analysis as convert_json_to_root_TT with:
     input: "output/histMixedBkg_TT.json"
     output: "output/histMixedBkg_TT.root"
@@ -362,15 +422,32 @@ use rule convert_json_to_root_TT as convert_json_to_root_mix with:
     output: "output/histMixedData.root"
     log: "output/logs/convert_json_to_root_mix.log"
 
-use rule convert_json_to_root_TT as convert_json_to_root_histall with:
-    input: "output/histAll.json"
-    output: "output/histAll.root"
-    log: "output/logs/convert_json_to_root_histall.log"
-
 use rule convert_json_to_root_TT as convert_json_to_root_data3b with:
     input: "output/histMixedBkg_data_3b_for_mixed.json"
     output: "output/histMixedBkg_data_3b_for_mixed.root"
     log: "output/logs/convert_json_to_root_data3b.log"
+
+use rule convert_json_to_root_TT as convert_json_to_root_TT_ZZZH with:
+    input: "output/histMixedBkg_ZZZH_TT.json"
+    output: "output/histMixedBkg_ZZZH_TT.root"
+    container: config["combine_container"]
+    log: "output/logs/convert_json_to_root_TT_ZZZH.log"
+
+use rule convert_json_to_root_TT as convert_json_to_root_mix_ZZZH with:
+    input: "output/histMixedData_ZZZH.json"
+    output: "output/histMixedData_ZZZH.root"
+    log: "output/logs/convert_json_to_root_mix_ZZZH.log"
+
+use rule convert_json_to_root_TT as convert_json_to_root_data3b_ZZZH with:
+    input: "output/histMixedBkg_ZZZH_data_3b_for_mixed.json"
+    output: "output/histMixedBkg_ZZZH_data_3b_for_mixed.root"
+    log: "output/logs/convert_json_to_root_data3b_ZZZH.log"
+
+
+use rule convert_json_to_root_TT as convert_json_to_root_histall with:
+    input: "output/histAll.json"
+    output: "output/histAll.root"
+    log: "output/logs/convert_json_to_root_histall.log"
 
 #######
 ### Closure fits (background systematics)
@@ -388,7 +465,7 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_HH4b 
         outputPath = "output/closureFits/",
         rebin = "1",
         variable = "SvB_MA_ps_hh",
-        variable_binning = "",
+        extra_arguments = "--use_kfold",
         container_wrapper = config['container_wrapper']
     resources:
         compute_backend="kubernetes",
@@ -396,22 +473,27 @@ use rule run_two_stage_closure from stat_analysis as run_two_stage_closure_HH4b 
     log: "output/logs/run_two_stage_closure_HH4b.log"
 
 use rule run_two_stage_closure_HH4b as run_two_stage_closure_ZZ4b with:
+    input: 
+        file_TT = "output/histMixedBkg_ZZZH_TT.root",
+        file_mix = "output/histMixedData_ZZZH.root",
+        file_sig = "output/histAll.root",
+        file_data3b = "output/histMixedBkg_ZZZH_data_3b_for_mixed.root"
     output: "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zz/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zz_rebin1.pkl"
     params:
         outputPath = "output/closureFits",
         rebin = "1",
         variable = "SvB_MA_ps_zz",
-        variable_binning = "",
+        extra_arguments = "",
         container_wrapper = config['container_wrapper']
     log: "output/logs/run_two_stage_closure_ZZ4b.log"
 
-use rule run_two_stage_closure_HH4b as run_two_stage_closure_ZH4b with:
+use rule run_two_stage_closure_ZZ4b as run_two_stage_closure_ZH4b with:
     output: "output/closureFits/3bDvTMix4bDvT/SvB_MA/rebin1/SR/zh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_zh_rebin1.pkl"
     params:
         outputPath = "output/closureFits",
         rebin = "1",
         variable = "SvB_MA_ps_zh",
-        variable_binning = "",
+        extra_arguments = "",
         container_wrapper = config['container_wrapper']
     log: "output/logs/run_two_stage_closure_ZH4b.log"
 
