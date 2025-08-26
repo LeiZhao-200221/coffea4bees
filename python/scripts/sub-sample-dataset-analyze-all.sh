@@ -19,7 +19,7 @@ fi
 
 
 echo "############### Running test processor "
-# python python/metadata/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f ${OUTPUT_DIR}/picoaod_datasets_TT_pseudodata_Run2.yml  -o ${OUTPUT_DIR}datasets_TT_pseudodata_Run2.yml
+# python python/src/scripts/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f ${OUTPUT_DIR}/picoaod_datasets_TT_pseudodata_Run2.yml  -o ${OUTPUT_DIR}datasets_TT_pseudodata_Run2.yml
 #cat ${OUTPUT_DIR}/datasets_synthetic_test.yml
 time python runner.py -o TT_pseudodata_datasets.coffea -d ps_data_TTToSemiLeptonic ps_data_TTTo2L2Nu ps_data_TTToHadronic -p python/analysis/processors/processor_HH4b.py -y UL18 UL17 UL16_preVFP UL16_postVFP  -op ${OUTPUT_DIR} -c python/analysis/metadata/HH4b_rerun_SvB.yml -m python/metadata/datasets_TT_pseudodata_Run2.yml
 #time python runner.py -o histAll_TT.coffea            -d TTToHadronic TTToSemiLeptonic TTTo2L2Nu                         -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op analysis/hists/ -c python/analysis/metadata/HH4b_rerun_SvB.yml 

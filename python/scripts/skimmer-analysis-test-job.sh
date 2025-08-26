@@ -20,7 +20,7 @@ else
     cat $INPUT_DIR/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml
 fi
 echo "############### Modifying dataset file with skimmer ci output"
-python python/metadata/merge_yaml_datasets.py -m $INPUT_DIR/datasets_HH4b.yml -f $INPUT_DIR/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml -o $OUTPUT_DIR/datasets_HH4b.yml
+python python/src/scripts/merge_yaml_datasets.py -m $INPUT_DIR/datasets_HH4b.yml -f $INPUT_DIR/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml -o $OUTPUT_DIR/datasets_HH4b.yml
 cat $OUTPUT_DIR/datasets_HH4b.yml
 
 echo "############### Changing metadata"
