@@ -359,7 +359,7 @@ class analysis(processor.ProcessorABC):
 
             if "SvB" not in self.friends and self.classifier_SvB is None:
                 # SvB_file = f'{path}/SvB_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB")}'
-                SvB_file = f'{path}/SvB{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB{SvB_suffix}")}'
+                SvB_file = f'{path}/SvB{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", f"SvB{SvB_suffix}")}'
                 event["SvB"] = ( 
                     NanoEventsFactory.from_root( 
                         SvB_file,
@@ -376,7 +376,7 @@ class analysis(processor.ProcessorABC):
 
             if "SvB_MA" not in self.friends and self.classifier_SvB_MA is None:
                 # SvB_MA_file = f'{path}/SvB_MA_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA")}'
-                SvB_MA_file = f'{path}/SvB_MA{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA{SvB_suffix}")}'
+                SvB_MA_file = f'{path}/SvB_MA{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", f"SvB_MA{SvB_suffix}")}'
                 event["SvB_MA"] = ( 
                     NanoEventsFactory.from_root( 
                         SvB_MA_file,
