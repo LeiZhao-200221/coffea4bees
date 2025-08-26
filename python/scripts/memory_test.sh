@@ -18,11 +18,11 @@ DATASETS="python/metadata/datasets_HH4b_v1p2.yml"
 echo "Using datasets file: $DATASETS"
 
 python src/scripts/memory/memory_test.py \
-    --threshold 5200 \
+    --threshold 2200 \
     -o $OUTPUT_DIR/mprofile_ci_test \
     --script runner.py \
         -o test.coffea -t \
-        -d GluGluToHHTo4B_cHHH0 \
+        -d GluGluToHHTo4B_cHHH1 \
         -p python/analysis/processors/processor_HH4b.py \
         -y UL18 \
         -op ${OUTPUT_DIR} \
