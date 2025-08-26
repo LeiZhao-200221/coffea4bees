@@ -28,6 +28,6 @@ python runner.py -s -p python/skimmer/tests/modify_branches.py -c ${OUTPUT_DIR}/
 ls -R python/skimmer/
 
 echo "############### Checking skimmer output"
-python python/metadata/merge_yaml_datasets.py -m ${OUTPUT_DIR}/datasets_HH4b.yml -f ${OUTPUT_DIR}/picoAOD_modify_branches.yml -o ${OUTPUT_DIR}/picoAOD_modify_branches.yml
+python src/scripts/merge_yaml_datasets.py -m ${OUTPUT_DIR}/datasets_HH4b.yml -f ${OUTPUT_DIR}/picoAOD_modify_branches.yml -o ${OUTPUT_DIR}/picoAOD_modify_branches.yml
 python runner.py -p python/skimmer/tests/modify_branches.py -c python/skimmer/tests/modify_branches_analysis.yml -y UL18 -d GluGluToHHTo4B_cHHH1 -op ${OUTPUT_DIR} -o modify_branches.coffea -m ${OUTPUT_DIR}/picoAOD_modify_branches.yml -t --debug
 

@@ -18,7 +18,6 @@ config:
   # SvB_MA:
   #   - path: 'python/analysis/weights/pytorch_models/2024_HHUL_all_kl/result.json'
   #     name: Final # name of the output stage (e.g. Final or some other checkpoint)
-  run_systematics: false
   top_reconstruction: fast
   fill_histograms: false
   make_friend_SvB: *friend_base

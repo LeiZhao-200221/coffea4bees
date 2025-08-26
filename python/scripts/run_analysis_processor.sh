@@ -26,17 +26,17 @@ usage() {
 # Function to display configuration
 display_config() {
     echo "############### Configuration"
-    echo "Processor:        $PROCESSOR_PATH"
-    echo "Metadata:         $METADATA_PATH"
-    echo "Config:           $CONFIG_PATH"
-    echo "Triggers:         $TRIGGERS_PATH"
-    echo "Luminosities:     $LUMINOSITIES_PATH"
-    echo "Datasets:         $DATASETS"
-    echo "Year:             $YEAR"
-    echo "Output filename:  $OUTPUT_FILENAME"
-    echo "Test mode:        $([ -n "$TEST_MODE" ] && echo "enabled" || echo "disabled")"
-    echo "Output subdir:    $OUTPUT_SUBDIR"
-    echo "Additional flags: ${ADDITIONAL_FLAGS:-"(none)"}"
+    echo "Processor:          $PROCESSOR_PATH"
+    echo "Datasets Metadata:  $METADATA_PATH"
+    echo "Config:             $CONFIG_PATH"
+    echo "Triggers:           $TRIGGERS_PATH"
+    echo "Luminosities:       $LUMINOSITIES_PATH"
+    echo "Datasets:           $DATASETS"
+    echo "Year:               $YEAR"
+    echo "Output filename:    $OUTPUT_FILENAME"
+    echo "Test mode:          $([ -n "$TEST_MODE" ] && echo "enabled" || echo "disabled")"
+    echo "Output subdir:      $OUTPUT_SUBDIR"
+    echo "Additional flags:   ${ADDITIONAL_FLAGS:-"(none)"}"
     echo ""
 }
 
@@ -81,7 +81,7 @@ while [[ $# -gt 0 ]]; do
             PROCESSOR_PATH="$2"
             shift 2
             ;;
-        --metadata)
+        --dataset-metadata)
             METADATA_PATH="$2"
             shift 2
             ;;
@@ -176,7 +176,7 @@ cmd=(python runner.py
     -p "$PROCESSOR_PATH" 
     -m "$METADATA_PATH" 
     -c "$CONFIG_PATH" 
-    # --triggers "$TRIGGERS_PATH"
+    --triggers "$TRIGGERS_PATH"
     # --luminosities "$LUMINOSITIES_PATH"
     -d $DATASETS 
     -y $YEAR

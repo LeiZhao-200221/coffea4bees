@@ -23,7 +23,7 @@ cat $OUTPUT_DIR/datasets_synthetic_test_Run3.yml
 
 # echo "############### Modifying dataset file with skimmer ci output"
 # cat python/metadata/datasets_ci.yml
-# python python/metadata/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f python/skimmer/metadata/picoaod_datasets_declustered_data_test_UL18A.yml  -o python/metadata/datasets_synthetic_seed17_test.yml
+# python src/scripts/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f python/skimmer/metadata/picoaod_datasets_declustered_data_test_UL18A.yml  -o python/metadata/datasets_synthetic_seed17_test.yml
 
 #/builds/johnda/coffea4bees/python/skimmer/GluGluToHHTo4B_cHHH1_UL18/picoAOD_seed5.root
 #/builds/johnda/coffea4bees/python
@@ -39,8 +39,8 @@ cat $OUTPUT_DIR/datasets_synthetic_test_Run3.yml
 
 
 echo "############### Running test processor "
-# python python/metadata/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f python/skimmer/metadata/picoaod_datasets_declustered_test_UL18.yml  -o python/metadata/datasets_synthetic_test.yml
-# python python/metadata/merge_yaml_datasets.py -m python/metadata/datasets_synthetic_seed17.yml -f python/skimmer/metadata/picoaod_datasets_declustered_GluGluToHHTo4B_cHHH1_Run2_seed17.yml -o python/metadata/datasets_synthetic_seed17.yml
+# python src/scripts/merge_yaml_datasets.py -m python/metadata/datasets_HH4b.yml -f python/skimmer/metadata/picoaod_datasets_declustered_test_UL18.yml  -o python/metadata/datasets_synthetic_test.yml
+# python src/scripts/merge_yaml_datasets.py -m python/metadata/datasets_synthetic_seed17.yml -f python/skimmer/metadata/picoaod_datasets_declustered_GluGluToHHTo4B_cHHH1_Run2_seed17.yml -o python/metadata/datasets_synthetic_seed17.yml
 #cat python/metadata/datasets_synthetic_test.yml
 
 time python runner.py -o test_synthetic_datasets.coffea -d synthetic_data  -p python/analysis/processors/processor_HH4b.py -y 2023_BPix  -op $OUTPUT_DIR/ -c python/analysis/metadata/HH4b_synthetic_data.yml -m $OUTPUT_DIR/datasets_synthetic_test_Run3.yml

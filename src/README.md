@@ -90,11 +90,17 @@ Event selection and filtering pipeline.
 ### 🛠️ Scripts (`scripts/`)
 Command-line utilities and automation tools.
 
+- **`merge_yaml_datasets.py`** - Utility to merge multiple YAML dataset files
 - **`fix_eos.py`** - Utility to repair corrupted EOS files
 - **`common.sh`** - Common shell utilities
+- **`memory/`** - Memory testing and monitoring tools for preventing system hangs
+  - `memory_limited_run.sh` - Universal memory guard for any command
+  - `memory_monitor.py` - Python-specific memory monitoring
+  - `profile_memory_simple.py` - Memory usage profiling
+  - `debug_memory.py` - Advanced memory debugging tools
 - Other automation and maintenance scripts
 
-**Use when:** You need command-line tools, automation scripts, or utilities to fix common problems.
+**Use when:** You need command-line tools, automation scripts, utilities to fix common problems, or memory monitoring to prevent system crashes.
 
 ### 🧰 Utilities (`utils/`)
 Generic, reusable utilities that don't fit into specific domains.

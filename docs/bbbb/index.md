@@ -12,7 +12,6 @@ _All code in this directory assumes it is the root folder, meaning all file path
 - **[skimmer](./skimmer/):** Includes processors for filtering NanoAOD files, applying selections, and saving skimmed NanoAOD files (referred to as picoAOD files).
 - **[analysis](./analysis/):** Houses the analysis processor for creating histograms with selections and scripts for generating plots.
 - **[classifier](./classifier/):** Contains machine learning models and scripts for classification tasks. _(Details to be added.)_
-- **[data](./data/):** Stores correction files, which will eventually be replaced by the use of JSON-based POG files.
 - **[jet_clustering](./jet_clustering/):** Includes tools for jet clustering and synthetic data generation.
 - **[metadata](./metadata/):** Contains datasets, cross-sections, friend trees, and other metadata files.
 - **[plots](./plots/):** Includes all scripts for generating visualizations and plots.

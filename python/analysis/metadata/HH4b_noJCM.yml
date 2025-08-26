@@ -10,7 +10,6 @@ config:
   apply_btagSF: true
   apply_boosted_veto: false
   run_SvB: false
-  run_systematics: false
   friends:
     trigWeight: "python/metadata/datasets_HH4b_2024_v2_trigweights.json@@trigWeight"
   # friend_top_reconstruction: 'hists/local/top_reconstruction_friendtree.json'

@@ -8,7 +8,9 @@ action() {
     docker run \
         --rm -it \
         -p ${host}:${port}:8000 \
-        -v "${PWD}":/docs \
+        -v "${PWD}":/docs/docs \
+        -v "${PWD}/mkdocs.yml":/docs/mkdocs.yml \
+        -w /docs \
         -e GIT_PYTHON_REFRESH=quiet \
         ${image}
 }

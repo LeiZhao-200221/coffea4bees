@@ -87,8 +87,8 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        corrections_metadata: str = "src/physics/corrections.yml",
         top_reconstruction_override: bool = False,
+        corrections_metadata: dict = None,
         run_systematics: list = [],
         make_classifier_input: str = None,
         make_top_reconstruction: str = None,
@@ -111,8 +111,7 @@ class analysis(processor.ProcessorABC):
         self.apply_boosted_veto = apply_boosted_veto
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
+        self.corrections_metadata = corrections_metadata
 
         self.run_systematics = run_systematics
         self.make_top_reconstruction = make_top_reconstruction

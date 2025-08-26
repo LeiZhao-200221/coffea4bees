@@ -56,7 +56,7 @@ class analysis(processor.ProcessorABC):
             SvB=None,
             SvB_MA=None,
             threeTag=False,
-            corrections_metadata="src/physics/corrections.yml",
+            corrections_metadata: dict = None,
             clustering_pdfs_file = "jet_clustering/jet-splitting-PDFs-00-07-02/clustering_pdfs_vs_pT_XXX.yml",
             run_SvB=True,
             do_declustering=False,
@@ -64,7 +64,7 @@ class analysis(processor.ProcessorABC):
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
         self.clustering_pdfs_file = clustering_pdfs_file
         self.classifier_SvB = HCREnsemble(SvB) if SvB else None
         self.classifier_SvB_MA = HCREnsemble(SvB_MA) if SvB_MA else None

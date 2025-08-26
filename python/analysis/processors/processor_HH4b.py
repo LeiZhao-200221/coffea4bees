@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
+import gc
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
 from python.analysis.helpers.cutflow import cutFlow
@@ -41,6 +42,8 @@ from coffea.analysis_tools import PackedSelection
 from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
 from coffea.util import load
 from memory_profiler import profile
+import psutil
+import os
 
 from ..helpers.load_friend import (
     FriendTemplate,
@@ -86,6 +89,7 @@ class analysis(processor.ProcessorABC):
         blind: bool = False,
         apply_JCM: bool = True,
         JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        corrections_metadata: dict = None,
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -94,9 +98,8 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        corrections_metadata: str = "src/physics/corrections.yml",
         top_reconstruction: str | None = None,
-        run_systematics: list = [],
+        run_systematics: list = [],  #### Way of splitting systematics. It can be event_weights, jes, btag
         make_classifier_input: str = None,
         make_top_reconstruction: str = None,
         make_friend_JCM_weight: str = None,
@@ -119,10 +122,8 @@ class analysis(processor.ProcessorABC):
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
         self.classifier_FvT = _init_classfier_FvT(FvT)
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
-
-        self.run_systematics = run_systematics
+        self.corrections_metadata = corrections_metadata
+        self.run_systematics = ['others', 'jes'] if 'all' in run_systematics else run_systematics
         self.make_top_reconstruction = make_top_reconstruction
         self.make_classifier_input = make_classifier_input
         self.make_friend_JCM_weight = make_friend_JCM_weight
@@ -134,9 +135,29 @@ class analysis(processor.ProcessorABC):
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.histCuts = hist_cuts
+        
+        # Memory monitoring
+        self.debug_memory = False  # Set to False to disable memory monitoring
+        
+    def _log_memory(self, stage_name):
+        """Log current memory usage"""
+        if not self.debug_memory:
+            return
+            
+        try:
+            process = psutil.Process(os.getpid())
+            memory_info = process.memory_info()
+            rss_mb = memory_info.rss / 1024 / 1024  # MB
+            vms_mb = memory_info.vms / 1024 / 1024  # MB
+            logging.info(f"MEMORY: RSS={rss_mb:.1f}MB, VMS={vms_mb:.1f}MB {stage_name}")
+        except Exception as e:
+            logging.warning(f"Memory monitoring failed at {stage_name}: {e}")
 
+    # @profile
     def process(self, event):
         logging.debug(event.metadata)
+        self._log_memory("process_start")
+        
         fname   = event.metadata['filename']
         self.dataset = event.metadata['dataset']
         self.estart  = event.metadata['entrystart']
@@ -148,6 +169,7 @@ class analysis(processor.ProcessorABC):
 
         ### target is for new friend trees
         target = Chunk.from_coffea_events(event)
+        self._log_memory("after_metadata_setup")
 
         #
         # Set process and datset dependent flags
@@ -178,6 +200,7 @@ class analysis(processor.ProcessorABC):
         #
         # Reading SvB friend trees
         #
+        self._log_memory("before_friend_trees")
         path = fname.replace(fname.split("/")[-1], "")
         if self.apply_FvT and self.classifier_FvT is None:
             if "FvT" in self.friends:
@@ -251,6 +274,8 @@ class analysis(processor.ProcessorABC):
                     except Exception as e:
                         event[k] = self.friends[k].arrays(target)
 
+            self._log_memory("after_friend_trees_loaded")
+
             if "SvB" not in self.friends and self.classifier_SvB is None:
                 # SvB_file = f'{path}/SvB_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB")}'
                 SvB_file = f'{path}/SvB_ULHH.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_ULHH")}'
@@ -286,15 +311,18 @@ class analysis(processor.ProcessorABC):
         #
         # Event selection
         #
+        self._log_memory("before_event_selection")
         event = apply_event_selection( event,
                                         self.corrections_metadata[self.year],
                                         cut_on_lumimask=self.config["cut_on_lumimask"]
                                         )
+        self._log_memory("after_event_selection")
 
 
         ### adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights(
-            event, target=target,
+            event, 
+            target=target,
             do_MC_weights=self.config["do_MC_weights"],
             dataset=self.dataset,
             year_label=self.year_label,
@@ -332,28 +360,33 @@ class analysis(processor.ProcessorABC):
         # Calculate and apply Jet Energy Calibration
         #
         if self.config["do_jet_calibration"]:
-            jets = apply_jerc_corrections(event,
-                                          corrections_metadata=self.corrections_metadata[self.year],
-                                          isMC=self.config["isMC"],
-                                          run_systematics=self.run_systematics,
-                                          dataset=self.dataset
-                                          )
+
+            jets = apply_jerc_corrections(
+                event,
+                corrections_metadata=self.corrections_metadata[self.year],
+                isMC=self.config["isMC"],
+                run_systematics= 'jes' in self.run_systematics,
+                dataset=self.dataset
+            )
         else:
             jets = event.Jet
 
 
-        shifts = [({"Jet": jets}, None)]
-        if self.run_systematics:
+        # Determine which shifts to run
+        if 'jes' in self.run_systematics:
+            shifts = []
+            shifts.extend([({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")])
+
             for jesunc in self.corrections_metadata[self.year]["JES_uncertainties"]:
                 shifts.extend( [ ({"Jet": jets[f"JES_{jesunc}"].up}, f"CMS_scale_j_{jesunc}Up"),
                                  ({"Jet": jets[f"JES_{jesunc}"].down}, f"CMS_scale_j_{jesunc}Down"), ] )
-
-            shifts.extend( [({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")] )
-
             logging.info(f"\nJet variations {[name for _, name in shifts]}")
+        else:
+            shifts = [({"Jet": jets}, None)]
 
         return processor.accumulate( self.process_shift(update_events(event, collections), name, weights, list_weight_names, target) for collections, name in shifts )
 
+    # @profile
     def process_shift(self, event, shift_name, weights, list_weight_names, target):
         """For different jet variations. It computes event variations for the nominal case."""
 
@@ -493,12 +526,14 @@ class analysis(processor.ProcessorABC):
         #
         if self.config["isMC"] and self.apply_btagSF:
 
-            weights, list_weight_names = add_btagweights( event, weights,
-                                                         list_weight_names=list_weight_names,
-                                                         shift_name=shift_name,
-                                                         use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
-                                                         run_systematics=self.run_systematics,
-                                                         corrections_metadata=self.corrections_metadata[self.year]
+            weights, list_weight_names = add_btagweights( 
+                event, 
+                weights,
+                list_weight_names=list_weight_names,
+                shift_name=shift_name,
+                use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
+                run_systematics = 'others' in self.run_systematics,
+                corrections_metadata=self.corrections_metadata[self.year]
             )
             logging.debug( f"Btag weight {weights.partial_weight(include=['CMS_btag'])[:10]}\n" )
             event["weight"] = weights.weight()
@@ -768,6 +803,18 @@ class analysis(processor.ProcessorABC):
                 | dump_SvB(selev, self.make_friend_SvB, "SvB_MA", analysis_selections)
             )
 
+        # Log sizes of return objects
+        if self.debug_memory:
+            import sys
+            hist_size = sys.getsizeof(hist) / 1024 / 1024  # MB
+            output_size = sys.getsizeof(processOutput) / 1024 / 1024  # MB
+            friends_size = sys.getsizeof(friends) / 1024 / 1024  # MB
+            logging.info(f"Return object sizes - hist: {hist_size:.1f}MB, output: {output_size:.1f}MB, friends: {friends_size:.1f}MB")
+
+        # Explicit cleanup before returning
+        del selev, event, weights, analysis_selections
+        gc.collect()
+        
         return hist | processOutput | friends
 
     def postprocess(self, accumulator):
