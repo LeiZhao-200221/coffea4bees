@@ -24,5 +24,5 @@ def freeze_parameters(analysis_key):
     """Generate string to set all othersignal POIs to zero for a given analysis"""
     othersignal = config['channels'][analysis_key]["othersignal"]
     if othersignal.strip():
-        return "--freezeParameters " + ",".join([f"r{sig}" for sig in othersignal.split()])
+        return "--freezeParameters " + ",".join([f"{sig}" for sig in othersignal.split()])
     return ""

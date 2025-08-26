@@ -2,13 +2,14 @@ import logging
 
 import numpy as np
 import yaml
-from analysis.helpers.common import apply_jerc_corrections
-from analysis.helpers.mc_weight_outliers import OutlierByMedian
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_4b_selection
-from analysis.helpers.event_selection import apply_event_selection
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from python.analysis.helpers.mc_weight_outliers import OutlierByMedian
+from python.analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.event_selection import apply_4b_selection
+from src.physics.event_selection import apply_event_selection
+
 from coffea.analysis_tools import PackedSelection, Weights
-from skimmer.processor.picoaod import PicoAOD
+from src.skimmer.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):
@@ -18,7 +19,7 @@ class Skimmer(PicoAOD):
         super().__init__(*args, **kwargs)
         self.loosePtForSkim = loosePtForSkim
         self.skim4b = skim4b
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
         self.mc_outlier_threshold = mc_outlier_threshold
 
 

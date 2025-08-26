@@ -8,10 +8,10 @@ import sys
 import os
 sys.path.insert(0, os.getcwd())
 
-from plots.iPlot import plot, plot2d
-import base_class.plots.iPlot_config as cfg
-from base_class.plots.plots import load_config, load_hists, read_axes_and_cuts
-from analysis.tests.parser import wrapper
+from python.plots.iPlot import plot, plot2d
+import src.plotting.iPlot_config as cfg
+from src.plotting.plots import load_config, load_hists, read_axes_and_cuts
+from python.analysis.tests.parser import wrapper
 
 
 class iPlotTestCase(unittest.TestCase):
@@ -114,7 +114,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_singleFile(self):
 
-        metadata = "plots/metadata/plotsAll.yml"
+        metadata = "python/plots/metadata/plotsAll.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile]
@@ -129,7 +129,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_multipleFiles(self):
 
-        metadata = "plots/metadata/plotsAll.yml"
+        metadata = "python/plots/metadata/plotsAll.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile, self.inputFile]
@@ -173,7 +173,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_NoFvT(self):
 
-        metadata = "plots/metadata/plotsAllNoFvT.yml"
+        metadata = "python/plots/metadata/plotsAllNoFvT.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile]

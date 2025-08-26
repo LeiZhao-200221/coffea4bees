@@ -71,7 +71,7 @@ datasets:
         sumw_diff: -889.0460205078125
         sumw: 58913.00732421875
         total_events: 978000
-    top_reconstruction: fast
+
     xs: 0.06856*0.5824**2
   GluGluToHHTo4B_cHHH1:
     UL16_preVFP:
@@ -146,7 +146,7 @@ datasets:
         sumw_diff: 1453.1521577835083
         sumw: 26757.179077148438
         total_events: 1000000
-    top_reconstruction: slow
+
     xs: 0.03077*0.5824**2
   GluGluToHHTo4B_cHHH2p45:
     UL16_preVFP:
@@ -213,7 +213,7 @@ datasets:
         sumw_diff: 13.910200119018555
         sumw: 10738.940551757812
         total_events: 950000
-    top_reconstruction: fast
+
     xs: 0.01333*0.5824**2
   GluGluToHHTo4B_cHHH5:
     UL16_preVFP:
@@ -275,7 +275,7 @@ datasets:
         sumw2: 6400.487365722656
         sumw: 78489.3359375
         total_events: 994000
-    top_reconstruction: fast
+
     xs: 0.09082*0.5824**2
   HH4b:
     '2016':

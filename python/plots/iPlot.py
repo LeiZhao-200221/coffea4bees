@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt
 
 # Local imports
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import (
+from src.plotting.plots import (
     makePlot, make2DPlot, load_config, load_hists,
     read_axes_and_cuts, parse_args, print_cfg
 )
-import base_class.plots.iPlot_config as cfg
+import src.plotting.iPlot_config as cfg
 
 # Constants
 DEFAULT_OUTPUT_FILE = "test.pdf"

@@ -4,7 +4,7 @@ from collections import defaultdict
 from functools import reduce
 from typing import Iterable
 
-from classifier.task import Analysis, ArgParser, converter
+from python.classifier.task import Analysis, ArgParser, converter
 
 from ..setting import IO, ResultKey
 
@@ -63,7 +63,7 @@ class Merge(Analysis):
     )
 
     def analyze(self, results: list[dict]):
-        from classifier.root.kfold import MergeMean, MergeStd, merge_kfolds
+        from python.classifier.root.kfold import MergeMean, MergeStd, merge_kfolds
 
         kfolds = _load_friends(self.opts.stage, results)
         if len(kfolds) > 1:
@@ -87,7 +87,7 @@ class Merge(Analysis):
 
 
 def _load_friends(stage: str, results: list[dict]):
-    from base_class.root import Friend
+    from src.data_formats.root import Friend
 
     kfolds: list[Friend] = []
     for result in results:

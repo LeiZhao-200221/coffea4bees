@@ -9,17 +9,18 @@ import warnings
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 
-from base_class.hist import Collection, Fill
-from base_class.physics.object import Jet
+from src.hist import Collection, Fill
+from src.hist.object import Jet
 
-from analysis.helpers.correctionFunctions import btagVariations
-from analysis.helpers.correctionFunctions import btagSF_norm as btagSF_norm_file
-from analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.correctionFunctions import btagVariations
+from python.analysis.helpers.correctionFunctions import btagSF_norm as btagSF_norm_file
+from python.analysis.helpers.cutflow import cutFlow
 
 
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_btag_sf
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from src.physics.common import apply_btag_sf
+from python.analysis.helpers.event_selection import apply_4b_selection
+from src.physics.event_selection import apply_event_selection
 import logging
 
 
@@ -31,7 +32,7 @@ warnings.filterwarnings("ignore")
 
 
 class analysis(processor.ProcessorABC):
-    def __init__(self, JCM='', corrections_metadata='analysis/metadata/corrections.yml'):
+    def __init__(self, JCM='', corrections_metadata='src/physics/corrections.yml'):
         self.histCuts = ['passPreSel']
         self.tags = ['threeTag', 'fourTag']
         self.JCM = jetCombinatoricModel(JCM)

@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, NotRequired, Optional, TypedDict
 
 import cloudpickle
 import lz4.frame
-from base_class.config import ConfigParser, parsers
-from base_class.system.eos import EOS
+from src.config import ConfigParser, parsers
+from src.storage.eos import EOS
 
 from ._io import dumps
 

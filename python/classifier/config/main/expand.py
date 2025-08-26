@@ -1,4 +1,4 @@
-from classifier.task import ArgParser, EntryPoint, main
+from python.classifier.task import ArgParser, EntryPoint, main
 
 from .. import setting as cfg
 from .help import _print_mod

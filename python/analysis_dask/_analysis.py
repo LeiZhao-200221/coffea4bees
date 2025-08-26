@@ -11,10 +11,10 @@ from coffea.dataset_tools import apply_to_dataset, preprocess
 from coffea.nanoevents.schemas import BaseSchema, NanoAODSchema
 from coffea.processor import ProcessorABC
 
-import base_class.dask.awkward as dak_ext
-from base_class.config._io import FileLoader
-from base_class.root import Chunk, Friend
-from base_class.system.eos import EOS
+import src.dask.awkward as dak_ext
+from src.config._io import FileLoader
+from src.data_formats.root import Chunk, Friend
+from src.storage.eos import EOS
 
 from ._io import _FileDumper, id_sha1
 

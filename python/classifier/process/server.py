@@ -20,8 +20,8 @@ from typing import (
     overload,
 )
 
-from base_class.typetools import check_subclass, get_partial_type_hints
-from classifier.typetools import Method
+from src.typetools import check_subclass, get_partial_type_hints
+from python.classifier.typetools import Method
 
 from ..utils import noop
 

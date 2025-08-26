@@ -1,6 +1,6 @@
 import importlib
 
-from classifier.config.state.static import MonitorExtensions
+from python.classifier.config.state.static import MonitorExtensions
 
 from ..process import status
 from .backends import Platform

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import awkward as ak
 import numpy as np
-from base_class.math.random import Squares
+from src.math.random import Squares
 
 if TYPE_CHECKING:
     from .classifier.HCR import HCREnsemble

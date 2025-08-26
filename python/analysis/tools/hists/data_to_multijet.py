@@ -5,7 +5,7 @@ from itertools import repeat
 
 import cloudpickle
 import fsspec
-from base_class.utils.argparser import DefaultFormatter
+from src.utils.argparser import DefaultFormatter
 from hist import Hist
 from rich.logging import RichHandler
 

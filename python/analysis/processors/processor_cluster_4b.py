@@ -12,30 +12,32 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea import processor
 from coffea.util import load
 from coffea.analysis_tools import Weights, PackedSelection
-from analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.processor_config import processor_config
 
-from base_class.hist import Collection, Fill
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
-#from analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
-from jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
-from jet_clustering.clustering   import cluster_bs, cluster_bs_fast
-from jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
+from src.hist import Collection, Fill
+from src.hist.object import LorentzVector, Jet, Muon, Elec
+#from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
+from python.jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
+from python.jet_clustering.clustering   import cluster_bs, cluster_bs_fast
+from python.jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
 
-from analysis.helpers.networks import HCREnsemble
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.networks import HCREnsemble
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_jerc_corrections, apply_btag_sf, update_events
-from analysis.helpers.event_weights import add_weights
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import apply_btag_sf, update_events
+from src.physics.event_weights import add_weights
 
-from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from python.analysis.helpers.event_selection import apply_4b_selection
+from src.physics.event_selection import apply_event_selection
 
 import logging
 
-from base_class.root import TreeReader, Chunk
+from src.data_formats.root import TreeReader, Chunk
 
 #
 # Setup
@@ -54,7 +56,7 @@ class analysis(processor.ProcessorABC):
             SvB=None,
             SvB_MA=None,
             threeTag=False,
-            corrections_metadata="analysis/metadata/corrections.yml",
+            corrections_metadata="src/physics/corrections.yml",
             clustering_pdfs_file = "jet_clustering/jet-splitting-PDFs-00-07-02/clustering_pdfs_vs_pT_XXX.yml",
             run_SvB=True,
             do_declustering=False,
@@ -147,8 +149,6 @@ class analysis(processor.ProcessorABC):
                                                   do_MC_weights=config["do_MC_weights"],
                                                   dataset=dataset,
                                                   year_label=year_label,
-                                                  estart=estart,
-                                                  estop=estop,
                                                   friend_trigWeight=None,
                                                   corrections_metadata=self.corrections_metadata[year],
                                                   apply_trigWeight=True,
@@ -372,7 +372,7 @@ class analysis(processor.ProcessorABC):
         #     print(f'{chunk}\n\n')
 
 
-        # from jet_clustering.dumpTestVectors   import dumpTestVectors_bbj
+        # from python.jet_clustering.dumpTestVectors   import dumpTestVectors_bbj
         # dumpTestVectors_bbj(chunk, selev, jets_for_clustering)
 
         #

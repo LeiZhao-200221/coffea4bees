@@ -41,10 +41,8 @@ if __name__ == '__main__':
                         default="SvB_MA_ps_hh_fine", help="Variable to plot")
     parser.add_argument('-s', '--signal', dest='signal',
                         default='GluGluToHHTo4B_cHHH1', help="Signal to plot")
-    parser.add_argument('-c', '--channel', dest='channel',
-                        default='HH4b', help="Channel label to plot")
     parser.add_argument('-m', '--metadata', dest='metadata',
-                        default='stats_analysis/metadata/HH4b.yml', help="Metadata file")
+                        default='stats_analysis/python/metadata/HH4b.yml', help="Metadata file")
     # parser.add_argument('-r', '--rebin', dest='rebin', type=int,
     #                     default=15, help="Rebin")
     args = parser.parse_args()
@@ -195,9 +193,9 @@ if __name__ == '__main__':
 
             if syst.endswith(('2016', '2017', '2018')):
                 tmp = syst.split('_')[-1]
-                nominal_hist = root_hists.Get(f"{args.channel}_{tmp}/{label_signal}")
-                up_hist.Add( root_hists.Get(f"{args.channel}_{tmp}/{label}_{syst}Up") )
-                down_hist.Add( root_hists.Get(f"{args.channel}_{tmp}/{label}_{syst}Down") )
+                nominal_hist = root_hists.Get(f"HHbb_{tmp}/{label_signal}")
+                up_hist.Add( root_hists.Get(f"HHbb_{tmp}/{label}_{syst}Up") )
+                down_hist.Add( root_hists.Get(f"HHbb_{tmp}/{label}_{syst}Down") )
 
             else:
                 for ichannel in metadata['bin']:

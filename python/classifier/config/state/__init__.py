@@ -2,8 +2,8 @@ import getpass
 import os
 from datetime import datetime
 
-from classifier.task import GlobalState
-from classifier.task.state import _SET
+from python.classifier.task import GlobalState
+from python.classifier.task.state import _SET
 
 
 class System(GlobalState):

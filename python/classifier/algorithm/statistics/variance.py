@@ -1,5 +1,5 @@
 import torch
-from base_class.math.statistics import Variance
+from src.math.statistics import Variance
 
 
 class TensorVariance(Variance[torch.Tensor]):

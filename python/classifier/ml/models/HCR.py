@@ -9,10 +9,10 @@ import fsspec
 import torch
 import torch.nn.functional as F
 import torch.types as tt
-from classifier.config.scheduler import SkimStep
-from classifier.config.setting.HCR import Input, InputBranch, Output
-from classifier.config.setting.ml import SplitterKeys
-from classifier.config.state.label import MultiClass
+from python.classifier.config.scheduler import SkimStep
+from python.classifier.config.setting.HCR import Input, InputBranch, Output
+from python.classifier.config.setting.ml import SplitterKeys
+from python.classifier.config.state.label import MultiClass
 from torch import Tensor
 
 from ...algorithm.utils import Selector, map_batch, to_num
@@ -32,7 +32,7 @@ from ..training import (
 )
 
 if TYPE_CHECKING:
-    from base_class.system.eos import PathLike
+    from src.storage.eos import PathLike
 
 
 @dataclass

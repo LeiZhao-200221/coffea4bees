@@ -44,7 +44,7 @@ python skimmer/metadata/check_event_counts.py -y skimmer/metadata/picoaod_datase
 
 Compares processed lumi sections against those expected in json
 ```
-python skimmer/metadata/check_lumi_sections.py -j data/goldenJSON/Cert_Collisions2023_366442_370790_Golden.json -y skimmer/metadata/picoaod_datasets_data_2023_BPix.yml
+python skimmer/metadata/check_lumi_sections.py -j base_class/data/goldenJSON/Cert_Collisions2023_366442_370790_Golden.json -y skimmer/metadata/picoaod_datasets_data_2023_BPix.yml
 ```
 
 

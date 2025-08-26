@@ -9,13 +9,13 @@ config:
   apply_FvT: false
   apply_JCM: true
   apply_JCM_lowpt: true
-  JCM_file: "analysis/weights/JCM/2024_v2/jetCombinatoricModel_SB_2024_v2.yml"
-  JCM_lowpt_file: "analysis/weights/JCM/2024_v2/jetCombinatoricModel_SB_2024_v2_lowpt.yml"
+  JCM_file: "python/analysis/weights/JCM/2024_v2/jetCombinatoricModel_SB_2024_v2.yml"
+  JCM_lowpt_file: "python/analysis/weights/JCM/2024_v2/jetCombinatoricModel_SB_2024_v2_lowpt.yml"
   apply_trigWeight: true
   apply_btagSF: false
   apply_boosted_veto: false
   run_SvB: false
   run_systematics: false
-  top_reconstruction_override: fast
+  top_reconstruction: fast
   friends:
-    trigWeight: "metadata/datasets_HH4b_2024_v2_trigweights.json@@trigWeight" 
+    trigWeight: "python/metadata/datasets_HH4b_2024_v2_trigweights.json@@trigWeight" 

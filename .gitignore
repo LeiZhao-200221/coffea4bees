@@ -146,6 +146,7 @@ venv.bak/
 sync.sh
 *.code-workspace
 **/*.code-workspace
+.shell
 
 # mypy
 .mypy_cache/
@@ -184,7 +185,8 @@ proxy/
 python/analysis/hists/
 runCITests.sh
 .bashrc
-*/*output*/
+python/*output*/
+*output*
 
 .local/
 set_ROOT.sh
@@ -203,7 +205,9 @@ python/skimmer/*root
 python/analysis/tests/test_dump*.yml
 python/stats_analysis/closureFitsNew/
 python/.sites_map.json
+python/workflows/gitlab-CI/debug-mixed-data.sh
 
+python/workflows/gitlab-CI/debug-signal.sh
 .snakemake/
 .condor_config
 python/analysis/debugMixedData.py
@@ -297,6 +301,8 @@ python/nominal_check_reclustered_splittings.config
 python/plots_check_reclustered_splittings.config
 python/jet_clustering/testTexSlides.tex
 
+
+python/workflows/gitlab-CI/test-signal.sh
 
 coffea4bees-dask-report-*.html
 python/analysis/debugMixedDataCutFlow.py

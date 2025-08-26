@@ -3,7 +3,7 @@ import sys
 import os
 #sys.path.insert(0, os.getcwd())
 
-#from base_class.JCMTools import ncr  # Replace 'your_module' with the name of your Python file without the .py extension
+#from src.JCMTools import ncr  # Replace 'your_module' with the name of your Python file without the .py extension
 #
 #class TestNCR(unittest.TestCase):
 #    def test_known_values(self):
@@ -44,7 +44,7 @@ class TestJCM(unittest.TestCase):
         #os.system("python analysis/make_weights_ROOT.py -o testJCM_Coffea_tests -c passPreSel -r SB ")
 
         #
-        #  > From python analysis/tests/dumpROOTToHist.py -o analysis/tests/HistsFromROOTFile.coffea -c passPreSel -r SB
+        #  > From python python/analysis/tests/dumpROOTToHist.py -o python/analysis/tests/HistsFromROOTFile.coffea -c passPreSel -r SB
         #
         parser = create_parser()
         self.args = parser.parse_args()
@@ -55,8 +55,8 @@ class TestJCM(unittest.TestCase):
 
         for test_pair in [#('analysis/testJCM_ROOT_tests/jetCombinatoricModel_SB_.yml', 'analysis/tests/jetCombinatoricModel_SB_ROOT.yml'),
                             #('analysis/testJCM_Coffea_tests/jetCombinatoricModel_SB_.yml', 'analysis/tests/jetCombinatoricModel_SB_Coffea.yml'),
-                            (f'{base_path}/testJCM_ROOT/jetCombinatoricModel_SB_.yml',   'analysis/tests/jetCombinatoricModel_SB_ROOT_new.yml'),
-                            (f'{base_path}/testJCM_Coffea/jetCombinatoricModel_SB_.yml', 'analysis/tests/jetCombinatoricModel_SB_Coffea_new.yml'),
+                            (f'{base_path}/testJCM_ROOT/jetCombinatoricModel_SB_.yml',   'python/analysis/tests/jetCombinatoricModel_SB_ROOT_new.yml'),
+                            (f'{base_path}/testJCM_Coffea/jetCombinatoricModel_SB_.yml', 'python/analysis/tests/jetCombinatoricModel_SB_Coffea_new.yml'),
                         ]:
 
             test_file      = test_pair[0]

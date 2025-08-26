@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.task import ArgParser, parse
+from python.classifier.task import ArgParser, parse
 
 from ..._HCR import _SCHEDULER
 from ..ggF import all_kl
 
 if TYPE_CHECKING:
-    from classifier.ml.skimmer import Splitter
+    from python.classifier.ml.skimmer import Splitter
 
 
 class loss_valid:
@@ -41,12 +41,12 @@ class Train(all_kl.Train):
     }
 
     def initializer(self, splitter: Splitter, **kwargs):
-        from classifier.ml.models.HCR import (
+        from python.classifier.ml.models.HCR import (
             GBNSchedule,
             HCRArch,
             HCRBenchmarks,
         )
-        from classifier.ml.models.HCR_finetune_ggF import SvBTraining
+        from python.classifier.ml.models.HCR_finetune_ggF import SvBTraining
 
         arch = HCRArch(**({"loss": self.loss} | self.opts.architecture))
         gbn = GBNSchedule(**self.opts.ghost_batch)

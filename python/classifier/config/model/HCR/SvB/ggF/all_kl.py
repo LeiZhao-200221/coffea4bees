@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.config.setting.cms import MC_HH_ggF
-from classifier.config.setting.HCR import Input, Output
-from classifier.config.state.label import MultiClass
-from classifier.task import ArgParser
+from python.classifier.config.setting.cms import MC_HH_ggF
+from python.classifier.config.setting.HCR import Input, Output
+from python.classifier.config.state.label import MultiClass
+from python.classifier.task import ArgParser
 
 from ..._HCR import ROC_BIN, HCREval, HCRTrain, roc_nominal_selection
 
 if TYPE_CHECKING:
-    from classifier.ml import BatchType
+    from python.classifier.ml import BatchType
 
 _BKG = ("multijet", "ttbar")
 _SIG = ("ZZ", "ZH", "ggF")
@@ -121,7 +121,7 @@ class Train(HCRTrain):
 
     @property
     def rocs(self):
-        from classifier.ml.benchmarks.multiclass import ROC
+        from python.classifier.ml.benchmarks.multiclass import ROC
 
         rocs = [
             ROC(

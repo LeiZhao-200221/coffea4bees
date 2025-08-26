@@ -1,7 +1,7 @@
 runner:
   condor_cores: 1
   condor_memory: 4GB
-  override_top_reconstruction: fast
+  top_reconstruction: fast
   friend_metafile: friend
 
 config:
@@ -13,5 +13,5 @@ config:
   apply_boosted_veto: false
   run_SvB: false
   run_systematics: false
-  #SvB   : 'analysis/weights/pytorch_models/2023/SvB_HCR_8_np753_seed0_lr0.01_epochs20_offset*_epoch20.pkl',
-  #SvB_MA': 'analysis/weights/pytorch_models/2023/SvB_MA_HCR+attention_8_np1061_seed0_lr0.01_epochs20_offset*_epoch20.pkl',
+  #SvB   : 'python/analysis/weights/pytorch_models/2023/SvB_HCR_8_np753_seed0_lr0.01_epochs20_offset*_epoch20.pkl',
+  #SvB_MA': 'python/analysis/weights/pytorch_models/2023/SvB_MA_HCR+attention_8_np1061_seed0_lr0.01_epochs20_offset*_epoch20.pkl',

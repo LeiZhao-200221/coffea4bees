@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.task.special import Deprecated
+from python.classifier.task.special import Deprecated
 
 from ...setting.df import Columns
 from ...setting.HCR import Input, InputBranch
@@ -55,7 +55,7 @@ class _Legacy(Deprecated, _common.Common):
         self.preprocessors.append(_add_isSelJet)
 
     def preprocess_by_group(self):
-        from classifier.df.tools import add_columns, rename_columns
+        from python.classifier.df.tools import add_columns, rename_columns
 
         return [
             _group.fullmatch(

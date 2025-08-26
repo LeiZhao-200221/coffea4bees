@@ -9,31 +9,31 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
-from analysis.helpers.common import apply_jerc_corrections, update_events
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.event_weights import (
+from python.analysis.helpers.common import apply_jerc_corrections, update_events
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
     add_weights,
 )
-from analysis.helpers.event_selection import apply_event_selection, apply_dilep_ttbar_selection, apply_4b_selection
-from analysis.helpers.filling_histograms import (
+from python.analysis.helpers.event_selection import apply_event_selection, apply_dilep_ttbar_selection, apply_4b_selection
+from python.analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,
 )
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.candidates_selection_resonant import create_cand_jet_dijet_quadjet
-from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.topCandReconstruction import (
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from python.analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.candidates_selection_resonant import create_cand_jet_dijet_quadjet
+from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from python.analysis.helpers.topCandReconstruction import (
     adding_top_reco_to_event,
     buildTop,
     find_tops,
     find_tops_slow,
 )
-from base_class.hist import Fill
-from base_class.root import Chunk, TreeReader
+from src.hist import Fill
+from src.data_formats.root import Chunk, TreeReader
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
@@ -49,7 +49,7 @@ from ..helpers.load_friend import (
 
 if TYPE_CHECKING:
     from ..helpers.classifier.HCR import HCRModelMetadata
-from analysis.helpers.truth_tools import find_genpart
+from python.analysis.helpers.truth_tools import find_genpart
 
 #
 # Setup
@@ -77,8 +77,8 @@ class analysis(processor.ProcessorABC):
         SvB_MA: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
-        # JCM_file: str = "analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
-        JCM_file: str = "analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
+        # JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        JCM_file: str = "python/analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -87,7 +87,7 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        corrections_metadata: str = "analysis/metadata/corrections.yml",
+        corrections_metadata: str = "src/physics/corrections.yml",
         top_reconstruction_override: bool = False,
         run_systematics: list = [],
         make_classifier_input: str = None,
@@ -309,12 +309,12 @@ class analysis(processor.ProcessorABC):
         if self.apply_boosted_veto:
 
             if self.dataset.startswith("GluGluToHHTo4B_cHHH1"):
-                boosted_file = load("metadata/boosted_overlap_signal.coffea")['boosted']
+                boosted_file = load("python/metadata/boosted_overlap_signal.coffea")['boosted']
                 boosted_events = boosted_file.get(self.dataset, {}).get('event', event.event)
                 boosted_events_set = set(boosted_events)
                 event['notInBoostedSel'] = np.array([e not in boosted_events_set for e in event.event.to_numpy()])
             elif self.dataset.startswith("data"):
-                boosted_file = load("metadata/boosted_overlap_data.coffea")
+                boosted_file = load("python/metadata/boosted_overlap_data.coffea")
                 mask = np.array(boosted_file['BDTcat_index']) > 0  ### > 0 is all boosted categories, 1 is most sensitive
                 filtered_runs = np.array(boosted_file['run'])[mask]
                 filtered_lumis = np.array(boosted_file['luminosityBlock'])[mask]
@@ -529,9 +529,9 @@ class analysis(processor.ProcessorABC):
         #
         # Example of how to write out event numbers
         #
-        # from analysis.helpers.write_debug_info import add_debug_Run3_data_early
+        # from python.analysis.helpers.write_debug_info import add_debug_Run3_data_early
         # add_debug_Run3_data_early(event, processOutput)
-        #from analysis.helpers.write_debug_info import add_debug_Run3_data
+        #from python.analysis.helpers.write_debug_info import add_debug_Run3_data
         #add_debug_Run3_data(event, processOutput)
 
         selev = event[analysis_selections]
@@ -602,7 +602,7 @@ class analysis(processor.ProcessorABC):
         #
         # Example of how to write out event numbers
         #
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output
         # add_debug_info_to_output(event, processOutput, weights, list_weight_names, analysis_selections)
 
 

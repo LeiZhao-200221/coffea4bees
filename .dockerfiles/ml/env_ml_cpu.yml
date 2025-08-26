@@ -20,8 +20,8 @@ dependencies:
   - bokeh
   - graphviz
   - pip:
-      - graphviz
-      - pyvis
+    - graphviz
+    - pyvis
   - rich
   # parallel
   - dask
@@ -40,7 +40,7 @@ dependencies:
   - correctionlib
   # machine learning
   - pytorch::pytorch
-  - pytorch::cpuonly
+  - pytorch::cpuonly 
   # grid certificate
   - ca-policy-lcg
   # HTCondor
@@ -52,5 +52,5 @@ dependencies:
   - tini
   # DB
   - pip:
-      - dbs3-client
-      - rucio-clients
+    - dbs3-client
+    - rucio-clients

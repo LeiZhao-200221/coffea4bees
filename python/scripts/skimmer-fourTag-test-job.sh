@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy
@@ -14,12 +14,12 @@ fi
 
 echo "############### Changing metadata"
 if [[ $(hostname) = *fnal* ]]; then
-    sed -e "s#base_path.*#base_path: \/srv\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/2024_.*/tmp\//" skimmer/metadata/HH4b_fourTag.yml > ${OUTPUT_DIR}/tmp_fourTag.yml
+    sed -e "s#base_path.*#base_path: \/srv\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/2024_.*/tmp\//" python/skimmer/metadata/HH4b_fourTag.yml > ${OUTPUT_DIR}/tmp_fourTag.yml
 else
-    sed -e "s#base_.*#base_path: \/builds\/${CI_PROJECT_PATH}\/python\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/2024_.*/tmp\//" -e "s/T3_US_FNALLPC/T3_CH_PSI/" skimmer/metadata/HH4b_fourTag.yml > ${OUTPUT_DIR}/tmp_fourTag.yml
+    sed -e "s#base_.*#base_path: /builds/${CI_PROJECT_PATH}/${OUTPUT_DIR}/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/" -e "s/2024_.*/tmp\//" -e "s/T3_US_FNALLPC/T3_CH_PSI/" python/skimmer/metadata/HH4b_fourTag.yml > ${OUTPUT_DIR}/tmp_fourTag.yml
 fi
 cat ${OUTPUT_DIR}/tmp_fourTag.yml
 
 echo "############### Running test processor"
-python runner.py -s -p skimmer/processor/skimmer_4b.py -c ${OUTPUT_DIR}/tmp_fourTag.yml -y UL18 -d data -op ${OUTPUT_DIR} -o picoaod_datasets_fourTag_data_test_UL18.yml -m metadata/datasets_HH4b.yml 
+python runner.py -s -p python/skimmer/processor/skimmer_4b.py -c ${OUTPUT_DIR}/tmp_fourTag.yml -y UL18 -d data -op ${OUTPUT_DIR} -o picoaod_datasets_fourTag_data_test_UL18.yml -m python/metadata/datasets_HH4b.yml 
 

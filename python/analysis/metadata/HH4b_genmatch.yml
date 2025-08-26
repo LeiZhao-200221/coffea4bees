@@ -7,5 +7,3 @@ runner:
 #    - T2_US_Purdue
 #    - T2_CH_CSCS
 
-config:
-  corrections_metadata : "analysis/metadata/corrections.yml"

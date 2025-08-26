@@ -93,8 +93,8 @@ if __name__ == "__main__":
     # input parameters
     #
     parser = argparse.ArgumentParser(description='Run coffea processor', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-j', '--json_file', default="data/goldenJSON/Cert_Collisions2023_366442_370790_Golden.json", help='golden json.')
-    parser.add_argument('-y', '--yaml_file', default="skimmer/metadata/picoaod_datasets_data_2023_BPix.yml", help='skimmer output yaml.')
+    parser.add_argument('-j', '--json_file', default="base_class/data/goldenJSON/Cert_Collisions2023_366442_370790_Golden.json", help='golden json.')
+    parser.add_argument('-y', '--yaml_file', default="skimmer/python/metadata/picoaod_datasets_data_2023_BPix.yml", help='skimmer output yaml.')
     #parser.add_argument('-o', '--output_file', dest="output_file", default="datasets_HH4b_merged.yml", help='Output file.')
     #parser.add_argument('-f', '--files_to_add', nargs='+', dest="files_to_add", default=["datasets_HH4b.yml"], help='Files to add.')
     args = parser.parse_args()

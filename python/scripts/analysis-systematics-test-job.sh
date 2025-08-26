@@ -1,12 +1,12 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET:-"metadata/datasets_HH4b.yml"}
+DATASETS=${DATASET:-"python/metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${1:-"output"}/analysis_systematics_test_job"
@@ -16,16 +16,16 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Modifying corrections for ci"
-sed -e "/Absolute_/d" -e "/BBEC1/d" -e "/EC2/d" -e "/- HF/d" -e "/- Relative/d" -e "/- hf/d" -e "/- lf/d" analysis/metadata/corrections.yml > $OUTPUT_DIR/corrections_ci.yml
+sed -e "/Absolute_/d" -e "/BBEC1/d" -e "/EC2/d" -e "/- HF/d" -e "/- Relative/d" -e "/- hf/d" -e "/- lf/d" src/physics/corrections.yml > $OUTPUT_DIR/corrections_ci.yml
 cat $OUTPUT_DIR/corrections_ci.yml
 
 echo "############### Modifying config"
-sed -e "s#corrections_metadata:.*#corrections_metadata: $OUTPUT_DIR/corrections_ci.yml#" analysis/metadata/HH4b_systematics.yml > $OUTPUT_DIR/HH4b_systematics_ci.yml
+sed -e "s#corrections_metadata:.*#corrections_metadata: $OUTPUT_DIR/corrections_ci.yml#" python/analysis/metadata/HH4b_systematics.yml > $OUTPUT_DIR/HH4b_systematics_ci.yml
 cat $OUTPUT_DIR/HH4b_systematics_ci.yml
 
 echo "############### Running test processor"
-python runner.py -t -o test_systematics.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
-#python runner.py -t -o test_systematics_preUL.coffea -d HH4b -p analysis/processors/processor_HH4b.py -y 2018 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
-#python analysis/merge_coffea_files.py -f $OUTPUT_DIR/test_systematics_UL.coffea $OUTPUT_DIR/test_systematics_preUL.coffea -o $OUTPUT_DIR/test_systematics.coffea
+python runner.py -t -o test_systematics.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
+#python runner.py -t -o test_systematics_preUL.coffea -d HH4b -p python/analysis/processors/processor_HH4b.py -y 2018 -op $OUTPUT_DIR/ -m $DATASETS -c $OUTPUT_DIR/HH4b_systematics_ci.yml
+#python python/analysis/merge_coffea_files.py -f $OUTPUT_DIR/test_systematics_UL.coffea $OUTPUT_DIR/test_systematics_preUL.coffea -o $OUTPUT_DIR/test_systematics.coffea
 ls $OUTPUT_DIR
 

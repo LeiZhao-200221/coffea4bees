@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 import cloudpickle
 import fsspec
 import pandas as pd
-from base_class.system.eos import EOS
-from base_class.utils.argparser import DefaultFormatter
+from src.storage.eos import EOS
+from src.utils.argparser import DefaultFormatter
 from rich.logging import RichHandler
 
 from ..ikappa._sanity import group_by_categories, group_to_str

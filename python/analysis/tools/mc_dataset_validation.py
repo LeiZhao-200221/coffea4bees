@@ -160,7 +160,7 @@ class sanity_check:
 
 
 if __name__ == "__main__":
-    from base_class.utils.argparser import DefaultFormatter
+    from src.utils.argparser import DefaultFormatter
 
     logging.basicConfig(
         level=logging.INFO,
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         from lpcjobqueue import LPCCondorCluster
 
         cluster = LPCCondorCluster(
-            transfer_input_files=["analysis/"],
+            transfer_input_files=["python/analysis/"],
             shared_temp_directory="/tmp",
             cores=1,
             memory="2GB",
@@ -327,7 +327,7 @@ if __name__ == "__main__":
         else:
             logging.info(f"No outliers found for {k}")
 
-    from base_class.system.eos import EOS
+    from src.storage.eos import EOS
 
     output = EOS(args.output)
     yaml.SafeDumper.add_representer(

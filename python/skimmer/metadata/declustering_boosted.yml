@@ -15,7 +15,6 @@ runner:
     - base_class
     - analysis
     - skimmer
-    - data
     - jet_clustering        
     - classifier
   allowlist_sites:

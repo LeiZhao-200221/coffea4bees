@@ -1,12 +1,12 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 # Setup proxy if needed
 setup_proxy
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET:-"metadata/datasets_HH4b_v1p1.yml"}
+DATASETS=${DATASET:-"python/metadata/datasets_HH4b_v1p1.yml"}
 echo "Using datasets file: $DATASETS"
 
 INPUT_DIR="${1:-"output"}/SvB_friendtree_job"
@@ -18,13 +18,13 @@ fi
 
 echo "############### Modifying config"
 if [[ $(hostname) = *fnal* ]]; then
-    sed -e "s|# SvB: \"metadata.*|SvB: \/srv\/$INPUT_DIR\/make_friend_SvB.json@@SvB|" -e "s|# SvB_MA: \"metadata.*|SvB_MA: \/srv\/$INPUT_DIR\/make_friend_SvB.json@@SvB_MA|" -e "s|SvB   : 'analysis/.*||"  -e "s|SvB_MA: 'analysis/.*||" analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_signals.yml
+    sed -e "s|# SvB: \"metadata.*|SvB: \/srv\/$INPUT_DIR\/make_friend_SvB.json@@SvB|" -e "s|# SvB_MA: \"metadata.*|SvB_MA: \/srv\/$INPUT_DIR\/make_friend_SvB.json@@SvB_MA|" -e "s|SvB   : 'analysis/.*||"  -e "s|SvB_MA: 'analysis/.*||" python/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_signals.yml
 else
-    sed -e "s|# SvB: \"metadata.*|SvB: /builds/${CI_PROJECT_PATH}/python/$INPUT_DIR/make_friend_SvB.json@@SvB|" -e "s|# SvB_MA: \"metadata.*|SvB_MA: /builds/${CI_PROJECT_PATH}/python/$INPUT_DIR/make_friend_SvB.json@@SvB_MA|" -e "s|SvB   : 'analysis/.*||"  -e "s|SvB_MA: 'analysis/.*||"  analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_signals.yml
+    sed -e "s|# SvB: \"metadata.*|SvB: /builds/${CI_PROJECT_PATH}/$INPUT_DIR/make_friend_SvB.json@@SvB|" -e "s|# SvB_MA: \"metadata.*|SvB_MA: /builds/${CI_PROJECT_PATH}/$INPUT_DIR/make_friend_SvB.json@@SvB_MA|" -e "s|SvB   : 'analysis/.*||"  -e "s|SvB_MA: 'analysis/.*||"  python/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_signals.yml
 fi
 cat $OUTPUT_DIR/HH4b_signals.yml
 
 echo "############### Running test processor"
-python runner.py -t -o test_SvB_friend.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/HH4b_signals.yml -m $DATASETS
+python runner.py -t -o test_SvB_friend.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/HH4b_signals.yml -m $DATASETS
 ls -lR ${OUTPUT_DIR}
 

@@ -14,20 +14,21 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import Weights, PackedSelection
 
-from base_class.hist import Collection, Fill
-from base_class.physics.object import LorentzVector, Jet
+from src.hist import Collection, Fill
+from src.hist.object import LorentzVector, Jet
 
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
-from analysis.helpers.common import apply_btag_sf, update_events
-from analysis.helpers.truth_tools import find_genpart
+from src.physics.common import apply_btag_sf, update_events
+from python.analysis.helpers.truth_tools import find_genpart
 
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_selection
+from src.physics.event_selection import apply_event_selection
+from python.analysis.helpers.event_selection import apply_4b_selection
 
 import logging
 
-from base_class.root import TreeReader, Chunk
+from src.data_formats.root import TreeReader, Chunk
 
 #
 # Setup
@@ -41,7 +42,7 @@ class analysis(processor.ProcessorABC):
     def __init__(
         self,
         *,
-        corrections_metadata="analysis/metadata/corrections.yml",
+        corrections_metadata="src/physics/corrections.yml",
     ):
 
         logging.debug("\nInitialize Analysis Processor")

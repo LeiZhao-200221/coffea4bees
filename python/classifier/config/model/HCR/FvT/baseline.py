@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from classifier.config.setting.HCR import Input, MassRegion, Output
-from classifier.config.state.label import MultiClass
-from classifier.task import ArgParser
+from python.classifier.config.setting.HCR import Input, MassRegion, Output
+from python.classifier.config.state.label import MultiClass
+from python.classifier.task import ArgParser
 
 from .._HCR import ROC_BIN, HCREval, HCRTrain, roc_nominal_selection
 
 if TYPE_CHECKING:
-    from classifier.ml import BatchType
+    from python.classifier.ml import BatchType
 
 
 def _roc_data_selection(batch: BatchType):
@@ -59,7 +59,7 @@ class Train(HCRTrain):
 
     @property
     def rocs(self):
-        from classifier.ml.benchmarks.multiclass import ROC
+        from python.classifier.ml.benchmarks.multiclass import ROC
 
         rocs = [
             ROC(

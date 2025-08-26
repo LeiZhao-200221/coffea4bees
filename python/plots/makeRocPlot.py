@@ -15,9 +15,9 @@ import yaml
 import mplhep as hep  # HEP (CMS) extensions/styling on top of mpl
 
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, get_plot_dict_from_config
-import base_class.plots.iPlot_config as cfg
-import base_class.plots.helpers as plot_helpers
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args, get_plot_dict_from_config
+import src.plotting.iPlot_config as cfg
+import src.plotting.helpers as plot_helpers
 import copy
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     #
     #  K-lambda
     #
-    cfg.plotConfig = load_config("plots/metadata/plotsAll_klambda.yml")
+    cfg.plotConfig = load_config("plots/python/metadata/plotsAll_klambda.yml")
 
     makeRocPlot(cfg, plot_name="SvB_MA_ps_hh_kl",
                 vars_to_plot=[{"var":"SvB_MA.ps_hh_fine","name":"k-lambda -5",  "color": "blue",     "sig":["HH4b_kl-5"], "bkg":["TTbar","Multijet"],"year":"RunII"},

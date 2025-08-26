@@ -1,6 +1,6 @@
 #!/bin/bash
 # Source common functions
-source "base_class/scripts/common.sh"
+source "src/scripts/common.sh"
 
 
 INPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
@@ -13,18 +13,18 @@ fi
 ## In root envirornment
 
 echo "############### Convert json to root"
-python3 stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedData.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
-python3 stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_TT.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
-python3 stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_data_3b_for_mixed_kfold.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
-python3 stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_data_3b_for_mixed.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
-python3 stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testSignal_UL.json                  --output $OUTPUT_DIR --histos SvB_MA_ps_hh
+python3 python/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedData.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
+python3 python/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_TT.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
+python3 python/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_data_3b_for_mixed_kfold.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
+python3 python/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_data_3b_for_mixed.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
+python3 python/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testSignal_UL.json                  --output $OUTPUT_DIR --histos SvB_MA_ps_hh
 
 
 #
 # Test it with the
 #
 echo "############### Run test runTwoStageClosure"
-python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal  --do_CI \
+python3 python/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal  --do_CI \
     --input_file_data3b $OUTPUT_DIR/testMixedBkg_data_3b_for_mixed.root \
     --input_file_TT     $OUTPUT_DIR/testMixedBkg_TT.root \
     --input_file_mix    $OUTPUT_DIR/testMixedData.root \
@@ -32,7 +32,7 @@ python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --ou
     
 echo "############### Run test runTwoStageClosure kfold"
 ls -lrt $OUTPUT_DIR/
-python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal_kfold/  --do_CI --use_kfold  \
+python3 python/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal_kfold/  --do_CI --use_kfold  \
     --input_file_data3b $OUTPUT_DIR/testMixedBkg_data_3b_for_mixed_kfold.root \
     --input_file_TT     $OUTPUT_DIR/testMixedBkg_TT.root \
     --input_file_mix    $OUTPUT_DIR/testMixedData.root \
@@ -50,13 +50,13 @@ python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --ou
 #
 # Make the input with
 #
-#  python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 20 --outputPath stats_analysis/tests --skip_closure
+#  python3 python/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 20 --outputPath python/stats_analysis/tests --skip_closure
 
 mkdir -p $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/
-cp -r stats_analysis/tests/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/
+cp -r python/stats_analysis/tests/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/
 
-python3 stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR --reuse_inputs --do_CI
-python3 stats_analysis/tests/test_runTwoStageClosure.py --knownCounts stats_analysis/tests/known_twoStageClosure_counts_SvB_MA_ps_hh.yml --output_path $OUTPUT_DIR --inputFile $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root
+python3 python/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR --reuse_inputs --do_CI
+python3 python/stats_analysis/tests/test_runTwoStageClosure.py --knownCounts python/stats_analysis/tests/known_twoStageClosure_counts_SvB_MA_ps_hh.yml --output_path $OUTPUT_DIR --inputFile $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root
 
-python3 stats_analysis/tests/dumpTwoStageInputs.py --input $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root   --output $OUTPUT_DIR/test_dump_twoStageClosureInputsCounts.yml
+python3 python/stats_analysis/tests/dumpTwoStageInputs.py --input $OUTPUT_DIR/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/hists_closure_3bDvTMix4bDvT_SvB_MA_ps_hh_rebin1.root   --output $OUTPUT_DIR/test_dump_twoStageClosureInputsCounts.yml
 

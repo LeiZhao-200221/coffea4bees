@@ -1,4 +1,4 @@
-from classifier.task import GlobalState
+from python.classifier.task import GlobalState
 
 from ..setting import ml
 

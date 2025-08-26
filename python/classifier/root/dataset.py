@@ -3,14 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Callable, Iterable
 
-from base_class.root import Chunk, Friend
+from src.data_formats.root import Chunk, Friend
 
 from ..nn.dataset.evaluation import AddableResultLoader, EvalDataset
 
 if TYPE_CHECKING:
-    from base_class.root.chain import NameMapping
-    from base_class.root.io import RecordLike
-    from base_class.system.eos import PathLike
+    from src.data_formats.root.chain import NameMapping
+    from src.data_formats.root.io import RecordLike
+    from src.storage.eos import PathLike
 
     from ..ml import BatchType
 

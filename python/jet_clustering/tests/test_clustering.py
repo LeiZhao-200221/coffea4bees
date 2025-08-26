@@ -13,8 +13,8 @@ from copy import copy
 import os
 
 sys.path.insert(0, os.getcwd())
-from jet_clustering.clustering   import kt_clustering, cluster_bs, cluster_bs_fast, cluster_bs_numba
-from jet_clustering.declustering import compute_decluster_variables, decluster_combined_jets, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, children_jet_flavors, get_list_of_all_sub_splittings, get_list_of_combined_jet_types, get_splitting_summary, get_splitting_name
+from python.jet_clustering.clustering   import kt_clustering, cluster_bs, cluster_bs_fast, cluster_bs_numba
+from python.jet_clustering.declustering import compute_decluster_variables, decluster_combined_jets, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, children_jet_flavors, get_list_of_all_sub_splittings, get_list_of_combined_jet_types, get_splitting_summary, get_splitting_name
 
 #import vector
 #vector.register_awkward()
@@ -32,11 +32,11 @@ class clusteringTestCase(unittest.TestCase):
         #
         #  Read in the pdfs
         #
-        #  Make with ../.ci-workflows/synthetic-dataset-plot-job.sh
+        #  Make with ../python/scripts/synthetic-dataset-plot-job.sh
         # input_pdf_file_name = "analysis/plots_synthetic_datasets/clustering_pdfs.yml"
-        #input_pdf_file_name = "jet_clustering/jet-splitting-PDFs-00-07-00/clustering_pdfs_vs_pT.yml"
-        input_pdf_file_name = "jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_UL18.yml"
-        #input_pdf_file_name = "jet_clustering/clustering_PDFs/clustering_pdfs_vs_pT.yml"
+        #input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-07-00/clustering_pdfs_vs_pT.yml"
+        input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_UL18.yml"
+        #input_pdf_file_name = "python/jet_clustering/clustering_PDFs/clustering_pdfs_vs_pT.yml"
         with open(input_pdf_file_name, 'r') as input_file:
             self.input_pdfs = yaml.safe_load(input_file)
 
