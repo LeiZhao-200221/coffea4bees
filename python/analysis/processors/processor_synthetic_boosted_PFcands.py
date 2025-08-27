@@ -127,47 +127,47 @@ class analysis(processor.ProcessorABC):
             sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau3")
 
 
-        subjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
+        fatjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
                           "i0" : sorted_sub_jets[:, :, 0],
                           "i1" : sorted_sub_jets[:, :, 1],
                           } )
 
         # Calculate di-jet variables
-        subjets["p", "st"]   = subjets.i0.pt + subjets.i1.pt
-        subjets["p", "dr"]   = subjets.i0.delta_r(subjets.i1)
-        subjets["p", "dphi"] = subjets.i0.delta_phi(subjets.i1)
+        fatjets["p", "st"]   = fatjets.i0.pt + fatjets.i1.pt
+        fatjets["p", "dr"]   = fatjets.i0.delta_r(fatjets.i1)
+        fatjets["p", "dphi"] = fatjets.i0.delta_phi(fatjets.i1)
 
 
         # Define the tau21 variable for each subjet
-        subjets["i0", "tau21"] = subjets.i0.tau2 / (subjets.i0.tau1 + 0.001)
-        subjets["i1", "tau21"] = subjets.i1.tau2 / (subjets.i1.tau1 + 0.001)
+        fatjets["i0", "tau21"] = fatjets.i0.tau2 / (fatjets.i0.tau1 + 0.001)
+        fatjets["i1", "tau21"] = fatjets.i1.tau2 / (fatjets.i1.tau1 + 0.001)
 
-        subjets["i0", "tau32"] = subjets.i0.tau3 / (subjets.i0.tau2 + 0.001)
-        subjets["i1", "tau32"] = subjets.i1.tau3 / (subjets.i1.tau2 + 0.001)
+        fatjets["i0", "tau32"] = fatjets.i0.tau3 / (fatjets.i0.tau2 + 0.001)
+        fatjets["i1", "tau32"] = fatjets.i1.tau3 / (fatjets.i1.tau2 + 0.001)
 
         # Dummy
-        subjets["i0", "btag_string"] = "0.001"
-        subjets["i1", "btag_string"] = "0.001"
+        fatjets["i0", "btag_string"] = "0.001"
+        fatjets["i1", "btag_string"] = "0.001"
 
 
         # Define the jet flavor for each subjet
-        subjets["i0", "jet_flavor"] = ak.where(subjets.i0.tau21 > 0.5, "b", "bj")
-        subjets["i1", "jet_flavor"] = ak.where(subjets.i1.tau21 > 0.5, "b", "bj")
+        fatjets["i0", "jet_flavor"] = ak.where(fatjets.i0.tau21 > 0.5, "b", "bj")
+        fatjets["i1", "jet_flavor"] = ak.where(fatjets.i1.tau21 > 0.5, "b", "bj")
 
         # Swap if i1 more complex than i0
-        i1_more_complex = (subjets.i1.jet_flavor == "bj") & (subjets.i0.jet_flavor == "b")
+        i1_more_complex = (fatjets.i1.jet_flavor == "bj") & (fatjets.i0.jet_flavor == "b")
 
-        subjets["iA"] = ak.where(i1_more_complex, subjets.i1, subjets.i0)
-        subjets["iB"] = ak.where(i1_more_complex, subjets.i0, subjets.i1)
+        fatjets["iA"] = ak.where(i1_more_complex, fatjets.i1, fatjets.i0)
+        fatjets["iB"] = ak.where(i1_more_complex, fatjets.i0, fatjets.i1)
 
-        # print(f"Subjets: {subjets.fields}")
-        # print(f"  iA flavor: {subjets.iA.jet_flavor[0:10]}")
-        # print(f"  iB flavor: {subjets.iA.jet_flavor[0:10]}")
+        # print(f"Fatjets: {fatjets.fields}")
+        # print(f"  iA flavor: {fatjets.iA.jet_flavor[0:10]}")
+        # print(f"  iB flavor: {fatjets.iA.jet_flavor[0:10]}")
 
         #
         #  Set the jet flavor for the combined fat jet
         #
-        C = [comb_jet_flavor(a, b) for a, b in zip(ak.flatten(subjets.iA.jet_flavor), ak.flatten(subjets.iB.jet_flavor))]
+        C = [comb_jet_flavor(a, b) for a, b in zip(ak.flatten(fatjets.iA.jet_flavor), ak.flatten(fatjets.iB.jet_flavor))]
         fatjet_flavor_flat = np.array(C)
         selev["selFatJet", "jet_flavor"] = ak.unflatten(fatjet_flavor_flat, ak.num(selev.selFatJet))
 
@@ -204,9 +204,26 @@ class analysis(processor.ProcessorABC):
         print(f" PFCands for FatJet1 {selev.PFCands[PFCandIndex_FatJet1].pdgId.tolist()}\n")
         #print(f" PFCands for FatJet1 {selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx.tolist()}\n")
 
-        print(type(selev.selFatJet),"\n")
-        #subjets["PFCand0"] = selev.PFCands[PFCandIndex_FatJet0]
-        #subjets["PFCand1"] = selev.PFCands[PFCandIndex_FatJet1]
+        PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
+        fatjets["PFCands"] = PFCands_perFatJet
+
+        print("Test",fatjets.PFCands[:, :, 0].pdgId.tolist(),"\n")
+        fatjets["PFCands0"] = fatjets.PFCands[:, :, 0]
+
+
+
+        print(f" nPFCands_perFatJet {ak.num(fatjets.PFCands)}\n")
+        print(f" np {ak.num(fatjets.p)}\n")
+        #print(f" nPFCandsR {ak.num(selev.PFCands[result])}\n")
+        #print(f" PFCandsR pdgId {selev.PFCands[result].pdgId.tolist()}\n")
+
+        print(f" PFCands0 index {PFCandIndex_FatJet0.tolist()}\n")
+        print(f" nPFCands0 {ak.num(selev.PFCands[PFCandIndex_FatJet0])}\n")
+
+        #print(type(selev.selFatJet),"\n")
+        #selev.PFCands[PFCandIndex_FatJet0]
+
+        #fatjets["PFCand1"] = selev.PFCands[PFCandIndex_FatJet1]
         selev["selFatJet_PFCand0"] = selev.PFCands[PFCandIndex_FatJet0]
 
 ###        #
@@ -228,9 +245,9 @@ class analysis(processor.ProcessorABC):
 
 
         #
-        #  Add the subjets to the event
+        #  Add the fatjets to the event
         #
-        selev["subjets"] = subjets
+        selev["fatjets"] = fatjets
 
 
         #print(f" PFCands for FatJet1 {selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx.tolist()}\n")
@@ -241,7 +258,7 @@ class analysis(processor.ProcessorABC):
         #print(f" Any passHLT: {ak.any(selev.passHLT)}")
         #print(f" FatJet pt: {selev.selFatJet.pt}")
         #
-        #print(f" nSubJets: {ak.num(selev.selFatJet.subjets, axis=2)}")
+        #print(f" nFatjets: {ak.num(selev.selFatJet.fatjets, axis=2)}")
         #print(f" subjet pt: {selev.selFatJet.pt[0:10]}")
 
 
@@ -295,13 +312,18 @@ class analysis(processor.ProcessorABC):
             i0 = Jet.plot(('...', R'subjet 0'), 'i0',     skip=['deepjet_c','n'], bins={"mass": (100, 0, 200), "pt": (50, 100, 1000)})
             i1 = Jet.plot(('...', R'subjet 1'), 'i1',     skip=['deepjet_c','n'], bins={"mass": (50, 0, 100)})
 
+            pf = PFCand.plot(('...', R'PFCands in selected fat jet'), "PFCands0",   skip=[],
+                             bins={"pt":   (50, 0, 10), "mass": (50, 0, 0.2)}
+                             )
+
+
 
         fill += PFCand.plot(("PFCand0", "PFCands in Selected Fat Jet0"),        "selFatJet_PFCand0",           skip=[],
                             bins={"pt":   (50, 0, 10), "mass": (50, 0, 0.2)}
                             )
 
 
-        fill += FatJetHists(('fatJets', R''), 'subjets')
+        fill += FatJetHists(('fatJets', R''), 'fatjets')
         #trkPt
         #print("fields",selev["selFatJet_PFCand0"].fields,"\n")
 
