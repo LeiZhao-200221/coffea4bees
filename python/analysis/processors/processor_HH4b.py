@@ -12,7 +12,7 @@ import yaml
 import gc
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
@@ -611,7 +611,7 @@ class analysis(processor.ProcessorABC):
             })
             sel_dict['passJetMult'] = selections.all(*allcuts)
 
-            self._cutFlow = cutFlow(do_truth_hists=self.config["isSignal"])
+            self._cutFlow = cutflow_4b(do_truth_hists=self.config["isSignal"])
             for cut, sel in sel_dict.items():
                 self._cutFlow.fill( cut, event[sel], allTag=True )
                 self._cutFlow.fill( f"{cut}_woTrig", event[sel], allTag=True,
