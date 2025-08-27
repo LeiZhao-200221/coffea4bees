@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import yaml
 from src.physics.objects.jet_corrections import apply_jerc_corrections
-from analysis.helpers.mc_weight_outliers import OutlierByMedian
+from src.skimmer.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
 from analysis.helpers.event_selection import apply_boosted_4b_selection
 from src.physics.event_selection import apply_event_selection

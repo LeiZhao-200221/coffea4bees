@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 import yaml
-from analysis.helpers.mc_weight_outliers import OutlierByMedian
+from src.skimmer.mc_weight_outliers import OutlierByMedian
 from analysis.helpers.processor_config import processor_config
 from coffea.analysis_tools import PackedSelection, Weights
 from src.skimmer.picoaod import PicoAOD
