@@ -383,9 +383,8 @@
 '2023_BPix':
   year_label: '2023'
   goldenJSON: 'src/data/goldenJSON/Cert_Collisions2023_366442_370790_Golden.json'
-  PU: 
-    file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2023_Summer23BPix/puWeights.json.gz'
-    tag: Collisions2023_369803_370790_eraD_GoldenJson
+  PU: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/LUM/2023_Summer23BPix/puWeights.json.gz'
+
   ele_sf: 
     file: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23BPix/electron.json.gz'
     HLT: '/cvmfs/cms.cern.ch/rsync/cms-nanoAOD/jsonpog-integration/POG/EGM/2023_Summer23BPix/electronHlt.json.gz'
