@@ -2,13 +2,12 @@ import yaml
 from src.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 from collections import OrderedDict
-from analysis.helpers.cutflow import cutFlow
 
 from python.jet_clustering.declustering import make_synthetic_event
+from python.analysis.helpers.cutflow import cutflow_4b
 
 from src.math.random import Squares
 from src.physics.event_selection import apply_event_selection
-
 
 from src.data_formats.root import Chunk, TreeReader
 from analysis.helpers.load_friend import (
@@ -44,6 +43,7 @@ class DeClustererBoosted(PicoAOD):
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]
+        self.cutFlow = cutflow_4b()
 
 
     def select(self, event):
@@ -113,7 +113,6 @@ class DeClustererBoosted(PicoAOD):
         })
         #sel_dict['passJetMult'] = selections.all(*allcuts)
 
-        self.cutFlow = cutFlow()
         for cut, sel in sel_dict.items():
             self.cutFlow.fill( cut, event[sel], allTag=True )
 
