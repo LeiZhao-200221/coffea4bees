@@ -28,6 +28,7 @@ import uproot
 import fsspec
 import psutil
 import yaml
+from omegaconf import OmegaConf
 from src.addhash import get_git_diff, get_git_revision_hash
 from coffea import processor
 from coffea.dataset_tools import rucio_utils
@@ -837,7 +838,14 @@ if __name__ == '__main__':
         configs['config']['run_systematics'] = args.systematics
 
     logging.info(f"Loading datasets metadata from: {args.metadata}")
-    datasets = yaml.safe_load(open(args.metadata, 'r'))
+    # load all .yml files in given metadata directory
+    if os.path.isdir(args.metadata):
+        files= [OmegaConf.load(os.path.join(args.metadata, f)) for f in os.listdir(args.metadata) if f.endswith(('.yaml', '.yml'))]
+        datasets = OmegaConf.to_container(OmegaConf.create({'datasets': OmegaConf.merge(*files)}), resolve=True)
+    else:   
+        #backward compatibility if .yml file is directly provided
+        datasets = yaml.safe_load(open(args.metadata, 'r'))
+
     
     logging.info(f"Loading triggers metadata from: {args.triggers}")
     triggers = yaml.safe_load(open(args.triggers, 'r'))
