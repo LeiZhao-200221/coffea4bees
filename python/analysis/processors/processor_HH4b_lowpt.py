@@ -11,7 +11,7 @@ import numpy as np
 import yaml
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
