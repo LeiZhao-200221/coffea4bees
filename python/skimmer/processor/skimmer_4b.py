@@ -14,7 +14,14 @@ from python.analysis.helpers.cutflow import cutflow_4b
 
 
 class Skimmer(PicoAOD):
-    def __init__(self, loosePtForSkim=False, skim4b=False, mc_outlier_threshold=200, corrections_metadata=None, cutflow_class=None, *args, **kwargs):
+    def __init__(
+            self, 
+            loosePtForSkim=False, 
+            skim4b=False, 
+            mc_outlier_threshold=200, 
+            corrections_metadata=None,
+            *args, **kwargs
+        ):
         if skim4b:
             kwargs["pico_base_name"] = f'picoAOD_fourTag'
         super().__init__(*args, **kwargs)
@@ -23,9 +30,7 @@ class Skimmer(PicoAOD):
         self.corrections_metadata = corrections_metadata if corrections_metadata is not None else {}
         self.mc_outlier_threshold = mc_outlier_threshold
         # Always use cutflow_4b unless explicitly overridden
-        if cutflow_class is None:
-            cutflow_class = cutflow_4b
-        self._cutFlow = cutflow_class()
+        self._cutFlow = cutflow_4b()
 
     def select(self, events):
         year    = events.metadata['year']

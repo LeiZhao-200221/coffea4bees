@@ -10,10 +10,15 @@ from src.physics.event_selection import apply_event_selection
 
 from coffea.analysis_tools import PackedSelection, Weights
 from src.skimmer.picoaod import PicoAOD
-
+from python.analysis.helpers.cutflow import cutflow_4b
 
 class Skimmer(PicoAOD):
-    def __init__(self, mc_outlier_threshold:int|None=200, corrections_metadata: dict = None, *args, **kwargs):
+    def __init__(
+            self, 
+            mc_outlier_threshold:int|None=200, 
+            corrections_metadata: dict = None, 
+            *args, **kwargs
+        ):
 
         super().__init__(*args, **kwargs)
         self.corrections_metadata = corrections_metadata
@@ -24,6 +29,7 @@ class Skimmer(PicoAOD):
             "passBoostedSel",
         ]
         self.mc_outlier_threshold = mc_outlier_threshold
+        self._cutFlow = cutflow_4b()
         logging.debug(f'Initialized processor with variables: {self.__dict__}')
 
 
