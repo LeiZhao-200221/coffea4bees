@@ -137,22 +137,6 @@ Directory names reflect what users are trying to accomplish, not technical imple
 ### 4. **Independent Base Components**
 Components in this library should be independent of higher-level analysis code and reusable across different physics analyses.
 
-## Migration from Previous Structure
-
-### Import Path Changes
-The following import paths have changed for better organization:
-
-| Old Import Path | New Import Path | Deprecation Shim |
-|---|---|---|
-| `base_class.awkward` | `base_class.data_formats.awkward` | ✅ Available |
-| `base_class.numpy` | `base_class.data_formats.numpy` | ✅ Available |
-| `base_class.root` | `base_class.data_formats.root` | ✅ Available |
-| `base_class.system` | `base_class.storage` | ✅ Available |
-| `base_class.plots` | `base_class.plotting` | ✅ Available |
-
-### Backward Compatibility
-Deprecation shims are provided for all moved modules. Old import paths will continue to work but will issue `DeprecationWarning`s. Update your imports to the new paths to remove warnings.
-
 ## Common Usage Patterns
 
 ### Reading ROOT Files

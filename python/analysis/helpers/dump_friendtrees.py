@@ -1,5 +1,5 @@
 import awkward as ak
-import src.awkward as akext
+import src.data_formats.awkward as akext
 import numpy as np
 from src.data_formats.root import Chunk, Friend
 from src.storage.eos import PathLike

@@ -1,7 +1,7 @@
 from numbers import Real
 from typing import Iterable
 
-import src.numpy as npext
+import src.data_formats.numpy as npext
 import numpy as np
 import torch
 import torch.types as tt
