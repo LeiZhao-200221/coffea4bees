@@ -50,7 +50,7 @@ rule limits:
             {params.set_parameters_zero} \
             {params.freeze_parameters} \
             -n _{params.signallabel}" \
-            2>&1 | tee -a $LOG $(basename {output.txt})
+            2>&1 | tee -a $LOG {output.txt}
 
         echo "[$(date)] Running CollectLimits" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
@@ -83,7 +83,7 @@ rule significance:
             {params.freeze_parameters} \
             --redefineSignalPOIs r{params.signallabel} \
             -n _{params.signallabel}" \
-            2>&1 | tee -a $LOG 
+            2>&1 | tee -a $LOG {output}
 
         echo "[$(date)] Running expected significance" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
@@ -93,7 +93,7 @@ rule significance:
             {params.freeze_parameters} \
             -n _{params.signallabel} \
             -t -1 --expectSignal=1" \
-            2>&1 | tee -a $LOG 
+            2>&1 | tee -a $LOG {output}
 
         echo "[$(date)] Completed significance rule with signal {params.signallabel}" >> $LOG
         """
@@ -162,37 +162,34 @@ rule impacts:
         {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M Impacts -d $(basename {input}) \
             --doInitialFit --robustFit 1 -m 125 \
-            --setParametersRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
+            --setParameterRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
             {params.set_parameters_zero} \
-            -n $(basename {input} .root)_{params.signallabel}" 2>&1 | tee -a $LOG
+            -n $(basename {input} .root)" 2>&1 | tee -a $LOG
 
         echo "|---- Running fits per systematic"
         echo "[$(date)] Running fits per systematic" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M Impacts -d $(basename {input}) \
             --doFits --robustFit 1 -m 125 --parallel 4 \
-            --setParametersRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
+            --setParameterRanges r{params.signallabel}=-10,10{params.set_parameters_ranges} \
             {params.set_parameters_zero} \
-            -n $(basename {input} .root)_{params.signallabel}" 2>&1 | tee -a $LOG
+            -n $(basename {input} .root)" 2>&1 | tee -a $LOG
 
         echo "|---- Running merging results"
         echo "[$(date)] Running merging results" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M Impacts \
-            -m 125 -n $(basename {input} .root)_{params.signallabel} \
+            -m 125 -n $(basename {input} .root) \
             -d $(basename {input}) \
-            -o impacts_combine_$(basename {input} .root)_{params.signallabel}_exp.json" 2>&1 | tee -a $LOG
+            -o impacts_combine_$(basename {input} .root)_exp.json" 2>&1 | tee -a $LOG
             
         echo "|---- Running creating pdf"
         echo "[$(date)] Running creating pdf" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
-            plotImpacts.py -i impacts_combine_$(basename {input} .root)_{params.signallabel}_exp.json \
+            plotImpacts.py -i impacts_combine_$(basename {input} .root)_exp.json \
             -o $(basename {output} .pdf) \
             --POI r{params.signallabel} \
             --per-page 20 --left-margin 0.3 --height 400 --label-size 0.04" 2>&1 | tee -a $LOG
-
-        echo "[$(date)] Cleaning up temporary files" >> $LOG
-        rm $(dirname {input})/higgsCombine_*Fit* 2>&1 | tee -a $LOG
 
         echo "[$(date)] Completed impacts rule with signal {params.signallabel}" >> $LOG
         """
@@ -218,7 +215,7 @@ rule gof:
             --algo saturated \
             {params.set_parameters_zero} \
             -n _$(basename {input} .root)_{params.signallabel}_gof_data" \
-            2>&1 | tee -a $LOG gof_data_$(basename {input} .root)_{params.signallabel}.txt
+            2>&1 | tee -a $LOG $(dirname {output})/gof_data_$(basename {input} .root)_{params.signallabel}.txt
 
         echo "|---- Running Goodness of Fit tests toys"
         echo "[$(date)] Running Goodness of Fit tests toys" >> $LOG
@@ -226,15 +223,15 @@ rule gof:
             combine -M GoodnessOfFit $(basename {input}) \
             --toysFrequentist -t 500 --algo saturated  \
             -n _$(basename {input} .root)_{params.signallabel}_gof_toys" \
-            2>&1 | tee -a $LOG gof_toys_$(basename {input} .root)_{params.signallabel}.txt
-            
+            2>&1 | tee -a $LOG $(dirname {output})/gof_toys_$(basename {input} .root)_{params.signallabel}.txt
+
         echo "|---- Collecting Goodness of Fit results"
         echo "[$(date)] Collecting Goodness of Fit results" >> $LOG
         {params.container_wrapper} "cd $(dirname {input}) &&\
             combineTool.py -M CollectGoodnessOfFit \
             --input higgsCombine_$(basename {input} .root)_{params.signallabel}_gof_data.GoodnessOfFit.mH120.root \
-            higgsCombine_$(basename {input} .root)_{params.signallabel}_gof_toys.GoodnessOfFit.mH120.123456.root" \
-            -o gof_$(basename {input} .root)_{params.signallabel}.json 2>&1 | tee -a $LOG
+            higgsCombine_$(basename {input} .root)_{params.signallabel}_gof_toys.GoodnessOfFit.mH120.123456.root \
+            -o gof_$(basename {input} .root)_{params.signallabel}.json" 2>&1 | tee -a $LOG
             
         echo "|---- Plotting Goodness of Fit results"
         echo "[$(date)] Plotting Goodness of Fit results" >> $LOG
@@ -268,7 +265,6 @@ rule postfit:
             combine -M FitDiagnostics $(basename {input}) \
             --redefineSignalPOIs r{params.signallabel} \
             {params.set_parameters_zero} \
-            --setParameters r{params.signallabel}=0 \
             {params.freeze_parameters} \
             -n _$(basename {input} .root)_prefit_bonly \
             --saveShapes --saveWithUncertainties --plots" 2>&1 | tee -a $LOG
@@ -303,11 +299,11 @@ rule postfit:
         echo "[$(date)] Running postfit plots for b-only" >> $LOG
 
         {params.container_wrapper} \
-            python3 plots/make_postfit_plot.py \
+            python3 python/plots/make_postfit_plot.py \
                 -i $(dirname {input})/fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
                 -o $(dirname {input})/plots/ \
                 -s {params.signal} \
-                -m stats_analysis/metadata/{params.channel}.yml
+                -m python/stats_analysis/metadata/{params.channel}.yml
 
         echo "[$(date)] Completed postfit rule with signal {params.signallabel}" >> $LOG
         """
