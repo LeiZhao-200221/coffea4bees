@@ -146,7 +146,7 @@ rule make_syst_plots:
             python3 python/plots/make_syst_plots.py \
                 -i {params.output_dir}/shapes.root \
                 -o {params.output_dir}/systs/ \
-                -d {input} -c {params.channel} \
+                -d $(basename {input} .root).txt -c {params.channel} \
                 -s {params.signal} \
                 -m python/stats_analysis/metadata/{params.channel}.yml \
                 --variable {params.variable} 2>&1 | tee -a {log}

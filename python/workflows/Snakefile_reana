@@ -21,6 +21,7 @@ include: "helpers/common.smk"
 
 hash = config['extra_arguments'].split("--githash ")[1]
 EOS_OUTPUT = f"/eos/user/a/algomez/work/HH4b/reana/{datetime.now().strftime('%Y%m%d')}_{hash}/"
+OUTPUT_PATH = config['output_path']
 
 # Filter dataset_systematics by signal type
 hh4b_datasets = [d for d in config['dataset_systematics'] if d.startswith('GluGlu')]
@@ -55,16 +56,17 @@ rule final_rule:
         f"{config['output_path']}/datacards/ZH4b/plots/postfitplots__ZH_bbbb__prefit.pdf",
         f"{config['output_path']}/datacards/ZZ4b/plots/postfitplots__ZZ_bbbb__prefit.pdf",
         f"{config['output_path']}/datacards/HH4b/plots/postfitplots__ggHH_kl_1_kt_1_13p0TeV_hbbhbb__prefit.pdf",
-        # f"{config['output_path']}/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf",
-        # f"{config['output_path']}/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf",
-        # f"{config['output_path']}/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf"
+        f"{config['output_path']}/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf",
+        f"{config['output_path']}/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf",
+        f"{config['output_path']}/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf"
     container: config["analysis_container"]
     resources:
         voms_proxy=True,
         kerberos=True,
     shell: 
         """
-        cp gitdiff.txt output/
+        rm -rf {OUTPUT_PATH}/datacards/*/higgsCombine_*
+        cp gitdiff.txt {OUTPUT_PATH}
         echo "Copying output to cernbox"
         python src/plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
         mkdir -p {EOS_OUTPUT}
@@ -632,7 +634,7 @@ use rule gof from combine as gof with:
     log: f"{config['output_path']}/logs/gof_{{channel}}_datacard_{{channel}}__{{signallabel}}.log"
 
 use rule make_syst_plots from stat_analysis as make_syst_plots_HH4b with:
-    input: f"{config['output_path']}/datacards/HH4b/datacard__ggHH_kl_1_kt_1_13p0TeV_hbbhbb.txt"
+    input: f"{config['output_path']}/datacards/HH4b/datacard__ggHH_kl_1_kt_1_13p0TeV_hbbhbb.root"
     output: f"{config['output_path']}/datacards/HH4b/systs/SvB_MA_ps_hh_nominal.pdf"
     container: config["combine_container"]
     log: f"{config['output_path']}/logs/make_syst_plots_HH4b.log"
@@ -648,7 +650,7 @@ use rule make_syst_plots from stat_analysis as make_syst_plots_HH4b with:
         kubernetes_memory_limit="8Gi"
 
 use rule make_syst_plots_HH4b as make_syst_plots_ZZ4b with:
-    input: f"{config['output_path']}/datacards/ZZ4b/datacard__ZZ_bbbb.txt"
+    input: f"{config['output_path']}/datacards/ZZ4b/datacard__ZZ_bbbb.root"
     output: f"{config['output_path']}/datacards/ZZ4b/systs/SvB_MA_ps_zz_nominal.pdf"
     params:
         variable="SvB_MA_ps_zz",
@@ -659,7 +661,7 @@ use rule make_syst_plots_HH4b as make_syst_plots_ZZ4b with:
     log: f"{config['output_path']}/logs/make_syst_plots_ZZ4b.log"
 
 use rule make_syst_plots_HH4b as make_syst_plots_ZH4b with:
-    input: f"{config['output_path']}/datacards/ZH4b/datacard__ZH_bbbb.txt"
+    input: f"{config['output_path']}/datacards/ZH4b/datacard__ZH_bbbb.root"
     output: f"{config['output_path']}/datacards/ZH4b/systs/SvB_MA_ps_zh_nominal.pdf"
     params:
         variable="SvB_MA_ps_zh",
