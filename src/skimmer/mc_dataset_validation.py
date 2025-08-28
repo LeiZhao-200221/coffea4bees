@@ -11,7 +11,7 @@ from dask.delayed import delayed
 from dask.distributed import Client, LocalCluster
 from rich.logging import RichHandler
 
-from ..helpers.mc_weight_outliers import OutlierByMedian
+from mc_weight_outliers import OutlierByMedian
 
 _NANOAOD = "nanoAOD"
 
