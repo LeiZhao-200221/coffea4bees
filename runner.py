@@ -4,11 +4,6 @@ import argparse
 import sys
 from pathlib import Path
 
-# Add python directory to sys.path for classifier imports
-_root_path = Path(__file__).parent
-if str(_root_path / "python") not in sys.path:
-    sys.path.insert(0, str(_root_path / "python"))
-
 import yaml
 import importlib
 import json
