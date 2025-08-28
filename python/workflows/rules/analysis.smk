@@ -118,5 +118,5 @@ rule make_plots:
         mkdir -p $MPLCONFIGDIR
         
         echo "Making plots" 2>&1 | tee -a {log}
-        python plots/makePlots.py {input} -o {params.output_dir} -m plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
+        python python/plots/makePlots.py {input} -o {params.output_dir} -m python/plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
         """
