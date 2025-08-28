@@ -39,7 +39,7 @@ rule analysis_processor:
         
         # Set up performance monitoring
         mprofile_dat="/tmp/{params.username}/mprofile_$(basename {log} .log).dat"
-        mprofile_png="$(dirname {output})/performance/mprofile_$(basename {log} .log).png"
+        mprofile_png="output/performance/mprofile_$(basename {log} .log).png"
         
         # Run analysis with optional performance monitoring
         cmd="python runner.py -d {params.datasets} -p {params.processor} -y {params.years} -o $(basename {output}) -op $(dirname {output})/ -m {params.datasets_file} -c $meta_tmp {params.extra_arguments}"
@@ -53,7 +53,7 @@ rule analysis_processor:
         # Generate performance plot if requested
         if [ "{params.run_performance}" = "True" ]; then
             echo "Running performance analysis" 2>&1 | tee -a {log}
-            mkdir -p $(dirname {output})/performance/
+            mkdir -p output/performance/
             mprof plot -o $mprofile_png $mprofile_dat 2>&1 | tee -a {log}
         fi
         """
@@ -118,5 +118,5 @@ rule make_plots:
         mkdir -p $MPLCONFIGDIR
         
         echo "Making plots" 2>&1 | tee -a {log}
-        python plots/makePlots.py {input} -o {params.output_dir} -m plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
+        python python/plots/makePlots.py {input} -o {params.output_dir} -m python/plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
         """

@@ -4,11 +4,6 @@ import argparse
 import sys
 from pathlib import Path
 
-# Add python directory to sys.path for classifier imports
-_root_path = Path(__file__).parent
-if str(_root_path / "python") not in sys.path:
-    sys.path.insert(0, str(_root_path / "python"))
-
 import yaml
 import importlib
 import json
@@ -456,7 +451,7 @@ def setup_config_defaults(config_runner, args):
         'class_name': 'analysis',
         'condor_cores': 2,
         'condor_memory': '4GB',
-    'condor_transfer_input_files': ['python/', 'src/', 'classifier/', 'skimmer/'],
+        'condor_transfer_input_files': ['python/', 'src/'],
         'min_workers': 1,
         'max_workers': 100,
         'workers': 2,

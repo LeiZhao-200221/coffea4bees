@@ -10,7 +10,7 @@ rule convert_hist_to_json:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting convert_hist_to_json for {input}" > {log}
-        python stats_analysis/convert_hist_to_json.py -o {output} -i {input} {params.syst_flag} 2>&1 | tee -a {log}
+        python python/stats_analysis/convert_hist_to_json.py -o {output} -i {input} {params.syst_flag} 2>&1 | tee -a {log}
         echo "[$(date)] Completed convert_hist_to_json for {input}" >> {log}
         """
 
@@ -24,7 +24,7 @@ rule convert_hist_to_json_closure:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting convert_hist_to_json_closure" > {log}
-        python stats_analysis/convert_hist_to_json_closure.py -o {output} -i {input} 2>&1 | tee -a {log}
+        python python/stats_analysis/convert_hist_to_json_closure.py -o {output} -i {input} 2>&1 | tee -a {log}
         echo "[$(date)] Completed convert_hist_to_json_closure" >> {log}
         """
 
@@ -115,7 +115,7 @@ rule make_combine_inputs:
             --output_dir {params.output_dir} \
             --rebin {params.rebin} \
             {params.variable_binning} \
-            --metadata stats_analysis/metadata/{params.signal}.yml \
+            --metadata python/stats_analysis/metadata/{params.signal}.yml \
             {params.stat_only} 2>&1 | tee -a {log}
             
         echo "[$(date)] Combining datacards" | tee -a {log}
@@ -133,15 +133,22 @@ rule make_syst_plots:
     params:
         variable="{variable}",
         output_dir="{output_dir}",
+        channel="{channel}",
+        signal="{signal}",
         container_wrapper = config.get("container_wrapper", "./run_container combine")
     log: "logs/make_syst_plots_{variable}.log"
     shell:
         """
         mkdir -p $(dirname {log})
         echo "[$(date)] Starting make_syst_plots for {params.variable}" > {log}
-        echo "Making syst plots" 2>&1 | tee -a ../{log}
+        echo "Making syst plots" 2>&1 | tee -a {log}
         {params.container_wrapper} \
-        python3 python/plots/make_syst_plots.py \
-        -i {params.output_dir}/shapes.root -o {params.output_dir}/systs/ -d {input} --variable {params.variable} 2>&1 | tee -a ../{log}
-        echo "[$(date)] Completed make_syst_plots for {params.variable}" >> ../{log}
+            python3 python/plots/make_syst_plots.py \
+                -i {params.output_dir}/shapes.root \
+                -o {params.output_dir}/systs/ \
+                -d $(basename {input} .root).txt -c {params.channel} \
+                -s {params.signal} \
+                -m python/stats_analysis/metadata/{params.channel}.yml \
+                --variable {params.variable} 2>&1 | tee -a {log}
+        echo "[$(date)] Completed make_syst_plots for {params.variable}" >> {log}
         """
