@@ -96,7 +96,7 @@ class Skimmer(PicoAOD):
         # print(f"debug {debug_event.passHLT} {debug_event.passJetMult} {debug_event.passPreSel} {debug_event.Jet.pt} {debug_event.Jet.pt_raw} \n\n\n")
 
         processOutput = {}
-        #from analysis.helpers.write_debug_info import add_debug_Run3_data_skim
+        #from python.analysis.helpers.write_debug_info import add_debug_Run3_data_skim
         #add_debug_Run3_data_skim(event, processOutput, selection)
 
         return final_selection, None, processOutput

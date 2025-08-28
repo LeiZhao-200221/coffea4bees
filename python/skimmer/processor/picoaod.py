@@ -13,7 +13,7 @@ import awkward as ak
 import numpy as np
 import numpy.typing as npt
 import uproot
-from analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutFlow
 from base_class.awkward.zip import NanoAOD
 from base_class.root import Chunk, TreeReader, TreeWriter, merge
 from base_class.system.eos import EOS, PathLike
