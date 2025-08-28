@@ -519,7 +519,7 @@ use rule make_combine_inputs_HH4b as make_combine_inputs_ZZ4b with:
         output_dir=f"{config['output_path']}/datacards/ZZ4b/",
         variable_binning="",
         stat_only="",
-        signal="HH4b",
+        signal="ZZ4b",
         container_wrapper = config['container_wrapper']
     log: f"{config['output_path']}/logs/make_combine_inputs_ZZ4b.log"
 

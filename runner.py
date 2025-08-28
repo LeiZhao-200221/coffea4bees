@@ -455,7 +455,7 @@ def setup_config_defaults(config_runner, args):
         'class_name': 'analysis',
         'condor_cores': 2,
         'condor_memory': '4GB',
-    'condor_transfer_input_files': ['python/', 'src/', 'classifier/', 'skimmer/'],
+        'condor_transfer_input_files': ['python/', 'src/'],
         'min_workers': 1,
         'max_workers': 100,
         'workers': 2,

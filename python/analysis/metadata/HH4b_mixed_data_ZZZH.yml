@@ -12,3 +12,4 @@ config:
   apply_btagSF: true
   apply_boosted_veto: false
   run_SvB: true
+  apply_mixeddata_sel: true
