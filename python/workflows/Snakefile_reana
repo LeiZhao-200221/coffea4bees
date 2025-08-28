@@ -68,7 +68,7 @@ rule final_rule:
         rm -rf {OUTPUT_PATH}/datacards/*/higgsCombine_*
         cp gitdiff.txt {OUTPUT_PATH}
         echo "Copying output to cernbox"
-        python src/plots/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
+        python src/plotting/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
         mkdir -p {EOS_OUTPUT}
         cp -r output/* {EOS_OUTPUT}
         """
