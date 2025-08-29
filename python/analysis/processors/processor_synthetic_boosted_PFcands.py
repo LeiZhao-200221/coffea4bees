@@ -10,7 +10,7 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 import hist
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 
 from src.physics.event_selection import apply_event_selection
 from src.hist import Collection, Fill
@@ -104,7 +104,7 @@ class analysis(processor.ProcessorABC):
         })
         #sel_dict['passJetMult'] = selections.all(*allcuts)
 
-        self.cutFlow = cutFlow()
+        self.cutFlow = cutflow_4b()
         for cut, sel in sel_dict.items():
             self.cutFlow.fill( cut, event[sel], allTag=True )
 
@@ -135,12 +135,12 @@ class analysis(processor.ProcessorABC):
         PFCandIndex_FatJet0 = selev.FatJetPFCands[PFCandFatJet0_mask].pFCandsIdx
         PFCandIndex_FatJet1 = selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx
 
-        print(f" nPFCands for FatJet0 {ak.num(PFCandIndex_FatJet0)}\n")
-        print(f" nPFCands for FatJet1 {ak.num(PFCandIndex_FatJet1)}\n")
+        # print(f" nPFCands for FatJet0 {ak.num(PFCandIndex_FatJet0)}\n")
+        # print(f" nPFCands for FatJet1 {ak.num(PFCandIndex_FatJet1)}\n")
+        #
+        # print(f" PFCands for FatJet0 {selev.PFCands[PFCandIndex_FatJet0].pdgId.tolist()}\n")
+        # print(f" PFCands for FatJet1 {selev.PFCands[PFCandIndex_FatJet1].pdgId.tolist()}\n")
 
-        print(f" PFCands for FatJet0 {selev.PFCands[PFCandIndex_FatJet0].pdgId.tolist()}\n")
-        print(f" PFCands for FatJet1 {selev.PFCands[PFCandIndex_FatJet1].pdgId.tolist()}\n")
-        #print(f" PFCands for FatJet1 {selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx.tolist()}\n")
 
         PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
 
@@ -180,10 +180,6 @@ class analysis(processor.ProcessorABC):
         fatjets["iA"] = ak.where(i1_more_complex, fatjets.i1, fatjets.i0)
         fatjets["iB"] = ak.where(i1_more_complex, fatjets.i0, fatjets.i1)
 
-        # print(f"Fatjets: {fatjets.fields}")
-        # print(f"  iA flavor: {fatjets.iA.jet_flavor[0:10]}")
-        # print(f"  iB flavor: {fatjets.iA.jet_flavor[0:10]}")
-
         #
         #  Set the jet flavor for the combined fat jet
         #
@@ -192,60 +188,28 @@ class analysis(processor.ProcessorABC):
         selev["selFatJet", "jet_flavor"] = ak.unflatten(fatjet_flavor_flat, ak.num(selev.selFatJet))
 
 
-
         #
         #  Printouts to understand the structure of the PFCands
         #
-        print(f"Number of FatJet PFCands: {ak.num(selev.FatJetPFCands)}\n")
-        print(f"   event fields: {selev.fields}\n")
-        print(f"   FatJet PFCands pt 0: {selev.FatJetPFCands.pt[0].tolist()}\n")
-        print(f"   FatJet PFCands pfCandIdx 0: {selev.FatJetPFCands.pFCandsIdx[0].tolist()}\n")
-        print(f"   FatJet PFCands jetIdx 0: {selev.FatJetPFCands.jetIdx[0].tolist()}\n")
-        print(f"FatJet PFCands fields: {selev.FatJetPFCands.fields}\n")
-        print(f"FatJet Fat Jet fields: {selev.FatJet.fields}\n")
-        print(f"FatJet FatJet dir: {dir(selev.FatJet)}\n")
-        print(f"PFCand fields: {selev.PFCands.fields}\n")
+        # print(f"Number of FatJet PFCands: {ak.num(selev.FatJetPFCands)}\n")
+        # print(f"   event fields: {selev.fields}\n")
+        # print(f"   FatJet PFCands pt 0: {selev.FatJetPFCands.pt[0].tolist()}\n")
+        # print(f"   FatJet PFCands pfCandIdx 0: {selev.FatJetPFCands.pFCandsIdx[0].tolist()}\n")
+        # print(f"   FatJet PFCands jetIdx 0: {selev.FatJetPFCands.jetIdx[0].tolist()}\n")
+        # print(f"FatJet PFCands fields: {selev.FatJetPFCands.fields}\n")
+        # print(f"FatJet Fat Jet fields: {selev.FatJet.fields}\n")
+        # print(f"FatJet FatJet dir: {dir(selev.FatJet)}\n")
+        # print(f"PFCand fields: {selev.PFCands.fields}\n")
 
-        print(f"FatJet index {ak.local_index(selev.FatJet, axis=1)}\n")
-        print(f"FatJet index0 {ak.local_index(selev.FatJet, axis=1)[:,0]}\n")
-        print(f"FatJet index1 {ak.local_index(selev.FatJet, axis=1)[:,1]}\n")
-
-
-        print("Test",fatjets.PFCands[:, :, 0].pdgId.tolist(),"\n")
-        fatjets["PFCands0"] = fatjets.PFCands[:, :, 0]
-
-
-
-        print(f" nPFCands_perFatJet {ak.num(fatjets.PFCands)}\n")
-        print(f" np {ak.num(fatjets.p)}\n")
         #print(f" nPFCandsR {ak.num(selev.PFCands[result])}\n")
         #print(f" PFCandsR pdgId {selev.PFCands[result].pdgId.tolist()}\n")
 
-        print(f" PFCands0 index {PFCandIndex_FatJet0.tolist()}\n")
-        print(f" nPFCands0 {ak.num(selev.PFCands[PFCandIndex_FatJet0])}\n")
 
         #print(type(selev.selFatJet),"\n")
         #selev.PFCands[PFCandIndex_FatJet0]
 
         #fatjets["PFCand1"] = selev.PFCands[PFCandIndex_FatJet1]
         selev["selFatJet_PFCand0"] = selev.PFCands[PFCandIndex_FatJet0]
-
-###        #
-###        # Probably a better way to do this....
-###        #   (Testing the following)
-###        # Add the PF Cands for each FatJet
-###        PFCands_test1 = ak.concatenate([selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1]], axis=1)
-###        print(f" nPFCands1  {ak.num(PFCands_test1)}\n")
-###        print(f" nPFCands1  {PFCands_test1.pdgId.tolist()}\n")
-###
-###        PFCands_test0 = ak.concatenate([selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1]], axis=0)
-###        print(f" nPFCands0  {ak.num(PFCands_test0)}\n")
-###        print(f" nPFCands0 {PFCands_test0.pdgId.tolist()}\n")
-###
-###        PFCands_testZ = ak.unflatten(ak.concatenate([selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1]]), 2)
-###
-###        print(f" nPFCandsZ  {ak.num(PFCands_testZ)}\n")
-###        print(f" nPFCandsZ {PFCands_testZ.pdgId.tolist()}\n")
 
 
         #
@@ -316,15 +280,11 @@ class analysis(processor.ProcessorABC):
             i0 = Jet.plot(('...', R'subjet 0'), 'i0',     skip=['deepjet_c','n'], bins={"mass": (100, 0, 200), "pt": (50, 100, 1000)})
             i1 = Jet.plot(('...', R'subjet 1'), 'i1',     skip=['deepjet_c','n'], bins={"mass": (50, 0, 100)})
 
-            pf = PFCand.plot(('...', R'PFCands in selected fat jet'), "PFCands0",   skip=[],
+            pf = PFCand.plot(('...', R'PFCands in selected fat jet'), "PFCands",   skip=[],
                              bins={"pt":   (50, 0, 10), "mass": (50, 0, 0.2)}
                              )
 
 
-
-        fill += PFCand.plot(("PFCand0", "PFCands in Selected Fat Jet0"),        "selFatJet_PFCand0",           skip=[],
-                            bins={"pt":   (50, 0, 10), "mass": (50, 0, 0.2)}
-                            )
 
 
         fill += FatJetHists(('fatJets', R''), 'fatjets')
