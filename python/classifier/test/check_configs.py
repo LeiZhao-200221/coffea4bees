@@ -1,9 +1,15 @@
+import sys
+from pathlib import Path
+
+sys.path.append(Path(__file__).resolve().parent / "python")
+
 import importlib
 import logging
 from itertools import chain
 
-from python.classifier.task import main
 from rich.logging import RichHandler
+
+from classifier.task import main
 
 from .utils.import_check import ImportTracker, walk_packages
 
