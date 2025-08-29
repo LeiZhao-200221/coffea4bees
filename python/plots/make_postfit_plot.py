@@ -61,6 +61,10 @@ if __name__ == '__main__':
                         default='fitDiagnostics.root', help="Root file after fitDiagnostics")
     parser.add_argument('-s', '--signal', dest='signal',
                         default='GluGluToHHTo4B_cHHH1', help="Signal to plot")
+    parser.add_argument('-c', '--channel', dest='channel',
+                        default='HH4b', help="Channel to plot")
+    parser.add_argument('-l', '--log', dest='log',
+                        action='store_true', default=True, help="Y-axis log")
     parser.add_argument('-m', '--metadata', dest='metadata',
                         default='stats_analysis/metadata/HH4b.yml', help="Metadata file")
     parser.add_argument('-t', '--type_of_fit', dest='type_of_fit', 
@@ -168,8 +172,8 @@ if __name__ == '__main__':
         CMS.SetLumi("")
         CMS.SetEnergy("13")
         CMS.ResetAdditionalInfo()
-        nominal_can = CMS.cmsDiCanvas('nominal_can',0,xmax,0.1,ymax,0.5,1.5,
-                                    "SvB MA Classifier Regressed P(Signal) | P(HH) is largest",
+        nominal_can = CMS.cmsDiCanvas('nominal_can',0,xmax,0.1,ymax,0.9,1.1,
+                                    f"SvB MA Classifier Regressed P(Signal) | P({args.channel}) is largest",
                                     "Events", 'Data/Pred.',
                                     square=CMS.kSquare, extraSpace=0.05, iPos=iPos)
         nominal_can.cd(1)
@@ -190,7 +194,7 @@ if __name__ == '__main__':
         hsignal.Scale( 100 )
         leg.AddEntry( hsignal, 'HH4b (x100)', 'lp' )
         CMS.cmsDraw( hsignal, 'histsame', fstyle=0, marker=1, alpha=1, lcolor=ROOT.TColor.GetColor("#e42536" ), fcolor=ROOT.TColor.GetColor("#e42536"))
-        nominal_can.cd(1).SetLogy(True)
+        if args.log: nominal_can.cd(1).SetLogy(True)
 
         nominal_can.cd(2)
 

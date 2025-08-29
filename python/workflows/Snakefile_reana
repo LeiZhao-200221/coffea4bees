@@ -67,10 +67,10 @@ rule final_rule:
         """
         rm -rf {OUTPUT_PATH}/datacards/*/higgsCombine_*
         cp gitdiff.txt {OUTPUT_PATH}
-        echo "Copying output to cernbox"
-        python src/plotting/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
+        echo "Copying output to cernbox "
         mkdir -p {EOS_OUTPUT}
         cp -r output/* {EOS_OUTPUT}
+        python src/plotting/pb_deploy_plots.py output/ {EOS_OUTPUT} -r -c -j 4
         """
 
 # use rule analysis_processor from analysis as analysis with:
@@ -680,6 +680,7 @@ use rule postfit from combine as postfit_HH4b with:
         signallabel="ggHH_kl_1_kt_1_13p0TeV_hbbhbb",
         channel="HH4b",
         signal="GluGluToHHTo4B_cHHH1",
+        log=True,
         set_parameters_zero=lambda wildcards: set_parameters_zero("HH4b"),
         freeze_parameters=lambda wildcards: freeze_parameters("HH4b"),
         container_wrapper=config.get("container_wrapper", "./run_container combine")
@@ -696,6 +697,7 @@ use rule postfit_HH4b as postfit_ZH4b with:
         signallabel="ZH_bbbb",
         channel="ZH4b",
         signal="ZH4b",
+        log=False,
         set_parameters_zero=lambda wildcards: set_parameters_zero("ZH4b"),
         freeze_parameters=lambda wildcards: freeze_parameters("ZH4b"),
         container_wrapper=config.get("container_wrapper", "./run_container combine")
@@ -708,6 +710,7 @@ use rule postfit_HH4b as postfit_ZZ4b with:
         signallabel="ZZ_bbbb",
         channel="ZZ4b",
         signal="ZZ4b",
+        log=False,
         set_parameters_zero=lambda wildcards: set_parameters_zero("ZZ4b"),
         freeze_parameters=lambda wildcards: freeze_parameters("ZZ4b"),
         container_wrapper=config.get("container_wrapper", "./run_container combine")

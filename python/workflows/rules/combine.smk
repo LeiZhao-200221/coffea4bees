@@ -252,6 +252,7 @@ rule postfit:
         freeze_parameters = "",
         channel="",
         signal="",
+        ylog="",
         container_wrapper = config.get("container_wrapper", "./run_container combine")
     log: "output/logs/postfit_{path}__{signallabel}.log"
     shell:
@@ -302,7 +303,9 @@ rule postfit:
             python3 python/plots/make_postfit_plot.py \
                 -i $(dirname {input})/fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
                 -o $(dirname {input})/plots/ \
+                -c {params.channel} \
                 -s {params.signal} \
+                --log {params.ylog} \
                 -m python/stats_analysis/metadata/{params.channel}.yml
 
         echo "[$(date)] Completed postfit rule with signal {params.signallabel}" >> $LOG
