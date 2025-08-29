@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-sys.path.append(Path(__file__).resolve().parent / "python")
+sys.path.append(Path(__file__).resolve().parents[3])
 
 import importlib
 import logging
