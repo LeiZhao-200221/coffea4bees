@@ -128,10 +128,29 @@ class analysis(processor.ProcessorABC):
             sorted_sub_jets = ak.with_field(sorted_sub_jets, sorted_sub_jets.pt, "tau3")
 
 
+        PFCandFatJet0_mask = selev.FatJetPFCands.jetIdx == ak.local_index(selev.FatJet, axis=1)[:,0]
+        PFCandFatJet1_mask = selev.FatJetPFCands.jetIdx == ak.local_index(selev.FatJet, axis=1)[:,1]
+
+
+        PFCandIndex_FatJet0 = selev.FatJetPFCands[PFCandFatJet0_mask].pFCandsIdx
+        PFCandIndex_FatJet1 = selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx
+
+        print(f" nPFCands for FatJet0 {ak.num(PFCandIndex_FatJet0)}\n")
+        print(f" nPFCands for FatJet1 {ak.num(PFCandIndex_FatJet1)}\n")
+
+        print(f" PFCands for FatJet0 {selev.PFCands[PFCandIndex_FatJet0].pdgId.tolist()}\n")
+        print(f" PFCands for FatJet1 {selev.PFCands[PFCandIndex_FatJet1].pdgId.tolist()}\n")
+        #print(f" PFCands for FatJet1 {selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx.tolist()}\n")
+
+        PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
+
         fatjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
                           "i0" : sorted_sub_jets[:, :, 0],
                           "i1" : sorted_sub_jets[:, :, 1],
-                          } )
+                          "PFCands": PFCands_perFatJet,
+                          },
+                         depth_limit=1,
+                         )
 
         # Calculate di-jet variables
         fatjets["p", "st"]   = fatjets.i0.pt + fatjets.i1.pt
@@ -191,22 +210,6 @@ class analysis(processor.ProcessorABC):
         print(f"FatJet index0 {ak.local_index(selev.FatJet, axis=1)[:,0]}\n")
         print(f"FatJet index1 {ak.local_index(selev.FatJet, axis=1)[:,1]}\n")
 
-        PFCandFatJet0_mask = selev.FatJetPFCands.jetIdx == ak.local_index(selev.FatJet, axis=1)[:,0]
-        PFCandFatJet1_mask = selev.FatJetPFCands.jetIdx == ak.local_index(selev.FatJet, axis=1)[:,1]
-
-
-        PFCandIndex_FatJet0 = selev.FatJetPFCands[PFCandFatJet0_mask].pFCandsIdx
-        PFCandIndex_FatJet1 = selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx
-
-        print(f" nPFCands for FatJet0 {ak.num(PFCandIndex_FatJet0)}\n")
-        print(f" nPFCands for FatJet1 {ak.num(PFCandIndex_FatJet1)}\n")
-
-        print(f" PFCands for FatJet0 {selev.PFCands[PFCandIndex_FatJet0].pdgId.tolist()}\n")
-        print(f" PFCands for FatJet1 {selev.PFCands[PFCandIndex_FatJet1].pdgId.tolist()}\n")
-        #print(f" PFCands for FatJet1 {selev.FatJetPFCands[PFCandFatJet1_mask].pFCandsIdx.tolist()}\n")
-
-        PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
-        fatjets["PFCands"] = PFCands_perFatJet
 
         print("Test",fatjets.PFCands[:, :, 0].pdgId.tolist(),"\n")
         fatjets["PFCands0"] = fatjets.PFCands[:, :, 0]

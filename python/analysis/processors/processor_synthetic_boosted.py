@@ -4,7 +4,7 @@ import numpy as np
 import yaml
 import warnings
 from collections import OrderedDict
-from base_class.hist import Template
+from src.hist import Template
 
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
