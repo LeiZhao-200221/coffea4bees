@@ -13,7 +13,7 @@ import awkward as ak
 import numpy as np
 import numpy.typing as npt
 import uproot
-from python.analysis.helpers.cutflow import cutFlow
+from src.skimmer.cutflow import cutflow
 from src.data_formats.awkward.zip import NanoAOD
 from src.data_formats.root import Chunk, TreeReader, TreeWriter, merge
 from src.storage.eos import EOS, PathLike
@@ -122,10 +122,10 @@ class PicoAOD(ProcessorABC):
                 )
                 return {dataset: metadata | {"files": [cached], "source": source_chunk}}
             except Exception:
-                ...
+                pass
 
-        # select events
-        self._cutFlow = cutFlow()
+    # select events
+    # self._cutFlow should be set by child classes, not here
         # preselect
         preselected = self.preselect(events)
         if preselected is None:

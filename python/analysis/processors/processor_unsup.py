@@ -21,7 +21,7 @@ from src.hist.object import LorentzVector, Jet, Muon, Elec
 
 from python.analysis.helpers.processor_config import processor_config
 from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, dumpTopCandidateTestVectors, buildTop
 from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
@@ -107,7 +107,7 @@ class analysis(processor.ProcessorABC):
         processOutput = {}
         processOutput['nEvent'] = {}
         processOutput['nEvent'][event.metadata['dataset']] = nEvent
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
 
         ###############################################
         ###### Reading 3to4, DtoM friend trees ########

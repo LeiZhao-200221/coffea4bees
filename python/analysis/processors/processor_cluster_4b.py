@@ -22,7 +22,7 @@ from python.jet_clustering.clustering   import cluster_bs, cluster_bs_fast
 from python.jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
 
 from python.analysis.helpers.networks import HCREnsemble
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
@@ -207,7 +207,7 @@ class analysis(processor.ProcessorABC):
 
         }
 
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
         self._cutFlow.fill( "all", event[selections.require(lumimask=True)], allTag=True)
         self._cutFlow.fill( "passNoiseFilter", event[selections.require(lumimask=True, passNoiseFilter=True)], allTag=True)
         self._cutFlow.fill( "passHLT", event[ selections.require( lumimask=True, passNoiseFilter=True, passHLT=True ) ], allTag=True, )

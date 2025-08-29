@@ -17,7 +17,7 @@ from coffea.analysis_tools import Weights, PackedSelection
 from src.hist import Collection, Fill
 from src.hist.object import LorentzVector, Jet
 
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 from src.physics.common import apply_btag_sf, update_events
@@ -210,7 +210,7 @@ class analysis(processor.ProcessorABC):
         selections.add( "pass1OtherJet40",    event.pass1OtherJet40)
         selections.add( "pass2OtherJet40",    event.pass2OtherJet40)
 
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
         self._cutFlow.fill( "all", event, allTag=True)
         self._cutFlow.fill( "pass4GenBJets00",    event[selections.require(pass4GenBJets00=True)], allTag=True)
         self._cutFlow.fill( "pass4GenBJets20",    event[selections.require(pass4GenBJets20=True)], allTag=True)
