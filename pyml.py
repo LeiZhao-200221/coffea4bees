@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-sys.path.append(Path(__file__).resolve().parent / "python")
+sys.path.append(str(Path(__file__).resolve().parent / "python"))
 
 from classifier.patch import patch_awkward_pandas
 from classifier.task import EntryPoint

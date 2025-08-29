@@ -1,6 +1,6 @@
 #!/bin/bash
 _pyml_python_bind() {
-    local cmds=(python -m classifier.task.autocomplete._bind)
+    local cmds=(python -m python.classifier.task.autocomplete._bind)
     if [ "$1" == "wait" ]; then
         cmds+=("wait")
     fi
@@ -22,7 +22,7 @@ _pyml_task_autocomplete() {
     fi
     _pyml_python_bind "" ${mid}
     while [ $code -eq 254 ]; do
-        (python -m classifier.task.autocomplete._core &)
+        (python -m python.classifier.task.autocomplete._core &)
         _pyml_python_bind wait ${mid}
     done
     if [ $code -eq 0 ]; then
