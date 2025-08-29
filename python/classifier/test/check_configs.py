@@ -1,8 +1,13 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 import importlib
 import logging
 from itertools import chain
 
-from python.classifier.task import main
+from classifier.task import main
 from rich.logging import RichHandler
 
 from .utils.import_check import ImportTracker, walk_packages
@@ -18,6 +23,7 @@ def walk_configs():
                     "/".join(
                         main.EntryPoint._fetch_config("", main._ModCtx(test=test))[:-1]
                     ),
+                    Path(__file__).resolve().parents[2],
                 )
                 for test in [False, True]
             ]

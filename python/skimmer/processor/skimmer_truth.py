@@ -2,18 +2,20 @@ import logging
 
 import numpy as np
 import yaml
-from python.analysis.helpers.mc_weight_outliers import OutlierByMedian
+from src.skimmer.mc_weight_outliers import OutlierByMedian
 from python.analysis.helpers.processor_config import processor_config
 from coffea.analysis_tools import PackedSelection, Weights
 from src.skimmer.picoaod import PicoAOD
 import awkward as ak
 from python.analysis.helpers.truth_tools import find_genpart
+from python.analysis.helpers.cutflow import cutflow_4b
 
 class Skimmer(PicoAOD):
     def __init__(self, loosePtForSkim=False, mc_outlier_threshold:int|None=200, corrections_metadata: dict = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.corrections_metadata = corrections_metadata
         self.mc_outlier_threshold = mc_outlier_threshold
+        self._cutFlow = cutflow_4b()
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]

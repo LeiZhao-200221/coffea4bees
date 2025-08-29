@@ -14,6 +14,7 @@ from src.physics.event_selection import apply_event_selection
 from src.physics.event_weights import add_weights
 
 from src.data_formats.root import Chunk, TreeReader
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
@@ -45,6 +46,7 @@ class DeClusterer(PicoAOD):
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
         self.corrections_metadata = corrections_metadata
+        self._cutFlow = cutflow_4b()
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]

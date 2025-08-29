@@ -6,6 +6,7 @@ import numpy as np
 from src.storage.eos import PathLike
 
 from src.skimmer.picoaod import PicoAOD, _branch_filter
+from python.analysis.helpers.cutflow import cutflow_4b
 
 warnings.filterwarnings(
     "ignore", category=RuntimeWarning, message="Missing cross-reference .*"
@@ -21,6 +22,7 @@ class TestSkimmer(PicoAOD):
                 _branch_filter(("Jet",), ("event",)),
             ),  # hacked, skip skip == keep
         )
+        self._cutFlow = cutflow_4b()
 
     def select(self, events: ak.Array):
         selection = events.event % 11 == 0

@@ -221,7 +221,5 @@ class ROOT(GlobalSetting):
 
     @classmethod
     def set__friend_allow_missing(cls, value: bool):
-        from src.data_formats.root import Friend
-
-        Friend.allow_missing.set(value)
+        # placeholder for compatibility
         return NotImplemented

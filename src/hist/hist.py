@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 from copy import deepcopy
+from textwrap import indent
 from typing import (
     Callable,
     Generic,
@@ -10,6 +11,10 @@ from typing import (
     TypeVar,
     overload,
 )
+
+from packaging.version import Version
+from rich.pretty import pretty_repr
+from typing_extensions import Self  # DEPRECATE
 
 import awkward as ak
 import numpy as np
@@ -24,10 +29,7 @@ from hist.axis import (
     StrCategory,
     Variable,
 )
-from packaging.version import Version
-from typing_extensions import Self  # DEPRECATE
 
-from .. import awkward as akext
 from ..aktools import (
     AnyInt,
     FieldLike,
@@ -36,6 +38,7 @@ from ..aktools import (
     get_field,
 )
 from ..config import Configurable, config
+from ..data_formats import awkward as akext
 from ..typetools import check_type, find_subclass
 from . import template as _t
 
@@ -68,6 +71,14 @@ def _fill_field(_s: str):
 
 def _fill_special(hist: str, axis: str):
     return f"{hist} \x00 {axis}"
+
+
+def _fill_repr(fill: str):
+    fills = fill.split(" \x00 ")
+    if len(fills) == 1:
+        return fills[0]
+    else:
+        return f'{fills[1]} (hist "{fills[0]}")'
 
 
 def _create_axis(args: AxisLike) -> HistAxis:
@@ -136,12 +147,10 @@ AxisLike = (
 )
 
 
-class FillError(Exception):
-    __module__ = Exception.__module__
+class FillError(Exception): ...
 
 
-class HistError(Exception):
-    __module__ = Exception.__module__
+class HistError(Exception): ...
 
 
 HistType = TypeVar("HistType", bound=Hist)
@@ -153,11 +162,10 @@ class _MissingFillValue: ...
 
 class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
     class __backend__:
+        ak: ak
         check_empty_mask: bool
-        akarray: type
         anyarray: type
-        repeat: Callable
-        broadcast: Callable[..., dict[str]] = None
+        broadcast_all: Callable[..., dict[str]] = None
 
         allow_str_array: bool = Version(ak.__version__) >= Version("2.0.0")
 
@@ -205,21 +213,19 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
                 return _MissingFillValue
             raise
 
-    def _is_jagged(self, obj):
-        return isinstance(obj, self.__backend__.akarray) and akext.is_jagged(obj)
-
     def fill(
         self,
         events: ak.Array,
         hists: _Collection[HistType, Self] = ...,
         **fill_args: FillLike,
     ):
+        _ak = self.__backend__.ak
         if hists is ...:
             if (hists := _Collection.current) is None:
-                raise FillError("No histogram collection is specified")
+                raise FillError("\nNo histogram collection is specified")
         if not isinstance(self, hists.__backend__.fill):
             raise FillError(
-                "Cannot fill a histogram collection with a different backend"
+                "\nCannot fill a histogram collection with a different backend."
             )
         fill_args = self._kwargs | fill_args
         mask_categories = []
@@ -241,53 +247,74 @@ class _Fill(Generic[HistType], Configurable, namespace="hist.Fill"):
             if self.__backend__.check_empty_mask and len(masked) == 0:
                 continue
             for k, v in fill_args.items():
-                if (isinstance(v, str) and k in hists._categories) or isinstance(
-                    v, bool | RealNumber
-                ):
-                    fill_values[k] = v
-                elif check_type(v, FieldLike):
-                    fill_values[k] = self._get_fill_arg(lambda: get_field(masked, v))
-                elif check_type(v, self.__backend__.anyarray):
-                    fill_values[k] = v if mask is None else v[mask]
-                elif isinstance(v, Callable):
-                    fill_values[k] = self._get_fill_arg(lambda: v(masked))
-                else:
-                    raise FillError(f'cannot fill "{k}" with "{v}"')
-            for name in self._fills:
-                fills = {
-                    k: (
-                        special
-                        if (special := _fill_special(name, k)) in fill_values
-                        else k
+                try:
+                    if (isinstance(v, str) and k in hists._categories) or isinstance(
+                        v, bool | RealNumber
+                    ):
+                        fill_values[k] = v
+                    elif check_type(v, FieldLike):
+                        fill_values[k] = self._get_fill_arg(
+                            lambda: get_field(masked, v)
+                        )
+                    elif isinstance(v, self.__backend__.anyarray):
+                        fill_values[k] = v if mask is None else v[mask]
+                    elif isinstance(v, Callable):
+                        fill_values[k] = self._get_fill_arg(lambda: v(masked))
+                    else:
+                        raise TypeError("Unsupported fill value.")
+                except Exception:
+                    raise FillError(
+                        f'\nWhile preparing fill value "{_fill_repr(k)}" from\n  {type(v)}\n{indent(pretty_repr(v), "    ")}\n the above error occurred.'
                     )
-                    for k in self._fills[name]
-                }
-                if any(fill_values[v] is _MissingFillValue for v in fills.values()):
-                    continue
-                shape = None
-                for v in fills.values():
-                    fill = fill_values[v]
-                    if self._is_jagged(fill):
-                        shape = ak.fill_none(ak.num(fill),0)
-                        break
+            for name in self._fills:
                 hist_args = {}
-                for k, v in fills.items():
-                    fill = fill_values[v]
-                    if shape is None:
-                        ...
-                    elif self._is_jagged(fill):
-                        fill = ak.flatten(fill)
-                    elif check_type(fill, self.__backend__.anyarray):
-                        fill = self.__backend__.repeat(fill, shape)
-                    hist_args[k] = fill
-                # https://github.com/scikit-hep/boost-histogram/issues/452 #
-                if (self.__backend__.broadcast is not None) and all(
-                    [isinstance(axis, StrCategory) for axis in hists._hists[name].axes]
-                ):
-                    hist_args = self.__backend__.broadcast(**hist_args)
-                ############################################################
-                hists._hists[name].fill(**hist_args)
-                hists._filled.add(name)
+                try:
+                    fills = {
+                        k: (
+                            special
+                            if (special := _fill_special(name, k)) in fill_values
+                            else k
+                        )
+                        for k in self._fills[name]
+                    }
+                    if any(fill_values[v] is _MissingFillValue for v in fills.values()):
+                        continue
+                    arrays = {}
+                    depths = {}
+                    for v in fills.values():
+                        fill = fill_values[v]
+                        if isinstance(fill, self.__backend__.anyarray):
+                            arrays[v] = fill
+                            depths[v] = akext.max_depth(fill)
+                    depths_set = set(depths.values())
+                    if len(depths_set) > 1:
+                        arrays = dict(
+                            zip(arrays.keys(), _ak.broadcast_arrays(*arrays.values()))
+                        )
+                    if max(depths_set) > 1:
+                        for k in arrays:
+                            arrays[k] = _ak.ravel(arrays[k])
+                    for k, v in fills.items():
+                        if (fill := arrays.get(v)) is None:
+                            fill = fill_values[v]
+                        hist_args[k] = fill
+                    # https://github.com/scikit-hep/boost-histogram/issues/452 #
+                    if (self.__backend__.broadcast_all is not None) and all(
+                        [
+                            isinstance(axis, StrCategory)
+                            for axis in hists._hists[name].axes
+                        ]
+                    ):
+                        hist_args = self.__backend__.broadcast_all(**hist_args)
+                    ############################################################
+                    hists._hists[name].fill(**hist_args)
+                    hists._filled.add(name)
+                except Exception:
+                    if hist_args:
+                        msg = f'filling histogram "{name}", with\n" + {indent(pretty_repr(hist_args), "    ")}'
+                    else:
+                        msg = f'preparing the arguments for histogram "{name}"'
+                    raise FillError(f"\nWhile {msg}\n the above exception occurred.")
 
 
 if sys.version_info >= (3, 11):
@@ -379,7 +406,7 @@ class _Collection(Generic[HistType, FillType]):
         return self.to_dict()
 
 
-def _broadcast(weight: FillLike, **kwargs: FillLike):
+def _broadcast_all(weight: FillLike, **kwargs: FillLike):
     tobroadcast = None
     for k, v in kwargs.items():
         tobroadcast = k
@@ -394,11 +421,10 @@ def _broadcast(weight: FillLike, **kwargs: FillLike):
 
 class Fill(_Fill[Hist]):
     class __backend__(_Fill.__backend__):
+        ak = ak
         check_empty_mask = True
-        akarray = ak.Array
-        anyarray = ak.Array | npt.NDArray
-        repeat = np.repeat
-        broadcast = _broadcast
+        anyarray = ak.Array | np.ndarray
+        broadcast_all = _broadcast_all
 
 
 class Collection(_Collection[Hist, Fill]):
