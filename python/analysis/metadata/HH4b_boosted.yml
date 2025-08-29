@@ -4,4 +4,4 @@ runner:
   # data_tier: nanoAOD
 
 config:
-
+  blind: false

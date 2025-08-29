@@ -4,13 +4,13 @@ import numpy as np
 import yaml
 import warnings
 from collections import OrderedDict
-from base_class.hist import Template
+from src.hist import Template
 
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 import hist
-from analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutFlow
 
 from src.physics.event_selection import apply_event_selection
 from src.hist import Collection, Fill
