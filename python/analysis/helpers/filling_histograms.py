@@ -1,4 +1,4 @@
-from analysis.helpers.hist_templates import (
+from python.analysis.helpers.hist_templates import (
     FvTHists,
     QuadJetHistsSelected,
     QuadJetHistsMinDr,
@@ -7,8 +7,8 @@ from analysis.helpers.hist_templates import (
     TopCandHists,
     WCandHists,
 )
-from base_class.hist import Collection, Fill
-from base_class.physics.object import Elec, Jet, LorentzVector, Muon
+from src.hist import Collection, Fill
+from src.hist.object import Elec, Jet, LorentzVector, Muon
 import logging
 from memory_profiler import profile
 

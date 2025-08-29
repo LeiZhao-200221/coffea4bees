@@ -1,69 +1,13 @@
 import numpy as np
 import awkward as ak
 import logging
-from coffea.lumi_tools import LumiMask
-from analysis.helpers.common import mask_event_decision, drClean
-from analysis.helpers.object_selection import (
+from python.analysis.helpers.object_selection import (
     lepton_selection,
     jet_selection,
     lowpt_jet_selection
 )
+from src.physics.common import drClean
 
-def apply_event_selection(
-    event: ak.Array, 
-    corrections_metadata: dict, 
-    cut_on_lumimask: bool = True
-) -> ak.Array:
-    """
-    Applies basic event selection criteria for a 4b analysis.
-
-    Parameters:
-    -----------
-    event : awkward.Array
-        The event data containing fields such as `run`, `luminosityBlock`, `HLT`, and `Flag`.
-    corrections_metadata : dict
-        Metadata containing corrections and configuration information, such as:
-        - `goldenJSON`: Path to the golden JSON file for luminosity masking.
-        - `NoiseFilter`: List of noise filters to apply.
-    cut_on_lumimask : bool, optional
-        Whether to apply the luminosity mask cut. Defaults to True.
-
-    Returns:
-    --------
-    event : awkward.Array
-        The input event data with additional fields:
-        - `lumimask`: Boolean mask indicating events passing the luminosity mask.
-        - `passHLT`: Boolean mask indicating events passing the HLT trigger.
-        - `passNoiseFilter`: Boolean mask indicating events passing noise filters.
-    """
-    # Apply luminosity mask
-    if 'goldenJSON' not in corrections_metadata:
-        raise KeyError("Missing 'goldenJSON' in corrections_metadata.")
-    lumimask = LumiMask(corrections_metadata['goldenJSON'])
-    event['lumimask'] = (
-        np.array(lumimask(event.run, event.luminosityBlock))
-        if cut_on_lumimask else np.full(len(event), True)
-    )
-
-    # Apply HLT trigger mask
-    event['passHLT'] = (
-        np.full(len(event), True)
-        if 'HLT' not in event.fields else mask_event_decision(
-            event, decision="OR", branch="HLT", list_to_mask=event.metadata.get('trigger', [])
-        )
-    )
-
-    # Apply noise filter mask
-    noise_filters = corrections_metadata.get('NoiseFilter', [])
-    event['passNoiseFilter'] = (
-        np.full(len(event), True)
-        if 'Flag' not in event.fields else mask_event_decision(
-            event, decision="AND", branch="Flag", list_to_mask=noise_filters,
-            list_to_skip=['BadPFMuonDzFilter', 'hfNoisyHitsFilter']
-        )
-    )
-
-    return event
 
 def apply_dilep_ttbar_selection(event: ak.Array, isRun3: bool = False) -> ak.Array:
     """
@@ -141,17 +85,21 @@ def apply_boosted_4b_selection(event: ak.Array) -> ak.Array:
 
     return event
 
-def apply_4b_selection(event, corrections_metadata, *,
-                                dataset: str = '',
-                                doLeptonRemoval: bool = True,
-                                loosePtForSkim: bool = False,
-                                override_selected_with_flavor_bit: bool = False,
-                                do_jet_veto_maps: bool = False,
-                                isRun3: bool = False,
-                                isMC: bool = False,  ### temporary for Run3
-                                isSyntheticData: bool = False,
-                                isSyntheticMC: bool = False,
-                            ):
+def apply_4b_selection(
+        event, 
+        corrections_metadata, 
+        *,
+        dataset: str = '',
+        doLeptonRemoval: bool = True,
+        loosePtForSkim: bool = False,
+        override_selected_with_flavor_bit: bool = False,
+        do_jet_veto_maps: bool = False,
+        isRun3: bool = False,
+        isMC: bool = False,  ### temporary for Run3
+        isSyntheticData: bool = False,
+        isSyntheticMC: bool = False,
+        apply_mixeddata_sel: bool = False
+) -> ak.Array:
     """
     Applies object selection criteria for 4b analysis.
 
@@ -179,6 +127,8 @@ def apply_4b_selection(event, corrections_metadata, *,
         Whether the data is synthetic. Defaults to False.
     isSyntheticMC : bool, optional
         Whether the Monte Carlo data is synthetic. Defaults to False.
+    apply_mixeddata_sel : bool, optional
+        Whether to apply mixed data selection. Defaults to False.
 
     Returns:
     --------
@@ -188,7 +138,7 @@ def apply_4b_selection(event, corrections_metadata, *,
     # Combined RunII and 3 selection
     event = lepton_selection(event, isRun3)
     
-    event = jet_selection(event, corrections_metadata, isRun3, isMC, isSyntheticData, isSyntheticMC, dataset, doLeptonRemoval, do_jet_veto_maps, override_selected_with_flavor_bit)
+    event = jet_selection(event, corrections_metadata, isRun3, isMC, isSyntheticData, isSyntheticMC, dataset, doLeptonRemoval, do_jet_veto_maps,apply_mixeddata_sel, override_selected_with_flavor_bit)
 
     event['passJetMult'] = event['nJet_selected'] >= 4
 

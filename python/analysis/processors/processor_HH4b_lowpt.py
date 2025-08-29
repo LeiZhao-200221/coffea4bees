@@ -9,31 +9,33 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
-from analysis.helpers.common import apply_jerc_corrections, update_events
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.event_weights import (
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import update_events
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
-    add_weights,
 )
-from analysis.helpers.filling_histograms import (
+from python.analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,
 )
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
-from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.topCandReconstruction import (
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from python.analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from python.analysis.helpers.topCandReconstruction import (
     adding_top_reco_to_event,
     buildTop,
     find_tops,
     find_tops_slow,
 )
-from analysis.helpers.event_selection import apply_event_selection, apply_4b_lowpt_selection
-from base_class.hist import Fill
-from base_class.root import Chunk, TreeReader
+from python.analysis.helpers.event_selection import apply_4b_lowpt_selection
+from src.physics.event_selection import apply_event_selection
+from src.physics.event_weights import add_weights
+from src.hist import Fill
+from src.data_formats.root import Chunk, TreeReader
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
@@ -49,7 +51,7 @@ from ..helpers.load_friend import (
 
 if TYPE_CHECKING:
     from ..helpers.classifier.HCR import HCRModelMetadata
-from analysis.helpers.truth_tools import find_genpart
+from python.analysis.helpers.truth_tools import find_genpart
 
 #
 # Setup
@@ -77,7 +79,10 @@ class analysis(processor.ProcessorABC):
         SvB_MA: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
-        JCM_file: str = "analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        corrections_metadata: dict = None,
+        apply_JCM_lowpt: bool = False,
+        JCM_lowpt_file: str = None,
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -87,8 +92,7 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        corrections_metadata: str = "analysis/metadata/corrections.yml",
-        top_reconstruction_override: bool = False,
+        top_reconstruction: bool = False,
         run_systematics: list = [],
         make_classifier_input: str = None,
         make_top_reconstruction: str = None,
@@ -101,7 +105,8 @@ class analysis(processor.ProcessorABC):
 
         logging.debug("\nInitialize Analysis Processor")
         self.blind = blind
-        self.apply_JCM = jetCombinatoricModel(JCM_file) if apply_JCM else None
+        self.apply_JCM = jetCombinatoricModel(JCM_file, zero_npt=True) if apply_JCM else None
+        self.apply_JCM_lowpt = jetCombinatoricModel(JCM_lowpt_file) if apply_JCM_lowpt else None
         self.apply_trigWeight = apply_trigWeight
         self.apply_btagSF = apply_btagSF
         self.apply_FvT = apply_FvT
@@ -112,8 +117,7 @@ class analysis(processor.ProcessorABC):
         self.apply_boosted_veto = apply_boosted_veto
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
+        self.corrections_metadata = corrections_metadata
 
         self.run_systematics = run_systematics
         self.make_top_reconstruction = make_top_reconstruction
@@ -121,7 +125,7 @@ class analysis(processor.ProcessorABC):
         self.make_friend_JCM_weight = make_friend_JCM_weight
         self.make_friend_FvT_weight = make_friend_FvT_weight
         self.make_friend_SvB = make_friend_SvB
-        self.top_reconstruction_override = top_reconstruction_override
+        self.top_reconstruction = top_reconstruction
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.histCuts = hist_cuts
@@ -140,8 +144,8 @@ class analysis(processor.ProcessorABC):
         ### target is for new friend trees
         target = Chunk.from_coffea_events(event)
 
-        if self.top_reconstruction_override:
-            self.top_reconstruction = self.top_reconstruction_override
+        if self.top_reconstruction:
+            self.top_reconstruction = self.top_reconstruction
             logging.info(f"top_reconstruction overridden to {self.top_reconstruction}\n")
         else:
             self.top_reconstruction = event.metadata.get("top_reconstruction", None)
@@ -199,8 +203,6 @@ class analysis(processor.ProcessorABC):
             do_MC_weights=self.config["do_MC_weights"],
             dataset=self.dataset,
             year_label=self.year_label,
-            estart=self.estart,
-            estop=self.estop,
             friend_trigWeight=self.friends.get("trigWeight"),
             corrections_metadata=self.corrections_metadata[self.year],
             apply_trigWeight=self.apply_trigWeight,
@@ -335,12 +337,14 @@ class analysis(processor.ProcessorABC):
         #
         if self.config["isMC"] and self.apply_btagSF:
 
-            weights, list_weight_names = add_btagweights( event, weights,
-                                                         list_weight_names=list_weight_names,
-                                                         shift_name=shift_name,
-                                                         use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
-                                                         run_systematics=self.run_systematics,
-                                                         corrections_metadata=self.corrections_metadata[self.year]
+            weights, list_weight_names = add_btagweights(
+                event,
+                weights,
+                list_weight_names=list_weight_names,
+                shift_name=shift_name,
+                use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
+                run_systematics=self.run_systematics,
+                corrections_metadata=self.corrections_metadata[self.year],
             )
             logging.debug( f"Btag weight {weights.partial_weight(include=['CMS_btag'])[:10]}\n" )
             event["weight"] = weights.weight()
@@ -361,11 +365,24 @@ class analysis(processor.ProcessorABC):
             self._cutFlow.fill( "passPreSel_allTag_woTrig", event[selections.all(*allcuts)], allTag=True,
                                 wOverride=np.sum(weights.partial_weight(exclude=['CMS_bbbb_resolved_ggf_triggerEffSF'])[selections.all(*allcuts)] ))
 
+        weights, list_weight_names = add_pseudotagweights(
+            event,
+            weights,
+            JCM_lowpt=self.apply_JCM_lowpt,
+            JCM=self.apply_JCM,
+            apply_FvT=self.apply_FvT,
+            isDataForMixed=self.config["isDataForMixed"],
+            list_weight_names=list_weight_names,
+            event_metadata=event.metadata,
+            year_label=self.year_label,
+            len_event=len(event),
+            label3b="lowpt_threeTag",
+        )
 
         #
         # Example of how to write out event numbers
         #
-        #from analysis.helpers.write_debug_info import add_debug_Run3_data
+        #from python.analysis.helpers.write_debug_info import add_debug_Run3_data
         #add_debug_Run3_data(event, processOutput)
 
         selev = event[analysis_selections]
@@ -405,32 +422,23 @@ class analysis(processor.ProcessorABC):
         #  Build di-jets and Quad-jets
         #
         selev = create_cand_jet_dijet_quadjet( selev,
-                                               apply_FvT=self.apply_FvT,
-                                               run_SvB=self.run_SvB,
-                                               run_systematics=self.run_systematics,
-                                               classifier_SvB=self.classifier_SvB,
-                                               classifier_SvB_MA=self.classifier_SvB_MA,
-                                               processOutput = processOutput,
-                                               isRun3=self.config["isRun3"],
-                                              )
+            apply_FvT=self.apply_FvT,
+            run_SvB=self.run_SvB,
+            run_systematics=self.run_systematics,
+            classifier_SvB=self.classifier_SvB,
+            classifier_SvB_MA=self.classifier_SvB_MA,
+            processOutput=processOutput,
+            isRun3=self.config["isRun3"],
+            include_lowptjets=True,
+            )
 
 
-        weights, list_weight_names = add_pseudotagweights( selev, weights,
-                                                           analysis_selections,
-                                                           JCM=self.apply_JCM,
-                                                           apply_FvT=self.apply_FvT,
-                                                           isDataForMixed=self.config["isDataForMixed"],
-                                                           list_weight_names=list_weight_names,
-                                                           event_metadata=event.metadata,
-                                                           year_label=self.year_label,
-                                                           len_event=len(event),
-                                                          )
 
 
         #
         # Example of how to write out event numbers
         #
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output
         # add_debug_info_to_output(event, processOutput, weights, list_weight_names, analysis_selections)
 
 
@@ -496,29 +504,34 @@ class analysis(processor.ProcessorABC):
         if self.fill_histograms:
             if not self.run_systematics:
                 ## this can be simplified
-                hist = filling_nominal_histograms(selev, self.apply_JCM,
-                                                  processName=self.processName,
-                                                  year=self.year,
-                                                  isMC=self.config["isMC"],
-                                                  histCuts=self.histCuts,
-                                                  apply_FvT=self.apply_FvT,
-                                                  run_SvB=self.run_SvB,
-                                                  run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
-                                                  top_reconstruction=self.top_reconstruction,
-                                                  isDataForMixed=self.config['isDataForMixed'],
-                                                  tag_list=["lowpt_fourTag", "lowpt_threeTag"],
-                                                  event_metadata=event.metadata)
+                hist = filling_nominal_histograms(
+                    selev,
+                    self.apply_JCM,
+                    JCM_lowpt=self.apply_JCM_lowpt,
+                    processName=self.processName,
+                    year=self.year,
+                    isMC=self.config["isMC"],
+                    histCuts=self.histCuts,
+                    apply_FvT=self.apply_FvT,
+                    run_SvB=self.run_SvB,
+                    run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
+                    top_reconstruction=self.top_reconstruction,
+                    isDataForMixed=self.config['isDataForMixed'],
+                    tag_list=["lowpt_fourTag", "lowpt_threeTag"],
+                    event_metadata=event.metadata,
+                )
 
             #
             # Run systematics
             #
             else:
-                hist = filling_syst_histograms(selev, weights,
-                                               analysis_selections,
-                                               shift_name=shift_name,
-                                               processName=self.processName,
-                                               year=self.year,
-                                               histCuts=self.histCuts)
+                hist = filling_syst_histograms(selev, 
+                    weights,
+                    analysis_selections,
+                    shift_name=shift_name,
+                    processName=self.processName,
+                    year=self.year,
+                    histCuts=self.histCuts)
 
         friends = { 'friends': {} }
         if self.make_top_reconstruction is not None:

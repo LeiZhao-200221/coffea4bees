@@ -1,7 +1,15 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "src/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}/analysis_testAll_job"
+# Setup proxy if needed
+setup_proxy
+
+display_section_header "Input Datasets"
+DATASETS=${DATASET:-"python/metadata/datasets_HH4b.yml"}
+echo "Using datasets file: $DATASETS"
+
+OUTPUT_DIR="${1:-"output"}/analysis_testAll_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
@@ -9,22 +17,19 @@ fi
 
 
 echo "############### Running test processor"
-#python runner.py -o hist_databkgs.coffea  -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ZZ4b ZH4b ggZH4b   -p analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
-#python runner.py -o hist_databkgs.coffea  -d data     -p analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
-#python runner.py -o hist_TTbkgs.coffea  -d  TTToHadronic TTToSemiLeptonic TTTo2L2Nu    -p analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
-#python runner.py -o hist_otherSig.coffea  -d  ZZ4b ZH4b ggZH4b    -p analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
+#python runner.py -o hist_databkgs.coffea  -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ZZ4b ZH4b ggZH4b   -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
+#python runner.py -o hist_databkgs.coffea  -d data     -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
+#python runner.py -o hist_TTbkgs.coffea  -d  TTToHadronic TTToSemiLeptonic TTTo2L2Nu    -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
+#python runner.py -o hist_otherSig.coffea  -d  ZZ4b ZH4b ggZH4b    -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
 
 
-python runner.py -o hist_signal.coffea -d GluGluToHHTo4B_cHHH1 GluGluToHHTo4B_cHHH0 GluGluToHHTo4B_cHHH2p45 GluGluToHHTo4B_cHHH5  -p analysis/processors/processor_HH4b.py -y UL17 UL18 UL16_preVFP UL16_postVFP -op $OUTPUT_DIR -m metadata/datasets_HH4b_v1p1.yml -c analysis/metadata/HH4b_systematics.yml --condor
+python runner.py -o hist_signal.coffea -d GluGluToHHTo4B_cHHH1 GluGluToHHTo4B_cHHH0 GluGluToHHTo4B_cHHH2p45 GluGluToHHTo4B_cHHH5  -p python/analysis/processors/processor_HH4b.py -y UL17 UL18 UL16_preVFP UL16_postVFP -op $OUTPUT_DIR -m python/metadata/datasets_HH4b_v1p1.yml -c python/analysis/metadata/HH4b_systematics.yml --condor
 
-#python analysis/tools/merge_coffea_files.py -f $OUTPUT_DIR/hist_databkgs.coffea $OUTPUT_DIR/hist_signal.coffea  -o $OUTPUT_DIR/histAll.coffea
+#python python/analysis/tools/merge_coffea_files.py -f $OUTPUT_DIR/hist_databkgs.coffea $OUTPUT_DIR/hist_signal.coffea  -o $OUTPUT_DIR/histAll.coffea
 
 
-#python analysis/tests/cutflow_test.py   --inputFile ${OUTPUT_DIR}/histAll.coffea --knownCounts analysis/tests/histAllCounts.yml
+#python python/analysis/tests/cutflow_test.py   --inputFile ${OUTPUT_DIR}/histAll.coffea --knownCounts python/analysis/tests/histAllCounts.yml
 
-# python runner.py -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ZZ4b ZH4b GluGluToHHTo4B_cHHH1 -c analysis/metadata/HH4b_noFvT.yml   -p analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP -o histAll_noFvT.coffea -op hists/
+# python runner.py -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ZZ4b ZH4b GluGluToHHTo4B_cHHH1 -c python/analysis/metadata/HH4b_noFvT.yml   -p python/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP -o histAll_noFvT.coffea -op hists/
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+

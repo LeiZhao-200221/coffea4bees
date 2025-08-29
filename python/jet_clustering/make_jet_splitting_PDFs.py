@@ -13,10 +13,10 @@ import yaml
 import re
 
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, init_arg_parser
-import base_class.plots.helpers as plot_helpers
-import base_class.plots.iPlot_config as cfg
-from jet_clustering.declustering import get_splitting_summary, get_splitting_name
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, init_arg_parser
+import src.plotting.helpers as plot_helpers
+import src.plotting.iPlot_config as cfg
+from python.jet_clustering.declustering import get_splitting_summary, get_splitting_name
 
 np.seterr(divide='ignore', invalid='ignore')
 

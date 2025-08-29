@@ -1,18 +1,33 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} --do_proxy
+# Source common functions
+source "src/scripts/common.sh"
 
-OUTPUT_DIR="${DEFAULT_DIR}memory_test"
-echo "############### Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output/" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory."
+    exit 1
 fi
 
-echo "############### Running memory test"
-sed -e "s#  workers: 4.*#  workers: 1\n  maxchunks: 1#" analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/HH4b_memory_test.yml
-python base_class/tests/memory_test.py --threshold 1700 -o $OUTPUT_DIR/mprofile_ci_test --script runner.py -o test.coffea -d GluGluToHHTo4B_cHHH1 -p analysis/processors/processor_HH4b.py -y UL18 -op local_outputs/analysis/ -m $DATASETS -c $OUTPUT_DIR/HH4b_memory_test.yml
-ls $OUTPUT_DIR/mprofile_ci_test.png
+# Setup proxy if needed
+setup_proxy 
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi
+# Create output directory
+OUTPUT_DIR="$OUTPUT_BASE_DIR/memory_test"
+create_output_directory "$OUTPUT_DIR"
+
+display_section_header "Input Datasets"
+DATASETS="python/metadata/datasets_HH4b_v1p2.yml"
+echo "Using datasets file: $DATASETS"
+
+python src/scripts/memory/memory_test.py \
+    --threshold 2200 \
+    -o $OUTPUT_DIR/mprofile_ci_test \
+    --script runner.py \
+        -o test.coffea -t \
+        -d GluGluToHHTo4B_cHHH1 \
+        -p python/analysis/processors/processor_HH4b.py \
+        -y UL18 \
+        -op ${OUTPUT_DIR} \
+        -m $DATASETS \
+        -c python/analysis/metadata/HH4b_signals.yml

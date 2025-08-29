@@ -7,8 +7,8 @@ from functools import cache, cached_property, partial
 from itertools import chain
 from typing import TYPE_CHECKING, Iterable
 
-from classifier.task import ArgParser, parse
-from classifier.typetools import enum_dict
+from python.classifier.task import ArgParser, parse
+from python.classifier.typetools import enum_dict
 
 from ...setting.df import Columns
 from ...setting.HCR import Input, InputBranch, MassRegion, NTag
@@ -71,7 +71,7 @@ class Common(LoadGroupedRoot):
 
     @cache
     def from_root(self, groups: frozenset[str]):
-        from classifier.df.io import FromRoot
+        from python.classifier.df.io import FromRoot
 
         friends = []
         for k, v in self.friends.items():
@@ -134,7 +134,7 @@ class CommonTrain(Common):
 
     def __init__(self):
         super().__init__()
-        from classifier.df.tools import drop_columns, map_selection_to_flag
+        from python.classifier.df.tools import drop_columns, map_selection_to_flag
 
         # fmt: off
         (
@@ -157,7 +157,7 @@ class CommonTrain(Common):
                 ).set(name=_Derived.ntag_index),
                 drop_columns(
                     "ZZSR", "ZHSR", "HHSR", "SR", "SB",
-                    "fourTag", "threeTag", "pseudoTagWeight",
+                    "fourTag", "threeTag",
                 ),
             ]
         )
@@ -182,7 +182,7 @@ class CommonTrain(Common):
     def preprocess_by_group(self):
         ps = []
         if self.opts.JCM_weight:
-            from classifier.compatibility.JCM.fit import apply_JCM_from_list
+            from python.classifier.compatibility.JCM.fit import apply_JCM_from_list
 
             for opts in self.opts.JCM_weight:
                 ps.append(
@@ -196,7 +196,7 @@ class CommonTrain(Common):
     def debug(self):
         import logging
 
-        from classifier.config.state.label import MultiClass
+        from python.classifier.config.state.label import MultiClass
         from rich.pretty import pretty_repr
 
         pres = defaultdict(list)

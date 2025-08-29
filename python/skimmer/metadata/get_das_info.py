@@ -32,7 +32,7 @@ if __name__ == '__main__':
     #
     parser = argparse.ArgumentParser(description='Run coffea processor', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--datasets', default="datasets_HH4b.yml", help='Main datasets file.')
-    parser.add_argument('-o', '--output_path', default="python/skimmer/metadata/", help='Main datasets file.')
+    parser.add_argument('-o', '--output_path', default="python/skimmer/python/metadata/", help='Main datasets file.')
     args = parser.parse_args()
 
     yaml_data = yaml.full_load(open(args.datasets, 'r'))

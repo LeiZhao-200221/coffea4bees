@@ -5,18 +5,15 @@ import logging
 import fsspec
 import torch
 import torch.nn.functional as F
-from classifier.config.scheduler import SkimStep
-from classifier.config.setting.HCR import Input, InputBranch, Output
-from classifier.config.setting.ml import SplitterKeys
-from classifier.config.state.label import MultiClass
+from python.classifier.config.scheduler import SkimStep
+from python.classifier.config.setting.HCR import Input, InputBranch, Output
+from python.classifier.config.setting.ml import SplitterKeys
+from python.classifier.config.state.label import MultiClass
 
+from ...utils import MemoryViewIO
 from .. import BatchType
 from ..skimmer import Filter
-from ..training import (
-    BenchmarkStage,
-    OutputStage,
-    TrainingStage,
-)
+from ..training import BenchmarkStage, OutputStage, TrainingStage
 from .HCR import HCRModel, HCRTraining, _HCRSkim
 
 
@@ -123,6 +120,6 @@ class SvBTraining(HCRTraining):
                             )
                         },
                     },
-                    f,
+                    MemoryViewIO(f),
                 )
             yield output_stage

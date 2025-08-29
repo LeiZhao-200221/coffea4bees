@@ -1,5 +1,5 @@
-from base_class.physics.object import LorentzVector, Jet
-from base_class.hist import H, Template
+from src.hist.object import LorentzVector, Jet
+from src.hist import H, Template
 import numpy as np
 
 class SvBHists(Template):
@@ -9,7 +9,7 @@ class SvBHists(Template):
     tt_vs_mj     = H((50, 0, 1, ('tt_vs_mj', "P(tT) | Background")))
 
     ps_zz   = H((25, 0, 1, ('ps_zz', "Regressed P(Signal) $|$ P(ZZ) is largest ")))
-    ps_zh   = H((25, 0, 1, ('ps_zh', "Regressed P(Signal) $|$ P(ZH) is largest ")))
+    ps_zh   = H((20, 0, 1, ('ps_zh', "Regressed P(Signal) $|$ P(ZH) is largest ")))
 
     ### var_binning makes the Run2 SvB_MA signal distribution flat
     var_binning = np.array([0.        , 0.17276639, 0.26010802, 0.32549336, 0.38053438,

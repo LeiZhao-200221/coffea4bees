@@ -9,7 +9,7 @@ import numpy._typing as npt_
 import numpy.typing as npt
 import pandas as pd
 import torch
-from base_class.root import Chain, Chunk, Friend
+from src.data_formats.root import Chain, Chunk, Friend
 
 if TYPE_CHECKING:
     from .tools import DFProcessor

@@ -2,8 +2,8 @@ import getpass
 import os
 from datetime import datetime
 
-from classifier.task import GlobalState
-from classifier.task.state import _SET
+from python.classifier.task import GlobalState
+from python.classifier.task.state import _SET
 
 
 class System(GlobalState):
@@ -20,7 +20,7 @@ class System(GlobalState):
             cls.user_name = "unknown"
         cls.main_task = main_task
         cls.startup_time = datetime.now()
-        cls.in_singularity = os.path.exists("/.singularity")
+        cls.in_singularity = os.path.exists("/.singularity.d")
 
     @classmethod
     def run_time(cls):

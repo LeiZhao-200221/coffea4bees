@@ -1,3 +1,6 @@
+# local configs
+/python/analysis_dask/config/**/*.local.cfg.yml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -139,11 +142,11 @@ venv.bak/
 # mkdocs documentation
 /site
 
-.git/
 .vscode/
 sync.sh
 *.code-workspace
 **/*.code-workspace
+.shell
 
 # mypy
 .mypy_cache/
@@ -167,7 +170,6 @@ cython_debug/
 #.idea/
 
 
-
 python/testJCM_*
 setupROOT.sh
 shell
@@ -183,9 +185,9 @@ proxy/
 python/analysis/hists/
 runCITests.sh
 .bashrc
-python/output/
-python/local_output/
-python/CI_output
+python/*output*/
+*output*
+gitdiff.txt
 
 .local/
 set_ROOT.sh
@@ -204,9 +206,9 @@ python/skimmer/*root
 python/analysis/tests/test_dump*.yml
 python/stats_analysis/closureFitsNew/
 python/.sites_map.json
-.ci-workflows/debug-mixed-data.sh
+python/workflows/gitlab-CI/debug-mixed-data.sh
 
-.ci-workflows/debug-signal.sh
+python/workflows/gitlab-CI/debug-signal.sh
 .snakemake/
 .condor_config
 python/analysis/debugMixedData.py
@@ -301,7 +303,7 @@ python/plots_check_reclustered_splittings.config
 python/jet_clustering/testTexSlides.tex
 
 
-.ci-workflows/test-signal.sh
+python/workflows/gitlab-CI/test-signal.sh
 
 coffea4bees-dask-report-*.html
 python/analysis/debugMixedDataCutFlow.py

@@ -1,4 +1,4 @@
-from classifier.task import ArgParser
+from python.classifier.task import ArgParser
 
 from . import one_kl
 

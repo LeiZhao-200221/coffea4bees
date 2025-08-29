@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--signal', dest='signal',
                         default='GluGluToHHTo4B_cHHH1', help="Signal to plot")
     parser.add_argument('-m', '--metadata', dest='metadata',
-                        default='stats_analysis/metadata/HH4b.yml', help="Metadata file")
+                        default='stats_analysis/python/metadata/HH4b.yml', help="Metadata file")
     # parser.add_argument('-r', '--rebin', dest='rebin', type=int,
     #                     default=15, help="Rebin")
     args = parser.parse_args()

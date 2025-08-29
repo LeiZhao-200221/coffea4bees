@@ -1,26 +1,28 @@
 import yaml
-from skimmer.processor.picoaod import PicoAOD #, fetch_metadata, resize
-from analysis.helpers.event_selection import apply_4b_selection
+from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
+from python.analysis.helpers.event_selection import apply_4b_selection
 from coffea.nanoevents import NanoEventsFactory
 
-from jet_clustering.clustering   import cluster_bs
-from jet_clustering.declustering import make_synthetic_event, clean_ISR
-from analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from base_class.math.random import Squares
-from analysis.helpers.event_weights import add_weights, add_btagweights
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_event_selection
+from python.jet_clustering.clustering   import cluster_bs
+from python.jet_clustering.declustering import make_synthetic_event, clean_ISR
+from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from src.math.random import Squares
+from python.analysis.helpers.event_weights import add_btagweights
+from python.analysis.helpers.processor_config import processor_config
+from src.physics.event_selection import apply_event_selection
+from src.physics.event_weights import add_weights
 
-from base_class.root import Chunk, TreeReader
-from analysis.helpers.load_friend import (
+from src.data_formats.root import Chunk, TreeReader
+from python.analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
 )
 
 from coffea.analysis_tools import Weights, PackedSelection
 import numpy as np
-from analysis.helpers.common import apply_jerc_corrections, update_events
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import update_events
 from copy import copy
 import logging
 import awkward as ak
@@ -31,6 +33,7 @@ class DeClusterer(PicoAOD):
                 subtract_ttbar_with_weights = False,
                 declustering_rand_seed=5,
                 friends: dict[str, str|FriendTemplate] = None,
+                corrections_metadata: dict = None,
                 *args, **kwargs):
         kwargs["pico_base_name"] = f'picoAOD_seed{declustering_rand_seed}'
         super().__init__(*args, **kwargs)
@@ -41,7 +44,7 @@ class DeClusterer(PicoAOD):
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]
@@ -96,7 +99,6 @@ class DeClusterer(PicoAOD):
 
         ## adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights( event, config["do_MC_weights"], dataset, year_label,
-                                                  estart, estop,
                                                   self.corrections_metadata[year],
                                                   isTTForMixed=False,
                                                   target=target,
@@ -240,7 +242,7 @@ class DeClusterer(PicoAOD):
 
         processOutput = {}
 
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output_clustering_inputs
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output_clustering_inputs
         # add_debug_info_to_output_clustering_inputs(selev, jets_for_clustering, processOutput)
 
         clustered_jets, _clustered_splittings = cluster_bs(jets_for_clustering, debug=False)
@@ -252,7 +254,7 @@ class DeClusterer(PicoAOD):
         #
         # Declustering
         #
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output_clustering_outputs
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output_clustering_outputs
         # add_debug_info_to_output_clustering_outputs(selev, clustered_jets, processOutput)
 
         b_pt_threshold = 30 if config["isRun3"] else 40
@@ -260,7 +262,7 @@ class DeClusterer(PicoAOD):
 
         declustered_jets = declustered_jets[ak.argsort(declustered_jets.pt, axis=1, ascending=False)]
 
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
         # add_debug_info_to_output_declustering_outputs(selev, declustered_jets, processOutput)
 
 

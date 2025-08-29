@@ -19,10 +19,10 @@ from scipy.optimize import curve_fit
 from hist import Hist
 
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import load_config, load_hists, read_axes_and_cuts
-import base_class.plots.iPlot_config as cfg
+from src.plotting.plots import load_config, load_hists, read_axes_and_cuts
+import src.plotting.iPlot_config as cfg
 
-from base_class.JCMTools import getCombinatoricWeight, getPseudoTagProbs
+from src.JCMTools import getCombinatoricWeight, getPseudoTagProbs
 
 def data_from_TH1F(inTH1F):
     centers = []

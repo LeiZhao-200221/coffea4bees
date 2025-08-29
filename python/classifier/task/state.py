@@ -134,7 +134,7 @@ class GlobalSetting(GlobalState, Static, metaclass=_ClassPropertyMeta):
 
     @classmethod
     def help(cls):
-        from base_class.typetools import get_partial_type_hints, type_name
+        from src.typetools import get_partial_type_hints, type_name
         from rich.markup import escape
 
         from ..docstring import class_attribute_docstring

@@ -1,7 +1,7 @@
 from typing import TypedDict
 
 import awkward as ak
-from base_class.root import Chunk, Friend
+from src.data_formats.root import Chunk, Friend
 
 
 class FriendTemplate(TypedDict):
@@ -14,7 +14,7 @@ def parse_friends(args: dict[str, str | FriendTemplate]) -> dict[str, Friend]:
     if args is None:
         return friends
 
-    from classifier.task import parse
+    from python.classifier.task import parse
 
     for name, path in args.items():
         if isinstance(path, str):

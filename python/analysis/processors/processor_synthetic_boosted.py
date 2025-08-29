@@ -10,16 +10,16 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 import hist
-from analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutFlow
 
+from src.physics.event_selection import apply_event_selection
+from src.hist import Collection, Fill
+from python.jet_clustering.clustering_hist_templates import ClusterHistsBoosted, ClusterHistsDetailedBoosted
+from src.hist.object import LorentzVector, Jet
 
-from analysis.helpers.event_selection import apply_event_selection
-from base_class.hist import Collection, Fill
-from jet_clustering.clustering_hist_templates import ClusterHistsBoosted, ClusterHistsDetailedBoosted
-from base_class.physics.object import LorentzVector, Jet
+from python.jet_clustering.declustering import compute_decluster_variables, get_splitting_name, get_list_of_combined_jet_types, get_list_of_all_sub_splittings
+from python.jet_clustering.clustering import comb_jet_flavor
 
-from jet_clustering.declustering import compute_decluster_variables, get_splitting_name, get_list_of_combined_jet_types, get_list_of_all_sub_splittings
-from jet_clustering.clustering import comb_jet_flavor
 
 import logging
 import vector
@@ -35,12 +35,12 @@ class analysis(processor.ProcessorABC):
     def __init__(
             self,
             *,
-            corrections_metadata="analysis/metadata/corrections.yml",
+            corrections_metadata: dict = None,
             **kwargs
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
     def process(self, event):
 

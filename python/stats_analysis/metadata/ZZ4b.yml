@@ -1,13 +1,13 @@
 processes:
   signal:
-    GluGluToHHTo4B_cHHH1:
-      label: HH4b
-      process: 2
-    ZH4b:
-      label: ZH4b
-      process: 1
+    # GluGluToHHTo4B_cHHH1:
+    #   label: HH4b
+    #   process: 2
+    # ZH4b:
+    #   label: ZH4b
+    #   process: 1
     ZZ4b:
-      label: ZZ4b
+      label: ZZ_bbbb
       process: 0
   background:
     multijet:
@@ -17,9 +17,9 @@ processes:
       label: 'tt'
       process: 2
 bin:
-  - &16 ZZbb_2016
-  - &17 ZZbb_2017
-  - &18 ZZbb_2018
+  - &16 ZZ4b_2016
+  - &17 ZZ4b_2017
+  - &18 ZZ4b_2018
 
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM?rev=167#LumiComb  # https://gitlab.cern.ch/hh/naming-conventions
 uncertainty:
@@ -51,20 +51,13 @@ uncertainty:
     years:
       *18: 1.015
 
-  BR_hbb:
+  xs_zbbzbb:
     type: 'lnN'
     years:
-      *16: 1.025
-      *17: 1.025
-      *18: 1.025
+      *16: 1.002
+      *17: 1.002
+      *18: 1.002
 
-  xs_hbbhbb:
-    type: 'lnN'
-    years:
-      *16: [0.942, 1.037]
-      *17: [0.942, 1.037]
-      *18: [0.942, 1.037]
-  
   # mtop_gHH:
   #   type: 'lnN'
   #   years:

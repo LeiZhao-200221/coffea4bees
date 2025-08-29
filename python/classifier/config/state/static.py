@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from base_class.system.eos import EOS, PathLike
+    from src.storage.eos import EOS, PathLike
 
 
 class GitRepo:
@@ -17,7 +17,7 @@ class GitRepo:
 
     @classmethod
     def get_url(cls, path: PathLike) -> str:
-        from base_class.system.eos import EOS
+        from src.storage.eos import EOS
 
         if cls._local is None:
             local = EOS(__file__)

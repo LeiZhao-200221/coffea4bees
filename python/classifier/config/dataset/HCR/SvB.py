@@ -4,9 +4,9 @@ import operator as op
 from functools import partial, reduce
 from typing import TYPE_CHECKING
 
-from classifier.config.setting.df import Columns
-from classifier.config.state.label import MultiClass
-from classifier.task import ArgParser, converter, parse
+from python.classifier.config.setting.df import Columns
+from python.classifier.config.state.label import MultiClass
+from python.classifier.task import ArgParser, converter, parse
 
 from . import _group, _picoAOD
 from ._common import CommonEval, CommonTrain
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def _reweight_bkg(df: pd.DataFrame):
-    df.loc[:, "weight"] *= df["pseudoTagWeight"] * df["FvT"]
+    df.loc[:, "weight"] *= df["FvT"]
     return df
 
 
@@ -34,7 +34,7 @@ class _common_selection:
         return df[selection]
 
     def __repr__(self):
-        from classifier.df.tools import _iter_str, _type_str
+        from python.classifier.df.tools import _iter_str, _type_str
 
         selections = [self.ntags, *self.regions]
         if self.passHLT:
@@ -109,14 +109,14 @@ class Background(_picoAOD.Background, _Train):
     )
 
     def __init__(self):
-        from classifier.df.tools import drop_columns
+        from python.classifier.df.tools import drop_columns
 
         super().__init__()
         self.postprocessors.insert(0, partial(self.normalize, norm=self.opts.norm))
         self.preprocessors.append(drop_columns("FvT"))
 
     def other_branches(self):
-        return super().other_branches() | {"FvT", "pseudoTagWeight"}
+        return super().other_branches() | {"FvT"}
 
     @staticmethod
     def normalize(df: pd.DataFrame, norm: float):

@@ -2,23 +2,24 @@ import logging
 
 import numpy as np
 import yaml
-from analysis.helpers.common import apply_jerc_corrections
-from analysis.helpers.mc_weight_outliers import OutlierByMedian
-from analysis.helpers.processor_config import processor_config
-from analysis.helpers.event_selection import apply_4b_selection
-from analysis.helpers.event_selection import apply_event_selection
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from python.analysis.helpers.mc_weight_outliers import OutlierByMedian
+from python.analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.event_selection import apply_4b_selection
+from src.physics.event_selection import apply_event_selection
+
 from coffea.analysis_tools import PackedSelection, Weights
-from skimmer.processor.picoaod import PicoAOD
+from src.skimmer.picoaod import PicoAOD
 
 
 class Skimmer(PicoAOD):
-    def __init__(self, loosePtForSkim=False, skim4b=False, mc_outlier_threshold:int|None=200, *args, **kwargs):
+    def __init__(self, loosePtForSkim=False, skim4b=False, mc_outlier_threshold:int|None=200, corrections_metadata: dict = None, *args, **kwargs):
         if skim4b:
             kwargs["pico_base_name"] = f'picoAOD_fourTag'
         super().__init__(*args, **kwargs)
         self.loosePtForSkim = loosePtForSkim
         self.skim4b = skim4b
-        self.corrections_metadata = yaml.safe_load(open('analysis/metadata/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
         self.mc_outlier_threshold = mc_outlier_threshold
 
 
@@ -95,7 +96,7 @@ class Skimmer(PicoAOD):
         # print(f"debug {debug_event.passHLT} {debug_event.passJetMult} {debug_event.passPreSel} {debug_event.Jet.pt} {debug_event.Jet.pt_raw} \n\n\n")
 
         processOutput = {}
-        #from analysis.helpers.write_debug_info import add_debug_Run3_data_skim
+        #from python.analysis.helpers.write_debug_info import add_debug_Run3_data_skim
         #add_debug_Run3_data_skim(event, processOutput, selection)
 
         return final_selection, None, processOutput

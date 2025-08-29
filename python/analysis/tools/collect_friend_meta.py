@@ -2,10 +2,10 @@ import json
 from argparse import ArgumentParser
 
 import fsspec
-from base_class.root import Friend
-from base_class.utils.argparser import DefaultFormatter
-from base_class.utils.json import DefaultEncoder
-from classifier.task import parse
+from src.data_formats.root import Friend
+from src.utils.argparser import DefaultFormatter
+from src.utils.json import DefaultEncoder
+from python.classifier.task import parse
 
 if __name__ == "__main__":
     argparser = ArgumentParser(formatter_class=DefaultFormatter)

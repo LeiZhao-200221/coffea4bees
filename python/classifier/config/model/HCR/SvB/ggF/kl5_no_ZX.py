@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from classifier.task import ArgParser
+from python.classifier.task import ArgParser
 
 from . import sm_no_ZX
 

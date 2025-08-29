@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Iterable
 
 import torch
 import torch.types as tt
-from classifier.config.setting import IO as cfg_IO
-from classifier.config.setting import ml as cfg
+from python.classifier.config.setting import IO as cfg_IO
+from python.classifier.config.setting import ml as cfg
 from rich.pretty import pretty_repr
 from torch import Tensor, nn
 from torch.utils.data import Dataset
@@ -24,7 +24,7 @@ from ..typetools import WithUUID, filename
 from . import BatchType, clear_cache
 
 if TYPE_CHECKING:
-    from base_class.system.eos import PathLike
+    from src.storage.eos import PathLike
 
 
 @dataclass(kw_only=True)

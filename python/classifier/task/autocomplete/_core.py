@@ -4,8 +4,8 @@ from collections import deque
 from multiprocessing.connection import Listener
 from typing import Iterable
 
-from classifier.config.main.help import _walk_configs
-from classifier.config.state import Flags
+from python.classifier.config.main.help import _walk_configs
+from python.classifier.config.state import Flags
 
 from .. import main as m
 from ..special import TaskBase

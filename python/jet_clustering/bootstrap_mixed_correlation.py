@@ -18,10 +18,10 @@ import matplotlib.pyplot as plt
 
 # Add current directory to path for local imports
 sys.path.insert(0, os.getcwd())
-from base_class.plots.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args
-import base_class.plots.helpers_make_plot_dict as plot_helpers_make_plot_dict
-import base_class.plots.helpers_make_plot as plot_helpers_make_plot
-import base_class.plots.iPlot_config as cfg
+from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args
+import src.plotting.helpers_make_plot_dict as plot_helpers_make_plot_dict
+import src.plotting.helpers_make_plot as plot_helpers_make_plot
+import src.plotting.iPlot_config as cfg
 
 # Configure numpy error handling
 np.seterr(divide='ignore', invalid='ignore')

@@ -1,15 +1,17 @@
 #!/bin/bash
-source scripts/set_initial_variables.sh --output ${1:-"output/"} 
+# Source common functions
+source "src/scripts/common.sh"
 
-INPUT_DIR="${DEFAULT_DIR}analysis_merge_test_job"
-OUTPUT_DIR="${DEFAULT_DIR}analysis_plot_job"
+
+INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
+OUTPUT_DIR="${1:-"output"}/analysis_plot_job"
 echo "############### Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
 echo "############### Running test processor"
-python plots/makePlots.py $INPUT_DIR/test.coffea --doTest -o $OUTPUT_DIR -m plots/metadata/plotsAll.yml
+python python/plots/makePlots.py $INPUT_DIR/test.coffea --doTest -o $OUTPUT_DIR -m python/plots/metadata/plotsAll.yml
 
 echo "############### Checking if pdf files exist"
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.pdf
@@ -25,7 +27,7 @@ ls $OUTPUT_DIR/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_oth
 
 
 echo "############### check making the plots from yaml "
-python plots/plot_from_yaml.py --input_yaml $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.yaml \
+python python/plots/plot_from_yaml.py --input_yaml $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_hh.yaml \
    $OUTPUT_DIR/RunII/passPreSel/fourTag/SR_vs_SB/data/SvB_MA_ps.yaml \
@@ -49,7 +51,3 @@ ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/data/quadJet_min
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/HH4b/quadJet_min_dr_close_vs_other_m.pdf
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_other_m.pdf 
 
-if [ "$return_to_base" = true ]; then
-    echo "############### Returning to base directory"
-    cd ../
-fi

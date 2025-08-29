@@ -6,12 +6,12 @@ import fsspec
 import numpy.typing as npt
 import torch
 import torch.nn.functional as F
-from classifier.config.model._kfold import _find_models
-from classifier.config.setting.HCR import Input
-from classifier.config.setting.ml import KFold, SplitterKeys
-from classifier.ml import BatchType
-from classifier.ml.skimmer import Splitter
-from classifier.nn.blocks.HCR import HCR
+from python.classifier.config.model._kfold import _find_models
+from python.classifier.config.setting.HCR import Input
+from python.classifier.config.setting.ml import KFold, SplitterKeys
+from python.classifier.ml import BatchType
+from python.classifier.ml.skimmer import Splitter
+from python.classifier.nn.blocks.HCR import HCR
 
 from .. import networks
 
@@ -53,6 +53,11 @@ class Legacy_HCREnsemble(networks.HCREnsemble):
 
         c_logits, q_logits = self.forward(j, o, a, e)
         return F.softmax(c_logits, dim=-1).numpy(), F.softmax(q_logits, dim=-1).numpy()
+
+
+class Legacy_HCREnsemble_FvT(Legacy_HCREnsemble):
+    classes = ["d4", "d3", "t4", "t3"]
+
 
 
 class _HCRKFoldModel:

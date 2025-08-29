@@ -1,4 +1,4 @@
-from classifier.config.dataset import HCR
+from python.classifier.config.dataset import HCR
 
 from .._root import LoadGroupedRootForTest
 

@@ -8,8 +8,9 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.event_selection import apply_event_selection, apply_boosted_4b_selection, apply_4b_selection
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.event_selection import apply_boosted_4b_selection, apply_4b_selection
+from src.physics.event_selection import apply_event_selection
 
 import logging
 
@@ -24,12 +25,12 @@ class analysis(processor.ProcessorABC):
     def __init__(
             self,
             *,
-            corrections_metadata="analysis/metadata/corrections.yml",
+            corrections_metadata: dict = None,
             **kwargs
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
 
 
@@ -104,7 +105,7 @@ class analysis(processor.ProcessorABC):
         #
         #  Adding infor for preliminary Boosted Synthetic data study
         #
-        # from analysis.helpers.write_debug_info import add_debug_info_for_Boosted_Synthetic
+        # from python.analysis.helpers.write_debug_info import add_debug_info_for_Boosted_Synthetic
         # add_debug_info_for_Boosted_Synthetic(boosted_events, processOutput)
 
         # print("\n")

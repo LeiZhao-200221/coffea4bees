@@ -25,7 +25,7 @@ def get_events_in_das(dataset_names):
 
     for _dataset in dataset_names:
         # Open and read a JSON file
-        with open(f"skimmer/metadata/das_summary_{_dataset}.json", 'r') as file:
+        with open(f"skimmer/python/metadata/das_summary_{_dataset}.json", 'r') as file:
             json_data = json.load(file)
 
         counts_in_das[_dataset] = json_data[0]["summary"][0]["nevents"]
@@ -51,10 +51,10 @@ if __name__ == "__main__":
     # input parameters
     #
     parser = argparse.ArgumentParser(description='Run coffea processor', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-y', '--yaml_file', default="skimmer/metadata/picoaod_datasets_data_2023_BPix.yml", help='skimmer output yaml.')
+    parser.add_argument('-y', '--yaml_file', default="skimmer/python/metadata/picoaod_datasets_data_2023_BPix.yml", help='skimmer output yaml.')
     args = parser.parse_args()
 
     # ASssuem that
-    # py python/skimmer/metadata/get_das_info.py -d python/metadata/datasets_HH4b_Run3.yml
+    # py python/skimmer/python/metadata/get_das_info.py -d python/python/metadata/datasets_HH4b_Run3.yml
 
     run(yaml_file_name = args.yaml_file)

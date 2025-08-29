@@ -15,21 +15,22 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea.nanoevents.methods import vector
 from coffea import processor
 
-from base_class.hist import Collection, Fill
-from base_class.hist import H, Template
-from base_class.physics.object import LorentzVector, Jet, Muon, Elec
+from src.hist import Collection, Fill
+from src.hist import H, Template
+from src.hist.object import LorentzVector, Jet, Muon, Elec
 
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from analysis.helpers.cutflow import cutFlow
-from analysis.helpers.topCandReconstruction import find_tops, dumpTopCandidateTestVectors, buildTop
-from analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.topCandReconstruction import find_tops, dumpTopCandidateTestVectors, buildTop
+from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
 from functools import partial
 from multiprocessing import Pool
 
-from analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from analysis.helpers.common import apply_btag_sf, update_events
-from analysis.helpers.event_selection import apply_4b_selection, apply_event_selection
+from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from src.physics.common import apply_btag_sf, update_events
+from src.physics.event_selection import apply_event_selection
+from python.analysis.helpers.event_selection import apply_4b_selection
 import logging
 
 
@@ -63,12 +64,12 @@ ak.behavior.update(vector.behavior)
 
 
 class analysis(processor.ProcessorABC):
-    def __init__(self, JCM='', threeTag = True, corrections_metadata='analysis/metadata/corrections.yml', run_systematics=[], SRno = '4', make_classifier_input: str = ''):
+    def __init__(self, JCM='', threeTag = True, corrections_metadata: dict = None, run_systematics=[], SRno = '4', make_classifier_input: str = ''):
         logging.debug('\nInitialize Analysis Processor')
         self.histCuts = ['passPreSel']
         self.tags = ['threeTag', 'fourTag'] if threeTag else ['fourTag']
         # self.JCM = jetCombinatoricModel(JCM)
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, 'r'))
+        self.corrections_metadata = corrections_metadata
         self.run_systematics = run_systematics
         self.m4jBinEdges = np.array([[0, 361], [361, 425], [425, 479], [479, 533], [533, 591], [591, 658], [658, 741], [741, 854], [854, 1044], [1044, 1800]])
         self.SRno = int(SRno)
@@ -398,7 +399,7 @@ class analysis(processor.ProcessorABC):
 
         friends = {}
         if self.make_classifier_input is not None:
-            from analysis.helpers.dump_friendtrees import dump_unsup_friend
+            from python.analysis.helpers.dump_friendtrees import dump_unsup_friend
             friends["friends"] = dump_unsup_friend(
                 selev,
                 self.make_classifier_input,   #### output file: return pathlike
