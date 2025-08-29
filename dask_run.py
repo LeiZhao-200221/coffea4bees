@@ -1,14 +1,20 @@
 #!/usr/bin/env python
+import sys
+from pathlib import Path
+
+sys.path.append(Path(__file__).resolve().parent / "python")
+
 import argparse
 import logging
 import warnings
 
-import dask
 import dask_awkward as dak
-from src.storage.eos import EOS
 from distributed import Client, LocalCluster
 from rich.logging import RichHandler
 from rich.pretty import pretty_repr
+
+import dask
+from src.storage.eos import EOS
 
 warnings.filterwarnings("ignore")
 
