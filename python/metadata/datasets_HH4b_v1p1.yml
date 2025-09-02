@@ -2,6 +2,17 @@ datasets:
   GluGluToBulkGravitonToHHTo4B:
     UL18:
       nanoAOD: /GluGluToBulkGravitonToHHTo4B_M-500_narrow_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+      picoAOD:
+        count: 278000
+        files:
+        - root://cmseos.fnal.gov//store/user/smurthy/XX4b/2025_Run2_skims/GluGluToBulkGravitonToHHTo4B_UL18/picoAOD.root
+        missing: {}
+        saved_events: 98546
+        sumw: 278000.0
+        sumw2: 278000.0
+        sumw2_raw: 278000.0
+        sumw_raw: 278000.0
+        total_events: 278000
   GluGluToHHTo4B_cHHH0:
     UL16_postVFP:
       nanoAOD: /GluGluToHHTo4B_cHHH0_TuneCP5_PSWeights_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM
