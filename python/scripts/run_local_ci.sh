@@ -30,24 +30,4 @@ else
   return 0
 fi
 
-# Search for the job name and assign the output list it belongs to a variable
-OUTPUT_LIST=$(awk -v job="$JOB_NAME" '
-  BEGIN { found=0; }
-  /^output_/ { in_list=1; output_list=$1; next; }
-  in_list && /^\]/ { in_list=0; }
-  in_list && $0 ~ job { found=1; print output_list; exit; }
-  END { if (!found) print ""; }
-' "$SNAKEFILE")
-
-if [ -z "$OUTPUT_LIST" ]; then
-  echo "Job name not found in any output list."
-else
-  echo "Changing the output list to $OUTPUT_LIST"
-
-  sed -e "s/input: outputs/input: $OUTPUT_LIST/" "$SNAKEFILE" > /tmp/Snakefile_testCI
-
-  pwd -LP
-  ./run_container snakemake --snakefile /tmp/Snakefile_testCI --use-apptainer --printshellcmds --keep-incomplete --until $JOB_NAME --cores 1
-
-fi
-
+./run_container snakemake --snakefile $SNAKEFILE --use-apptainer --cores 1 $JOB_NAME
