@@ -11,7 +11,7 @@ import numpy as np
 import yaml
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,
@@ -61,7 +61,7 @@ class analysis(processor.ProcessorABC):
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         fill_histograms: bool = True,
-        corrections_metadata: str = "src/physics/corrections.yml",
+        corrections_metadata: dict = None,
         friends: dict[str, str|FriendTemplate] = None,
     ):
 
@@ -69,8 +69,7 @@ class analysis(processor.ProcessorABC):
         self.apply_trigWeight = apply_trigWeight
         self.apply_btagSF = apply_btagSF
         self.fill_histograms = fill_histograms
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
+        self.corrections_metadata = corrections_metadata
         self.friends = parse_friends(friends)
 
 

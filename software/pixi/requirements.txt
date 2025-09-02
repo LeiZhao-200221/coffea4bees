@@ -1,0 +1,2 @@
+python>=3.11
+bioconda::snakemake==8.27.1

@@ -108,6 +108,7 @@ def jet_selection(
     dataset: str = '',
     doLeptonRemoval: bool = True,
     do_jet_veto_maps: bool = False,
+    apply_mixeddata_sel: bool = False,
     override_selected_with_flavor_bit: bool = False
 ) -> ak.Array:
     """
@@ -133,6 +134,8 @@ def jet_selection(
         Whether to perform lepton removal. Defaults to True.
     do_jet_veto_maps : bool, optional
         Whether to apply jet veto maps. Defaults to False.
+    mixeddata_sel : bool, optional
+        Whether to apply mixeddata selection as in HIG-22-011. Defaults to False.
     override_selected_with_flavor_bit : bool, optional
         Whether to override selected jets with flavor bit. Defaults to False.
 
@@ -202,14 +205,20 @@ def jet_selection(
         event['Jet', 'calibration'] = event.Jet.pt / (event.Jet.pt_raw if 'pt_raw' in event.Jet.fields else ak.full_like(event.Jet.pt, 1))
         event['Jet', 'btagScore'] = event.Jet.btagDeepFlavB
 
-        if ('GluGlu' in dataset) and not isSyntheticMC:
-            event['Jet', 'corrPuId'] = compute_puid(event.Jet, dataset)
+        if apply_mixeddata_sel:
+            event['Jet', 'pileup'] = ((event.Jet.puId < 6) & (event.Jet.pt < 50))
+            event['Jet', 'selected_loose'] = (event.Jet.pt >= 20) & ~event.Jet.pileup
+            event['Jet', 'selected'] = (event.Jet.pt >= 40) & (np.abs(event.Jet.eta) <= 2.4) & ~event.Jet.pileup 
+        
         else:
-            event['Jet', 'corrPuId'] = ak.where(event.Jet.puId < 7, True, False)
+            if ('GluGlu' in dataset) and not isSyntheticMC:
+                event['Jet', 'corrPuId'] = compute_puid(event.Jet, dataset)
+            else:
+                event['Jet', 'corrPuId'] = ak.where(event.Jet.puId < 7, True, False)
 
-        event['Jet', 'pileup'] = ((event.Jet.corrPuId) & (event.Jet.pt < 50)) | ((np.abs(event.Jet.eta) > 2.4) & (event.Jet.pt < 40))
-        event['Jet', 'selected_loose'] = (event.Jet.pt >= 20) & ~event.Jet.pileup & (event.Jet.jetId >= 2) & event.Jet.lepton_cleaned
-        event['Jet', 'selected'] = (event.Jet.pt >= 40) & (np.abs(event.Jet.eta) <= 2.4) & ~event.Jet.pileup & (event.Jet.jetId >= 2) & event.Jet.lepton_cleaned
+            event['Jet', 'pileup'] = ((event.Jet.corrPuId) & (event.Jet.pt < 50)) | ((np.abs(event.Jet.eta) > 2.4) & (event.Jet.pt < 40))
+            event['Jet', 'selected_loose'] = (event.Jet.pt >= 20) & ~event.Jet.pileup & (event.Jet.jetId >= 2) & event.Jet.lepton_cleaned
+            event['Jet', 'selected'] = (event.Jet.pt >= 40) & (np.abs(event.Jet.eta) <= 2.4) & ~event.Jet.pileup & (event.Jet.jetId >= 2) & event.Jet.lepton_cleaned
 
     # Tagging jets
     event['Jet', 'tagged'] = event.Jet.selected & (event.Jet.btagScore >= corrections_metadata['btagWP']['M'])

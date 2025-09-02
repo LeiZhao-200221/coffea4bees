@@ -1,8 +1,10 @@
 import inspect
 import re
+from pathlib import Path
 from textwrap import indent
 
 import fsspec
+
 from python.classifier.task import ArgParser, EntryPoint, Task, main, parse
 from python.classifier.task.special import Deprecated, WorkInProgress
 from python.classifier.task.task import _INDENT
@@ -39,7 +41,10 @@ def _print_mod(cat: str, imp: str, opts: list[str | dict], newline: str = "\n"):
 
 def __walk(cat: str, ctx: main._ModCtx):
     for pkg in walk_packages(
-        "", "/".join(EntryPoint._fetch_config(cat, ctx)), skip_private=True
+        "",
+        Path(__file__).resolve().parents[3]
+        / "/".join(EntryPoint._fetch_config(cat, ctx)),
+        skip_private=True,
     ):
         yield pkg, ctx
 

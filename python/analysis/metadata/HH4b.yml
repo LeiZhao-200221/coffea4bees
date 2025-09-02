@@ -9,7 +9,6 @@ config:
   apply_btagSF: true
   apply_boosted_veto: false
   run_SvB: true
-  run_systematics: false
   run_dilep_ttbar_crosscheck: true
   hist_cuts: [ passPreSel ]
   # hist_cuts: [ passPreSel, passSvB, failSvB ]

@@ -2,16 +2,16 @@ import yaml
 from src.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 from collections import OrderedDict
-from analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutFlow
 
 from python.jet_clustering.declustering import make_synthetic_event
+from python.analysis.helpers.cutflow import cutflow_4b
 
 from src.math.random import Squares
 from src.physics.event_selection import apply_event_selection
 
-
 from src.data_formats.root import Chunk, TreeReader
-from analysis.helpers.load_friend import (
+from python.analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
 )
@@ -30,6 +30,7 @@ class DeClustererBoosted(PicoAOD):
     def __init__(self, clustering_pdfs_file = "None",
                 declustering_rand_seed=5,
                 friends: dict[str, str|FriendTemplate] = None,
+                corrections_metadata: dict = None,
                 *args, **kwargs):
         kwargs["pico_base_name"] = f'picoAOD_seed{declustering_rand_seed}'
         super().__init__(*args, **kwargs)
@@ -39,10 +40,11 @@ class DeClustererBoosted(PicoAOD):
 
         self.friends = parse_friends(friends)
         self.declustering_rand_seed = declustering_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
         self.skip_collections = kwargs["skip_collections"]
         self.skip_branches    = kwargs["skip_branches"]
+        self.cutFlow = cutflow_4b()
 
 
     def select(self, event):
@@ -112,7 +114,6 @@ class DeClustererBoosted(PicoAOD):
         })
         #sel_dict['passJetMult'] = selections.all(*allcuts)
 
-        self.cutFlow = cutFlow()
         for cut, sel in sel_dict.items():
             self.cutFlow.fill( cut, event[sel], allTag=True )
 
@@ -194,7 +195,7 @@ class DeClustererBoosted(PicoAOD):
         #
 
 
-        # from analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
+        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
         # add_debug_info_to_output_declustering_outputs(selev, declustered_jets, processOutput)
 
 

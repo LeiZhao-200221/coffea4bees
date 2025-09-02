@@ -90,11 +90,17 @@ Event selection and filtering pipeline.
 ### 🛠️ Scripts (`scripts/`)
 Command-line utilities and automation tools.
 
+- **`merge_yaml_datasets.py`** - Utility to merge multiple YAML dataset files
 - **`fix_eos.py`** - Utility to repair corrupted EOS files
 - **`common.sh`** - Common shell utilities
+- **`memory/`** - Memory testing and monitoring tools for preventing system hangs
+  - `memory_limited_run.sh` - Universal memory guard for any command
+  - `memory_monitor.py` - Python-specific memory monitoring
+  - `profile_memory_simple.py` - Memory usage profiling
+  - `debug_memory.py` - Advanced memory debugging tools
 - Other automation and maintenance scripts
 
-**Use when:** You need command-line tools, automation scripts, or utilities to fix common problems.
+**Use when:** You need command-line tools, automation scripts, utilities to fix common problems, or memory monitoring to prevent system crashes.
 
 ### 🧰 Utilities (`utils/`)
 Generic, reusable utilities that don't fit into specific domains.
@@ -130,22 +136,6 @@ Directory names reflect what users are trying to accomplish, not technical imple
 
 ### 4. **Independent Base Components**
 Components in this library should be independent of higher-level analysis code and reusable across different physics analyses.
-
-## Migration from Previous Structure
-
-### Import Path Changes
-The following import paths have changed for better organization:
-
-| Old Import Path | New Import Path | Deprecation Shim |
-|---|---|---|
-| `base_class.awkward` | `base_class.data_formats.awkward` | ✅ Available |
-| `base_class.numpy` | `base_class.data_formats.numpy` | ✅ Available |
-| `base_class.root` | `base_class.data_formats.root` | ✅ Available |
-| `base_class.system` | `base_class.storage` | ✅ Available |
-| `base_class.plots` | `base_class.plotting` | ✅ Available |
-
-### Backward Compatibility
-Deprecation shims are provided for all moved modules. Old import paths will continue to work but will issue `DeprecationWarning`s. Update your imports to the new paths to remove warnings.
 
 ## Common Usage Patterns
 

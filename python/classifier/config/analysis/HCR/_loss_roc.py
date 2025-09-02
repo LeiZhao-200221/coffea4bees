@@ -71,7 +71,7 @@ class _collect_loss_roc:
         return styles
 
     def __new__(cls, results: list, inline_resources=False):
-        import src.numpy as npext
+        import src.data_formats.numpy as npext
         import pandas as pd
 
         # fetch variables

@@ -9,7 +9,7 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 import hist
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 
 from src.physics.event_selection import apply_event_selection
 from src.hist import Collection, Fill
@@ -32,12 +32,12 @@ class analysis(processor.ProcessorABC):
     def __init__(
             self,
             *,
-            corrections_metadata="src/physics/corrections.yml",
+            corrections_metadata: dict = None,
             **kwargs
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
     def process(self, event):
 

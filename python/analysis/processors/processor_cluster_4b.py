@@ -22,7 +22,7 @@ from python.jet_clustering.clustering   import cluster_bs, cluster_bs_fast
 from python.jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
 
 from python.analysis.helpers.networks import HCREnsemble
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
@@ -56,7 +56,7 @@ class analysis(processor.ProcessorABC):
             SvB=None,
             SvB_MA=None,
             threeTag=False,
-            corrections_metadata="src/physics/corrections.yml",
+            corrections_metadata: dict = None,
             clustering_pdfs_file = "jet_clustering/jet-splitting-PDFs-00-07-02/clustering_pdfs_vs_pT_XXX.yml",
             run_SvB=True,
             do_declustering=False,
@@ -64,7 +64,7 @@ class analysis(processor.ProcessorABC):
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
         self.clustering_pdfs_file = clustering_pdfs_file
         self.classifier_SvB = HCREnsemble(SvB) if SvB else None
         self.classifier_SvB_MA = HCREnsemble(SvB_MA) if SvB_MA else None
@@ -207,7 +207,7 @@ class analysis(processor.ProcessorABC):
 
         }
 
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
         self._cutFlow.fill( "all", event[selections.require(lumimask=True)], allTag=True)
         self._cutFlow.fill( "passNoiseFilter", event[selections.require(lumimask=True, passNoiseFilter=True)], allTag=True)
         self._cutFlow.fill( "passHLT", event[ selections.require( lumimask=True, passNoiseFilter=True, passHLT=True ) ], allTag=True, )

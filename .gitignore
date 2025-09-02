@@ -142,12 +142,12 @@ venv.bak/
 # mkdocs documentation
 /site
 
-.git/
 .vscode/
 sync.sh
 *.code-workspace
 **/*.code-workspace
 .shell
+pixi.*
 
 # mypy
 .mypy_cache/
@@ -171,7 +171,6 @@ cython_debug/
 #.idea/
 
 
-
 python/testJCM_*
 setupROOT.sh
 shell
@@ -189,6 +188,7 @@ runCITests.sh
 .bashrc
 python/*output*/
 *output*
+gitdiff.txt
 
 .local/
 set_ROOT.sh

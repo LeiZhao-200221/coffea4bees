@@ -17,7 +17,10 @@ workflow:
     # Run for pushes to branches WITHOUT open merge requests
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS == null'
       when: always
-     # Run for web-triggered pipelines
+    # Run for scheduled pipelines
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    # Run for web-triggered pipelines
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: always
 
@@ -35,6 +38,8 @@ variables:
   # DATASET_RUN3: metadata/datasets_HH4b_Run3_cernbox.yml
 
 include:
+  - local: 'software/dockerfiles/stages_build.yml'
+  - local: 'src/workflows/gitlab-CI/stages_proxy.yml'
   - local: 'python/workflows/gitlab-CI/stages_*.yml'
   - project: 'authoring/documentation/mkdocs-ci'
     file: 'mkdocs-gitlab-pages.gitlab-ci.yml'
@@ -57,23 +62,25 @@ stages:
 
 validation:
   before_script:
+    - bash docs/sync_readmes.sh
+    - bash docs/update_mkdocs_nav.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    # Only run on pushes to main branch when docs have changed
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
-      changes:
-        - docs/**
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: never
 
 pages:
   before_script:
+    - bash docs/sync_readmes.sh
+    - bash docs/update_mkdocs_nav.sh
     - cp docs/mkdocs.yml .
     - cp docs/requirements.txt .
   rules:
-    # Only run on pushes to main branch when docs have changed
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master")'
-      changes:
-        - docs/**
+      when: always
+    - when: never
 
 .base_analysis:
   needs:

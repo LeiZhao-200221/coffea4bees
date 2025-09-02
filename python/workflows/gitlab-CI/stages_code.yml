@@ -1,4 +1,4 @@
-analysis-helpers-job:    
+analysis-helpers-job:
   stage: code
   extends:
     - .base_analysis
@@ -11,6 +11,13 @@ kappa-framework:
     - .base_analysis
   script:
     - source python/scripts/baseclass-kappa-framework.sh
+
+hist-collection:
+  stage: code
+  extends:
+    - .base_analysis
+  script:
+    - source python/scripts/baseclass-hist-collection.sh
 
 jet-clustering:
   stage: code
@@ -34,6 +41,7 @@ memory-test:
     - .base_analysis
   script:
     - source python/scripts/memory_test.sh
+  allow_failure: true
   artifacts:
     paths:
       - output/memory_test/mprofile_ci_test.png

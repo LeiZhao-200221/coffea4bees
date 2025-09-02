@@ -20,7 +20,7 @@ from src.hist import H, Template
 from src.hist.object import LorentzVector, Jet, Muon, Elec
 
 from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.topCandReconstruction import find_tops, dumpTopCandidateTestVectors, buildTop
 from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
@@ -64,12 +64,12 @@ ak.behavior.update(vector.behavior)
 
 
 class analysis(processor.ProcessorABC):
-    def __init__(self, JCM='', threeTag = True, corrections_metadata='src/physics/corrections.yml', run_systematics=[], SRno = '4', make_classifier_input: str = ''):
+    def __init__(self, JCM='', threeTag = True, corrections_metadata: dict = None, run_systematics=[], SRno = '4', make_classifier_input: str = ''):
         logging.debug('\nInitialize Analysis Processor')
         self.histCuts = ['passPreSel']
         self.tags = ['threeTag', 'fourTag'] if threeTag else ['fourTag']
         # self.JCM = jetCombinatoricModel(JCM)
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, 'r'))
+        self.corrections_metadata = corrections_metadata
         self.run_systematics = run_systematics
         self.m4jBinEdges = np.array([[0, 361], [361, 425], [425, 479], [479, 533], [533, 591], [591, 658], [658, 741], [741, 854], [854, 1044], [1044, 1800]])
         self.SRno = int(SRno)
@@ -105,7 +105,7 @@ class analysis(processor.ProcessorABC):
         processOutput = {}
         processOutput['nEvent'] = {}
         processOutput['nEvent'][event.metadata['dataset']] = nEvent
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
 
         ###############################################
         ###### Reading 3to4, DtoM friend trees ########

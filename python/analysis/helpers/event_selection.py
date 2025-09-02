@@ -85,17 +85,21 @@ def apply_boosted_4b_selection(event: ak.Array) -> ak.Array:
 
     return event
 
-def apply_4b_selection(event, corrections_metadata, *,
-                                dataset: str = '',
-                                doLeptonRemoval: bool = True,
-                                loosePtForSkim: bool = False,
-                                override_selected_with_flavor_bit: bool = False,
-                                do_jet_veto_maps: bool = False,
-                                isRun3: bool = False,
-                                isMC: bool = False,  ### temporary for Run3
-                                isSyntheticData: bool = False,
-                                isSyntheticMC: bool = False,
-                            ):
+def apply_4b_selection(
+        event, 
+        corrections_metadata, 
+        *,
+        dataset: str = '',
+        doLeptonRemoval: bool = True,
+        loosePtForSkim: bool = False,
+        override_selected_with_flavor_bit: bool = False,
+        do_jet_veto_maps: bool = False,
+        isRun3: bool = False,
+        isMC: bool = False,  ### temporary for Run3
+        isSyntheticData: bool = False,
+        isSyntheticMC: bool = False,
+        apply_mixeddata_sel: bool = False
+) -> ak.Array:
     """
     Applies object selection criteria for 4b analysis.
 
@@ -123,6 +127,8 @@ def apply_4b_selection(event, corrections_metadata, *,
         Whether the data is synthetic. Defaults to False.
     isSyntheticMC : bool, optional
         Whether the Monte Carlo data is synthetic. Defaults to False.
+    apply_mixeddata_sel : bool, optional
+        Whether to apply mixed data selection. Defaults to False.
 
     Returns:
     --------
@@ -132,7 +138,7 @@ def apply_4b_selection(event, corrections_metadata, *,
     # Combined RunII and 3 selection
     event = lepton_selection(event, isRun3)
     
-    event = jet_selection(event, corrections_metadata, isRun3, isMC, isSyntheticData, isSyntheticMC, dataset, doLeptonRemoval, do_jet_veto_maps, override_selected_with_flavor_bit)
+    event = jet_selection(event, corrections_metadata, isRun3, isMC, isSyntheticData, isSyntheticMC, dataset, doLeptonRemoval, do_jet_veto_maps,apply_mixeddata_sel, override_selected_with_flavor_bit)
 
     event['passJetMult'] = event['nJet_selected'] >= 4
 

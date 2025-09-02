@@ -4,11 +4,6 @@ import argparse
 import sys
 from pathlib import Path
 
-# Add python directory to sys.path for classifier imports
-_root_path = Path(__file__).parent
-if str(_root_path / "python") not in sys.path:
-    sys.path.insert(0, str(_root_path / "python"))
-
 import yaml
 import importlib
 import json
@@ -16,8 +11,9 @@ import logging
 import os
 import time
 import warnings
-from concurrent.futures import ProcessPoolExecutor
+from memory_profiler import profile
 from copy import copy
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -27,6 +23,7 @@ import uproot
 import fsspec
 import psutil
 import yaml
+from omegaconf import OmegaConf
 from src.addhash import get_git_diff, get_git_revision_hash
 from coffea import processor
 from coffea.dataset_tools import rucio_utils
@@ -454,7 +451,7 @@ def setup_config_defaults(config_runner, args):
         'class_name': 'analysis',
         'condor_cores': 2,
         'condor_memory': '4GB',
-    'condor_transfer_input_files': ['python/', 'src/', 'classifier/', 'skimmer/'],
+        'condor_transfer_input_files': ['python/', 'src/'],
         'min_workers': 1,
         'max_workers': 100,
         'workers': 2,
@@ -465,7 +462,6 @@ def setup_config_defaults(config_runner, args):
         'friend_metafile': 'friends',
         'friend_merge_step': 100_000,
         'write_coffea_output': True,
-        'override_top_reconstruction': None,
         'uproot_xrootd_retry_delays': [5, 15, 45]
     }
     
@@ -749,6 +745,13 @@ if __name__ == '__main__':
         default=False,
         help='Run in test mode with limited number of files'
     )
+    mode_group.add_argument(
+        '--systematics',
+        nargs='+',
+        dest="systematics",
+        default=None,
+        help='List of systematics to apply (e.g., "others jes all")'
+    )
 
     # Execution environment options
     exec_group = parser.add_argument_group('Execution Environment')
@@ -820,12 +823,24 @@ if __name__ == '__main__':
     logging.info(f"Loading configs from: {args.configs}")
     configs = yaml.safe_load(open(args.configs, 'r'))
     
+    if not 'config' in configs: configs['config'] = {}
     # Add corrections_metadata to configs
     logging.info("Loading corrections metadata from: src/physics/corrections.yml")
-    configs['corrections_metadata'] = corrections_metadata
-    
+    configs['config']['corrections_metadata'] = corrections_metadata
+
+    if args.systematics:
+        logging.info(f"Systematics to run: {args.systematics}")
+        configs['config']['run_systematics'] = args.systematics
+
     logging.info(f"Loading datasets metadata from: {args.metadata}")
-    datasets = yaml.safe_load(open(args.metadata, 'r'))
+    # load all .yml files in given metadata directory
+    if os.path.isdir(args.metadata):
+        files= [OmegaConf.load(os.path.join(args.metadata, f)) for f in os.listdir(args.metadata) if f.endswith(('.yaml', '.yml'))]
+        datasets = OmegaConf.to_container(OmegaConf.create({'datasets': OmegaConf.merge(*files)}), resolve=True)
+    else:   
+        #backward compatibility if .yml file is directly provided
+        datasets = yaml.safe_load(open(args.metadata, 'r'))
+
     
     logging.info(f"Loading triggers metadata from: {args.triggers}")
     triggers = yaml.safe_load(open(args.triggers, 'r'))
@@ -868,12 +883,6 @@ if __name__ == '__main__':
             xsec = calculate_cross_section(matched_dataset, dataset_type, metadata)
             logging.info(f"Dataset type: {dataset_type}, Cross-section: {xsec}")
 
-            top_reconstruction = config_runner["override_top_reconstruction"] 
-                #or (
-                # metadata['datasets'][matched_dataset]['top_reconstruction']
-                # if "top_reconstruction" in metadata['datasets'][matched_dataset]
-                # else None)
-            logging.info(f"top construction configured as {top_reconstruction} ")
 
             metadata_dataset[matched_dataset] = {
                 'year': year,
@@ -881,7 +890,6 @@ if __name__ == '__main__':
                 'xs': xsec,
                 'lumi': float(metadata['luminosities'][year]),
                 'trigger': metadata['triggers'][year],
-                'top_reconstruction': top_reconstruction
             }
             # Main dataset processing logic            
             if dataset_type == 'mc':

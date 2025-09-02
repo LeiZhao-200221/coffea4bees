@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
 # Script to run either a coffea, combine, or snakemake container
+# --- Helper for colored output ---
+info() {
+    echo -e "\033[1;34m[INFO]\033[0m $1"
+}
+error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+}
+warning() {
+    echo -e "\033[1;33m[WARNING]\033[0m $1"
+}
+
 
 # Function to display help message
 show_help() {
@@ -27,17 +38,23 @@ show_help() {
 # Define default paths
 COFFEA_IMAGE="docker://gitlab-registry.cern.ch/cms-cmu/coffea4bees:latest"
 COMBINE_IMAGE="docker://gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0"
-SNAKEMAKE_IMAGE="docker://gitlab-registry.cern.ch/cms-cmu/coffea4bees:reana_latest"
 
 if [ -d '/cvmfs/unpacked.cern.ch' ]; then
     COFFEA_IMAGE="/cvmfs/unpacked.cern.ch/${COFFEA_IMAGE#docker://}"
     COMBINE_IMAGE="/cvmfs/unpacked.cern.ch/${COMBINE_IMAGE#docker://}"
-    SNAKEMAKE_IMAGE="/cvmfs/unpacked.cern.ch/${SNAKEMAKE_IMAGE#docker://}"
 fi
 
-# Set APPTAINER_BINDPATH dynamically
+# --- Host-specific Configuration ---
+info "Determining configuration for hostname: $(hostname)"
+# Default Pixi installation directory
+PIXI_DIR="$HOME/.pixi"
 if [[ $(hostname) == *"cmslpc"* ]]; then
     export APPTAINER_BINDPATH=/uscmst1b_scratch,/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security,/uscms_data/
+    # On LPC, use a shared/persistent storage area instead of $HOME
+    PIXI_DIR="/uscms_data/d3/${USER}/.pixi"
+    if [ ! -d "$PIXI_DIR" ]; then
+        info "LPC environment detected. Pixi will be installed in ${PIXI_DIR}"
+    fi
 elif [[ $(hostname) == *"lxplus"* ]]; then
     export APPTAINER_BINDPATH=/afs,/eos,/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
 elif [[ $(hostname) == *"rogue"* ]]; then
@@ -45,18 +62,20 @@ elif [[ $(hostname) == *"rogue"* ]]; then
 elif [[ $(hostname) == *"lxplus"* ]]; then
     export APPTAINER_BINDPATH=/cvmfs,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
 else
-    echo "Warning: Unknown hostname. Setting APPTAINER_BINDPATH to default."
+   warning "Unknown hostname. Setting APPTAINER_BINDPATH to default."
 fi
 
 # Check if apptainer is installed
-command -v apptainer >/dev/null 2>&1 || { echo >&2 "Error: apptainer is not installed.  Aborting."; exit 1; }
+command -v apptainer >/dev/null 2>&1 || { error "Apptainer is not installed.  Aborting."; exit 1; }
 
 # Function to run the coffea container
 run_coffea() {
 
+    info "Running Coffea container..."
     if [ -z "$*" ]; then
         if [[ $(hostname) == *"cmslpc"* ]]; then
             if [[ ! -f ".shell" ]]; then
+                info "No .shell file found. Installing lpcjobqueue..."
                 curl -OL https://raw.githubusercontent.com/CoffeaTeam/lpcjobqueue/main/bootstrap.sh
                 bash bootstrap.sh
                 rm bootstrap.sh
@@ -66,13 +85,13 @@ run_coffea() {
             # For htcondor jobs
             ./.shell ../${COFFEA_IMAGE#/cvmfs/unpacked.cern.ch/}
         else
-            # Arguments provided, run them inside the container
+            info "Leaving the container open..."
             APPTAINER_SHELL=$(which bash) apptainer exec -B "$PWD":/srv --pwd /srv/ \
             "$COFFEA_IMAGE" \
             /bin/bash 
         fi
     else
-        # Arguments provided, run them inside the container
+        info "Arguments provided, run them inside the container ..."
         APPTAINER_SHELL=$(which bash) apptainer exec -B "$PWD":/srv --pwd /srv/ \
         "$COFFEA_IMAGE" \
         /bin/bash -c "$*"
@@ -81,7 +100,8 @@ run_coffea() {
 
 # Function to run the combine container
 run_combine() {
-  
+
+    info "Running Combine container..."
     export APPTAINER_CACHEDIR="/tmp/$(whoami)/apptainer_cache"
     export APPTAINER_TMPDIR="/tmp/.apptainer/"
     export MPLCONFIGDIR="/tmp/$(whoami)/.config/matplotlib"
@@ -89,12 +109,12 @@ run_combine() {
     COMBINE_SETUP="source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsusr/CMSSW_11_3_4/ && cmsenv && cd /home/cmsusr/coffea4bees/"
 
     if [ -z "$*" ]; then
-        # No further arguments, just open the container
+        info "No further arguments, just open the container..."
         APPTAINER_SHELL=$(which bash) apptainer exec -B ${PWD}:/home/cmsusr/coffea4bees --pwd /home/cmsusr/coffea4bees/ \
         ${COMBINE_IMAGE} \
         /bin/bash -i -c "$COMBINE_SETUP && bash"
     else
-        # Arguments provided, run them inside the container
+        info "Arguments provided, run them inside the container ..."
         APPTAINER_SHELL=$(which bash) apptainer exec -B ${PWD}:/home/cmsusr/coffea4bees --pwd /home/cmsusr/coffea4bees/ \
         ${COMBINE_IMAGE} \
         /bin/bash -c "$COMBINE_SETUP && $*"
@@ -103,15 +123,105 @@ run_combine() {
 
 # Function to run snakemake
 run_snakemake() {
+
+    info "Running Snakemake..."
+    # Exit immediately if a command or pipeline fails.
+    set -eo pipefail
+
     if [ -z "$1" ]; then
-        echo "Error: No argument supplied. Please provide the snakefile."
-        echo "Usage: $0 snakemake --snakefile <snakefile>"
-        echo "You can also provide additional snakemake arguments."
-        echo "Useful snakemake arguments: --cores, --use-singularity, --use-apptainer, --printshellcmds, --rerun-incomplete, --force"
+        error "No arguments supplied for snakemake."
+        show_help
         exit 1
     fi
 
-    apptainer exec -B ${PWD}:/srv --pwd /srv ${SNAKEMAKE_IMAGE} snakemake "$@"
+    local REQUIREMENTS_FILE="software/pixi/requirements.txt"
+
+    # 1. Check for and Install Pixi
+    if ! command -v pixi &> /dev/null; then
+        info "Pixi not found. Installing now to ${PIXI_DIR}..."
+        # The installer respects the PIXI_HOME environment variable for the installation path.
+        export PIXI_HOME="${PIXI_DIR}"
+        # Create the target directory if it doesn't exist to prevent installer errors.
+        mkdir -p "${PIXI_DIR}"
+        curl -fsSL https://pixi.sh/install.sh | bash
+
+        # Manually update PATH for the current script session.
+        export PATH="${PIXI_DIR}/bin:$PATH"
+        
+        # Verification step to ensure the environment is ready
+        if ! command -v pixi &> /dev/null; then
+            echo -e "\033[1;31m[ERROR]\033[0m Pixi installation failed or PATH was not updated correctly."
+            echo "Please open a new terminal and run this script again."
+            exit 1
+        fi
+        info "Pixi installed and added to PATH for this session."
+    else
+        info "Pixi is already installed. Location: $(command -v pixi)"
+    fi
+
+    # 2. Initialize Pixi Project (if needed)
+    if [ ! -f "pixi.toml" ]; then
+        info "No 'pixi.toml' found. Creating a new Pixi project configuration..."
+        # Create a pixi.toml file with the correct channels and project structure.
+        # This avoids using the `pixi channel` subcommand, which is deprecated.
+        # Channel priority is determined by their order in the list.
+        cat > pixi.toml << EOF
+[project]
+name = "analysis-environment"
+version = "0.1.0"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[dependencies]
+EOF
+        info "Created 'pixi.toml' with conda-forge and bioconda channels."
+    fi
+
+    # 3. Synchronize Dependencies from requirements file
+    if [ -f "${REQUIREMENTS_FILE}" ]; then
+        info "Checking dependencies from '${REQUIREMENTS_FILE}'..."
+        local packages_to_add=()
+        while IFS= read -r package || [[ -n "$package" ]]; do
+            if [[ -z "$package" ]] || [[ "$package" == \#* ]]; then
+                continue
+            fi
+            local clean_package
+            clean_package=$(echo "${package}" | sed 's/.*:://' | sed -E 's/[<>=!].*//')
+            if ! grep -q -E "^\s*${clean_package}\s*=" pixi.toml; then
+                packages_to_add+=("${package}")
+            fi
+        done < "${REQUIREMENTS_FILE}"
+
+        if [ ${#packages_to_add[@]} -gt 0 ]; then
+            info "New dependencies found in '${REQUIREMENTS_FILE}'. Synchronizing environment..."
+            info "Packages to add: ${packages_to_add[*]}"
+            rm -f pixi.lock
+            pixi add "${packages_to_add[@]}"
+            info "Installing environment after adding packages..."
+            pixi install
+            info "Environment synchronization complete."
+        else
+            info "Dependencies are already up-to-date."
+        fi
+    else
+        if ! sed -n '/\[dependencies\]/,/\[.*\]/p' pixi.toml | grep -q -E '^\s*\w+\s*='; then
+            warning "No '${REQUIREMENTS_FILE}' found and 'pixi.toml' has no dependencies."
+            warning "Please create '${REQUIREMENTS_FILE}' or add dependencies to 'pixi.toml' manually."
+            warning "Proceeding, but the following command may fail."
+        fi
+    fi
+
+    # 4. Run the Snakemake Workflow with all user-provided arguments
+    # Check if snakemake is available in the environment
+    if ! pixi run which snakemake &> /dev/null; then
+        error "Snakemake executable not found in Pixi environment. Check your requirements and environment build."
+        exit 1
+    fi
+
+    info "Executing Snakemake command via 'pixi run'..."
+    pixi run snakemake "$@"
+
+    info "Workflow execution finished successfully!"
 }
 
 # Main logic: check arguments and run the appropriate container

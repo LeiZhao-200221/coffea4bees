@@ -21,7 +21,7 @@ def extract_jetmet_tar_files(tar_file_name: str=None,
     """
 
     extracted_files = []
-    extract_path = f"/tmp/{os.getenv('USER', 'default_user')}/coffea4bees/"
+    extract_path = f"/tmp/{os.getenv('USER') or os.getenv('LOGNAME') or os.getenv('USERNAME') or os.getuid()}/coffea4bees/"
 
     # Ensure the extraction path exists
     try:
@@ -37,7 +37,7 @@ def extract_jetmet_tar_files(tar_file_name: str=None,
 
                 new_file_name = member.name
                 if ('Puppi' in jet_type) and (jet_type in member.name):
-                    if ('Summer23' not in member.name): # need a second if to avoid getting False and False = True
+                    if ('Summer23' not in member.name):
                         new_file_name = member.name.replace('_', '', 1) #22 and 23 corrections have different name formats
                         member.name = new_file_name
 

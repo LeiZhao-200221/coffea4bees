@@ -11,7 +11,7 @@ import numpy as np
 import yaml
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
@@ -80,6 +80,7 @@ class analysis(processor.ProcessorABC):
         blind: bool = False,
         apply_JCM: bool = True,
         JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        corrections_metadata: dict = None,
         apply_JCM_lowpt: bool = False,
         JCM_lowpt_file: str = None,
         apply_trigWeight: bool = True,
@@ -91,7 +92,6 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        corrections_metadata: str = "src/physics/corrections.yml",
         top_reconstruction: bool = False,
         run_systematics: list = [],
         make_classifier_input: str = None,
@@ -117,8 +117,7 @@ class analysis(processor.ProcessorABC):
         self.apply_boosted_veto = apply_boosted_veto
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
-        with open(corrections_metadata, "r") as f:
-            self.corrections_metadata = yaml.safe_load(f)
+        self.corrections_metadata = corrections_metadata
 
         self.run_systematics = run_systematics
         self.make_top_reconstruction = make_top_reconstruction

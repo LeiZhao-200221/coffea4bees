@@ -8,7 +8,7 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 
-from python.analysis.helpers.cutflow import cutFlow
+from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_selection import apply_boosted_4b_selection, apply_4b_selection
 from src.physics.event_selection import apply_event_selection
 
@@ -25,12 +25,12 @@ class analysis(processor.ProcessorABC):
     def __init__(
             self,
             *,
-            corrections_metadata="src/physics/corrections.yml",
+            corrections_metadata: dict = None,
             **kwargs
     ):
 
         logging.debug("\nInitialize Analysis Processor")
-        self.corrections_metadata = yaml.safe_load(open(corrections_metadata, "r"))
+        self.corrections_metadata = corrections_metadata
 
 
 
@@ -93,7 +93,7 @@ class analysis(processor.ProcessorABC):
         }
 
         event['weight'] = np.ones(len(event))
-        self._cutFlow = cutFlow()
+        self._cutFlow = cutflow_4b()
         self._cutFlow.fill( "all", event[selections.require(lumimask=True)], allTag=True )
         self._cutFlow.fill( "passNoiseFilter", event[selections.require(lumimask=True, passNoiseFilter=True)], allTag=True, )
         self._cutFlow.fill( "passHLT", event[ selections.require( lumimask=True, passNoiseFilter=True, passHLT=True ) ], allTag=True, )

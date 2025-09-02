@@ -1,13 +1,13 @@
 import yaml
 from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
-from analysis.helpers.event_selection import apply_4b_selection
+from python.analysis.helpers.event_selection import apply_4b_selection
 from src.physics.event_selection import apply_event_selection
 from coffea.nanoevents import NanoEventsFactory
 
-from analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from src.math.random import Squares
-from analysis.helpers.event_weights import add_btagweights
-from analysis.helpers.processor_config import processor_config
+from python.analysis.helpers.event_weights import add_btagweights
+from python.analysis.helpers.processor_config import processor_config
 from src.physics.event_weights import add_weights
 
 from coffea.analysis_tools import Weights, PackedSelection
@@ -20,14 +20,14 @@ import awkward as ak
 import uproot
 
 class SubSampler(PicoAOD):
-    def __init__(self, sub_sampling_rand_seed=5, *args, **kwargs):
+    def __init__(self, sub_sampling_rand_seed=5, corrections_metadata: dict = None, *args, **kwargs):
         kwargs["pico_base_name"] = f'picoAOD_PSData'
         super().__init__(*args, **kwargs)
 
         logging.info(f"\nRunning SubSampler with these parameters: sub_sampling_rand_seed = {sub_sampling_rand_seed} args = {args}, kwargs = {kwargs}")
 
         self.sub_sampling_rand_seed = sub_sampling_rand_seed
-        self.corrections_metadata = yaml.safe_load(open('src/physics/corrections.yml', 'r'))
+        self.corrections_metadata = corrections_metadata
 
     def select(self, event):
 
