@@ -9,15 +9,17 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
+import gc
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
 from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
-    add_weights,
 )
-from python.analysis.helpers.event_selection import apply_event_selection, apply_dilep_ttbar_selection, apply_4b_selection
+from src.physics.event_selection import apply_event_selection
+from src.physics.event_weights import add_weights
+from python.analysis.helpers.event_selection import apply_dilep_ttbar_selection, apply_4b_selection
 from python.analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,
@@ -40,6 +42,8 @@ from coffea.analysis_tools import PackedSelection
 from coffea.nanoevents import NanoAODSchema, NanoEventsFactory
 from coffea.util import load
 from memory_profiler import profile
+import psutil
+import os
 
 from ..helpers.load_friend import (
     FriendTemplate,
@@ -69,17 +73,72 @@ def _init_classfier(path: str | list[HCRModelMetadata]):
         from ..helpers.classifier.HCR import HCREnsemble
         return HCREnsemble(path)
 
+def _init_classfier_FvT(path: str | list[HCRModelMetadata]):
+    if path is None:
+        return None
+    from ..helpers.classifier.HCR import Legacy_HCREnsemble_FvT
+    return Legacy_HCREnsemble_FvT(path)
 
 class analysis(processor.ProcessorABC):
+    """
+    Coffea processor for HH→4b analysis workflows.
+
+    This class orchestrates the event selection, object reconstruction, friend tree loading, weight calculation,
+    systematic variations, and histogram filling for the HH→4b analysis. It supports both nominal and systematic
+    processing, including jet energy corrections, b-tagging scale factors, trigger weights, and classifier outputs
+    (FvT, SvB, etc.).
+
+    Key Features:
+        - Loads and applies friend trees (FvT, SvB, JCM, top reconstruction, etc.)
+        - Handles MC and data workflows, including blinding and mixed data selection
+        - Applies event selection, object selection, and cutflows
+        - Calculates and applies event weights (MC, btag, pseudotag, trigger, resonance, etc.)
+        - Supports systematic variations (JES, others)
+        - Fills histograms and optionally dumps friend trees for classifier inputs and weights
+        - Supports top candidate reconstruction (slow/fast algorithms or friend trees)
+        - Memory usage logging (optional)
+
+    Args:
+        SvB (str | list[HCRModelMetadata], optional): Path or metadata for SvB classifier.
+        SvB_MA (str | list[HCRModelMetadata], optional): Path or metadata for SvB_MA classifier.
+        FvT (str | list[HCRModelMetadata], optional): Path or metadata for FvT classifier.
+        blind (bool): Whether to blind data in signal region.
+        apply_JCM (bool): Whether to apply Jet Combinatoric Model weights.
+        JCM_file (str): Path to JCM weight file.
+        corrections_metadata (dict): Metadata for corrections (JES, etc.).
+        apply_trigWeight (bool): Whether to apply trigger weights.
+        apply_btagSF (bool): Whether to apply b-tagging scale factors.
+        apply_FvT (bool): Whether to apply FvT classifier/friend tree.
+        apply_boosted_veto (bool): Whether to apply boosted event veto.
+        run_dilep_ttbar_crosscheck (bool): Whether to run dilepton ttbar crosscheck selection.
+        fill_histograms (bool): Whether to fill histograms.
+        hist_cuts (list): List of cut names for histogram filling.
+        run_SvB (bool): Whether to run SvB classifier/friend tree.
+        top_reconstruction (str | None): Top candidate reconstruction mode ('slow', 'fast', or None).
+        run_systematics (list): List of systematics to run (e.g., ['jes', 'others']).
+        make_classifier_input (str): Path for dumping classifier input friend tree.
+        make_top_reconstruction (str): Path for dumping top reconstruction friend tree.
+        make_friend_JCM_weight (str): Path for dumping JCM weight friend tree.
+        make_friend_FvT_weight (str): Path for dumping FvT weight friend tree.
+        make_friend_SvB (str): Path for dumping SvB friend tree.
+        subtract_ttbar_with_weights (bool): Whether to subtract ttbar using weights.
+        apply_mixeddata_sel (bool): Whether to apply mixed data selection.
+        friends (dict): Dictionary of friend tree templates or paths.
+
+    Returns:
+        dict: Output containing histograms, cutflow, and optionally dumped friend trees.
+    """
     def __init__(
         self,
         *,
         SvB: str|list[HCRModelMetadata] = None,
         SvB_MA: str|list[HCRModelMetadata] = None,
+        FvT: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
-        # JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
-        JCM_file: str = "python/analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
+        JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        # JCM_file: str = "python/analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
+        corrections_metadata: dict = None,
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -88,15 +147,15 @@ class analysis(processor.ProcessorABC):
         fill_histograms: bool = True,
         hist_cuts = ['passPreSel'],
         run_SvB: bool = True,
-        top_reconstruction_override: bool = False,
-        corrections_metadata: dict = None,
-        run_systematics: list = [],
+        top_reconstruction: str | None = None,
+        run_systematics: list = [],  #### Way of splitting systematics. It can be event_weights, jes, btag
         make_classifier_input: str = None,
         make_top_reconstruction: str = None,
         make_friend_JCM_weight: str = None,
         make_friend_FvT_weight: str = None,
         make_friend_SvB: str = None,
         subtract_ttbar_with_weights: bool = False,
+        apply_mixeddata_sel: bool = False,  #### apply HIG-22-011 sel for mixeddata
         friends: dict[str, str|FriendTemplate] = None,
     ):
 
@@ -112,21 +171,44 @@ class analysis(processor.ProcessorABC):
         self.apply_boosted_veto = apply_boosted_veto
         self.classifier_SvB = _init_classfier(SvB)
         self.classifier_SvB_MA = _init_classfier(SvB_MA)
+        self.classifier_FvT = _init_classfier_FvT(FvT)
         self.corrections_metadata = corrections_metadata
-
-        self.run_systematics = run_systematics
+        self.run_systematics = ['others', 'jes'] if 'all' in run_systematics else run_systematics
         self.make_top_reconstruction = make_top_reconstruction
         self.make_classifier_input = make_classifier_input
         self.make_friend_JCM_weight = make_friend_JCM_weight
         self.make_friend_FvT_weight = make_friend_FvT_weight
         self.make_friend_SvB = make_friend_SvB
-        self.top_reconstruction_override = top_reconstruction_override
+        self.top_reconstruction = top_reconstruction
+        if self.top_reconstruction is not None and self.top_reconstruction not in ["slow", "fast"]:
+            raise ValueError(f"top_reconstruction must be None, 'slow', or 'fast', got: {self.top_reconstruction}")
         self.subtract_ttbar_with_weights = subtract_ttbar_with_weights
         self.friends = parse_friends(friends)
         self.histCuts = hist_cuts
+        self.apply_mixeddata_sel = apply_mixeddata_sel
+        
+        # Memory monitoring
+        self.debug_memory = False  # Set to False to disable memory monitoring
+        
+    def _log_memory(self, stage_name):
+        """Log current memory usage"""
+        if not self.debug_memory:
+            return
+            
+        try:
+            process = psutil.Process(os.getpid())
+            memory_info = process.memory_info()
+            rss_mb = memory_info.rss / 1024 / 1024  # MB
+            vms_mb = memory_info.vms / 1024 / 1024  # MB
+            logging.info(f"MEMORY: RSS={rss_mb:.1f}MB, VMS={vms_mb:.1f}MB {stage_name}")
+        except Exception as e:
+            logging.warning(f"Memory monitoring failed at {stage_name}: {e}")
 
+    # @profile
     def process(self, event):
         logging.debug(event.metadata)
+        self._log_memory("process_start")
+        
         fname   = event.metadata['filename']
         self.dataset = event.metadata['dataset']
         self.estart  = event.metadata['entrystart']
@@ -138,12 +220,7 @@ class analysis(processor.ProcessorABC):
 
         ### target is for new friend trees
         target = Chunk.from_coffea_events(event)
-
-        if self.top_reconstruction_override:
-            self.top_reconstruction = self.top_reconstruction_override
-            logging.info(f"top_reconstruction overridden to {self.top_reconstruction}\n")
-        else:
-            self.top_reconstruction = event.metadata.get("top_reconstruction", None)
+        self._log_memory("after_metadata_setup")
 
         #
         # Set process and datset dependent flags
@@ -174,21 +251,30 @@ class analysis(processor.ProcessorABC):
         #
         # Reading SvB friend trees
         #
+        self._log_memory("before_friend_trees")
         path = fname.replace(fname.split("/")[-1], "")
-        if self.apply_FvT:
+        if self.apply_FvT and self.classifier_FvT is None:
             if "FvT" in self.friends:
                 event["FvT"] = rename_FvT_friend(target, self.friends["FvT"])
                 if self.config["isDataForMixed"] or self.config["isTTForMixed"]:
                     for _FvT_name in event.metadata["FvT_names"]:
                         event[_FvT_name] = rename_FvT_friend(target, self.friends[_FvT_name])
                         event[_FvT_name, _FvT_name] = event[_FvT_name].FvT
+
             else:
                 # TODO: remove backward compatibility in the future
                 if self.config["isMixedData"]:
 
                     FvT_name = event.metadata["FvT_name"]
-                    event["FvT"] = getattr( NanoEventsFactory.from_root( f'{event.metadata["FvT_file"]}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                            FvT_name )
+                    event["FvT"] = getattr( 
+                        NanoEventsFactory.from_root( 
+                            f'{event.metadata["FvT_file"]}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop,
+                            schemaclass=FriendTreeSchema, 
+                        ).events(),
+                        FvT_name 
+                    )
 
                     event["FvT", "FvT"] = getattr(event["FvT"], FvT_name)
 
@@ -204,8 +290,15 @@ class analysis(processor.ProcessorABC):
                     #
                     # Use the first to define the FvT weights
                     #
-                    event["FvT"] = getattr( NanoEventsFactory.from_root( f'{event.metadata["FvT_files"][0]}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                            event.metadata["FvT_names"][0], )
+                    event["FvT"] = getattr( 
+                        NanoEventsFactory.from_root( 
+                            f'{event.metadata["FvT_files"][0]}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop, 
+                            schemaclass=FriendTreeSchema, 
+                        ).events(),
+                        event.metadata["FvT_names"][0], 
+                    )
 
                     event["FvT", "FvT"] = getattr( event["FvT"], event.metadata["FvT_names"][0] )
 
@@ -218,13 +311,27 @@ class analysis(processor.ProcessorABC):
 
                     for _FvT_name, _FvT_file in zip( event.metadata["FvT_names"], event.metadata["FvT_files"] ):
 
-                        event[_FvT_name] = getattr( NanoEventsFactory.from_root( f"{_FvT_file}", entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema, ).events(),
-                                                    _FvT_name, )
+                        event[_FvT_name] = getattr( 
+                            NanoEventsFactory.from_root( 
+                                f"{_FvT_file}", 
+                                entry_start=self.estart, 
+                                entry_stop=self.estop, 
+                                schemaclass=FriendTreeSchema, 
+                            ).events(),
+                            _FvT_name, 
+                        )
 
                         event[_FvT_name, _FvT_name] = getattr(event[_FvT_name], _FvT_name)
 
                 else:
-                    event["FvT"] = ( NanoEventsFactory.from_root( f'{fname.replace("picoAOD", "FvT")}', entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema).events().FvT )
+                    event["FvT"] = ( 
+                        NanoEventsFactory.from_root( 
+                            f'{fname.replace("picoAOD", "FvT")}', 
+                            entry_start=self.estart, 
+                            entry_stop=self.estop, 
+                            schemaclass=FriendTreeSchema
+                        ).events().FvT 
+                    )
 
                 if "std" not in event.FvT.fields:
                     event["FvT", "std"] = np.ones(len(event))
@@ -246,11 +353,22 @@ class analysis(processor.ProcessorABC):
                     except Exception as e:
                         event[k] = self.friends[k].arrays(target)
 
+            self._log_memory("after_friend_trees_loaded")
+
+            if self.apply_mixeddata_sel: SvB_suffix = '_newSBDef'
+            else: SvB_suffix = '_ULHH'
+
             if "SvB" not in self.friends and self.classifier_SvB is None:
                 # SvB_file = f'{path}/SvB_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB")}'
-                SvB_file = f'{path}/SvB_ULHH.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_ULHH")}'
-                event["SvB"] = ( NanoEventsFactory.from_root( SvB_file,
-                                                              entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema).events().SvB )
+                SvB_file = f'{path}/SvB{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", f"SvB{SvB_suffix}")}'
+                event["SvB"] = ( 
+                    NanoEventsFactory.from_root( 
+                        SvB_file,
+                        entry_start=self.estart, 
+                        entry_stop=self.estop, 
+                        schemaclass=FriendTreeSchema
+                    ).events().SvB 
+                )
 
                 if not ak.all(event.SvB.event == event.event):
                     raise ValueError("ERROR: SvB events do not match events ttree")
@@ -259,9 +377,15 @@ class analysis(processor.ProcessorABC):
 
             if "SvB_MA" not in self.friends and self.classifier_SvB_MA is None:
                 # SvB_MA_file = f'{path}/SvB_MA_newSBDef.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA")}'
-                SvB_MA_file = f'{path}/SvB_MA_ULHH.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", "SvB_MA_ULHH")}'
-                event["SvB_MA"] = ( NanoEventsFactory.from_root( SvB_MA_file,
-                                                                 entry_start=self.estart, entry_stop=self.estop, schemaclass=FriendTreeSchema ).events().SvB_MA )
+                SvB_MA_file = f'{path}/SvB_MA{SvB_suffix}.root' if 'mix' in self.dataset else f'{fname.replace("picoAOD", f"SvB_MA{SvB_suffix}")}'
+                event["SvB_MA"] = ( 
+                    NanoEventsFactory.from_root( 
+                        SvB_MA_file,
+                        entry_start=self.estart, 
+                        entry_stop=self.estop, 
+                        schemaclass=FriendTreeSchema
+                    ).events().SvB_MA
+                )
 
                 if not ak.all(event.SvB_MA.event == event.event):
                     raise ValueError("ERROR: SvB_MA events do not match events ttree")
@@ -281,20 +405,22 @@ class analysis(processor.ProcessorABC):
         #
         # Event selection
         #
-        event = apply_event_selection( event,
-                                        self.corrections_metadata[self.year],
-                                        cut_on_lumimask=self.config["cut_on_lumimask"]
-                                        )
+        self._log_memory("before_event_selection")
+        event = apply_event_selection( 
+            event,
+            self.corrections_metadata[self.year],
+            cut_on_lumimask=self.config["cut_on_lumimask"]
+        )
+        self._log_memory("after_event_selection")
 
 
         ### adds all the event mc weights and 1 for data
         weights, list_weight_names = add_weights(
-            event, target=target,
+            event, 
+            target=target,
             do_MC_weights=self.config["do_MC_weights"],
             dataset=self.dataset,
             year_label=self.year_label,
-            estart=self.estart,
-            estop=self.estop,
             friend_trigWeight=self.friends.get("trigWeight"),
             corrections_metadata=self.corrections_metadata[self.year],
             apply_trigWeight=self.apply_trigWeight,
@@ -329,28 +455,33 @@ class analysis(processor.ProcessorABC):
         # Calculate and apply Jet Energy Calibration
         #
         if self.config["do_jet_calibration"]:
-            jets = apply_jerc_corrections(event,
-                                          corrections_metadata=self.corrections_metadata[self.year],
-                                          isMC=self.config["isMC"],
-                                          run_systematics=self.run_systematics,
-                                          dataset=self.dataset
-                                          )
+
+            jets = apply_jerc_corrections(
+                event,
+                corrections_metadata=self.corrections_metadata[self.year],
+                isMC=self.config["isMC"],
+                run_systematics= 'jes' in self.run_systematics,
+                dataset=self.dataset
+            )
         else:
             jets = event.Jet
 
 
-        shifts = [({"Jet": jets}, None)]
-        if self.run_systematics:
+        # Determine which shifts to run
+        if 'jes' in self.run_systematics:
+            shifts = []
+            shifts.extend([({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")])
+
             for jesunc in self.corrections_metadata[self.year]["JES_uncertainties"]:
                 shifts.extend( [ ({"Jet": jets[f"JES_{jesunc}"].up}, f"CMS_scale_j_{jesunc}Up"),
                                  ({"Jet": jets[f"JES_{jesunc}"].down}, f"CMS_scale_j_{jesunc}Down"), ] )
-
-            shifts.extend( [({"Jet": jets.JER.up}, f"CMS_res_j_{self.year_label}Up"), ({"Jet": jets.JER.down}, f"CMS_res_j_{self.year_label}Down")] )
-
             logging.info(f"\nJet variations {[name for _, name in shifts]}")
+        else:
+            shifts = [({"Jet": jets}, None)]
 
         return processor.accumulate( self.process_shift(update_events(event, collections), name, weights, list_weight_names, target) for collections, name in shifts )
 
+    # @profile
     def process_shift(self, event, shift_name, weights, list_weight_names, target):
         """For different jet variations. It computes event variations for the nominal case."""
 
@@ -358,16 +489,19 @@ class analysis(processor.ProcessorABC):
         weights = copy.copy(weights)
 
         # Apply object selection (function does not remove events, adds content to objects)
-        event = apply_4b_selection( event, self.corrections_metadata[self.year],
-                                    dataset=self.dataset,
-                                    doLeptonRemoval=self.config["do_lepton_jet_cleaning"],
-                                    override_selected_with_flavor_bit=self.config["override_selected_with_flavor_bit"],
-                                    do_jet_veto_maps=self.config["do_jet_veto_maps"],
-                                    isRun3=self.config["isRun3"],
-                                    isMC=self.config["isMC"], ### temporary
-                                    isSyntheticData=self.config["isSyntheticData"],
-                                    isSyntheticMC=self.config["isSyntheticMC"],
-                                    )
+        event = apply_4b_selection( 
+            event, 
+            self.corrections_metadata[self.year],
+            dataset=self.dataset,
+            doLeptonRemoval=self.config["do_lepton_jet_cleaning"],
+            override_selected_with_flavor_bit=self.config["override_selected_with_flavor_bit"],
+            do_jet_veto_maps=self.config["do_jet_veto_maps"],
+            isRun3=self.config["isRun3"],
+            isMC=self.config["isMC"], ### temporary
+            isSyntheticData=self.config["isSyntheticData"],
+            isSyntheticMC=self.config["isSyntheticMC"],
+            apply_mixeddata_sel=self.apply_mixeddata_sel,
+        )
 
         if self.run_dilep_ttbar_crosscheck:
             event['passDilepTtbar'] = apply_dilep_ttbar_selection(event, isRun3=self.config["isRun3"])
@@ -478,7 +612,7 @@ class analysis(processor.ProcessorABC):
             })
             sel_dict['passJetMult'] = selections.all(*allcuts)
 
-            self._cutFlow = cutFlow(do_truth_hists=self.config["isSignal"])
+            self._cutFlow = cutflow_4b(do_truth_hists=self.config["isSignal"])
             for cut, sel in sel_dict.items():
                 self._cutFlow.fill( cut, event[sel], allTag=True )
                 self._cutFlow.fill( f"{cut}_woTrig", event[sel], allTag=True,
@@ -490,12 +624,14 @@ class analysis(processor.ProcessorABC):
         #
         if self.config["isMC"] and self.apply_btagSF:
 
-            weights, list_weight_names = add_btagweights( event, weights,
-                                                         list_weight_names=list_weight_names,
-                                                         shift_name=shift_name,
-                                                         use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
-                                                         run_systematics=self.run_systematics,
-                                                         corrections_metadata=self.corrections_metadata[self.year]
+            weights, list_weight_names = add_btagweights( 
+                event, 
+                weights,
+                list_weight_names=list_weight_names,
+                shift_name=shift_name,
+                use_prestored_btag_SF=self.config["use_prestored_btag_SF"],
+                run_systematics = 'others' in self.run_systematics,
+                corrections_metadata=self.corrections_metadata[self.year]
             )
             logging.debug( f"Btag weight {weights.partial_weight(include=['CMS_btag'])[:10]}\n" )
             event["weight"] = weights.weight()
@@ -516,15 +652,17 @@ class analysis(processor.ProcessorABC):
             self._cutFlow.fill( "passPreSel_allTag_woTrig", event[selections.all(*allcuts)], allTag=True,
                                 wOverride=np.sum(weights.partial_weight(exclude=['CMS_bbbb_resolved_ggf_triggerEffSF'])[selections.all(*allcuts)] ))
 
-        weights, list_weight_names = add_pseudotagweights( event, weights,
-                                                           JCM=self.apply_JCM,
-                                                           apply_FvT=self.apply_FvT,
-                                                           isDataForMixed=self.config["isDataForMixed"],
-                                                           list_weight_names=list_weight_names,
-                                                           event_metadata=event.metadata,
-                                                           year_label=self.year_label,
-                                                           len_event=len(event),
-                                                          )
+        weights, list_weight_names = add_pseudotagweights( 
+            event, 
+            weights,
+            JCM=self.apply_JCM,
+            apply_FvT=self.apply_FvT,
+            isDataForMixed=self.config["isDataForMixed"],
+            list_weight_names=list_weight_names,
+            event_metadata=event.metadata,
+            year_label=self.year_label,
+            len_event=len(event),
+            )
 
         #
         # Example of how to write out event numbers
@@ -587,15 +725,20 @@ class analysis(processor.ProcessorABC):
         #
         #  Build di-jets and Quad-jets
         #
-        selev = create_cand_jet_dijet_quadjet( selev,
-                                               apply_FvT=self.apply_FvT,
-                                               run_SvB=self.run_SvB,
-                                               run_systematics=self.run_systematics,
-                                               classifier_SvB=self.classifier_SvB,
-                                               classifier_SvB_MA=self.classifier_SvB_MA,
-                                               processOutput = processOutput,
-                                               isRun3=self.config["isRun3"],
-                                              )
+        selev = create_cand_jet_dijet_quadjet( 
+            selev,
+            apply_FvT=self.apply_FvT,
+            classifier_FvT=self.classifier_FvT,
+            run_SvB=self.run_SvB,
+            run_systematics=self.run_systematics,
+            classifier_SvB=self.classifier_SvB,
+            classifier_SvB_MA=self.classifier_SvB_MA,
+            processOutput = processOutput,
+            isRun3=self.config["isRun3"],
+            weights=weights,
+            list_weight_names=list_weight_names,
+            analysis_selections=analysis_selections,
+            )
 
 
 
@@ -675,32 +818,40 @@ class analysis(processor.ProcessorABC):
         #
         # Hists
         #
+        if self.classifier_FvT: apply_FvT = True
+        else: apply_FvT = self.apply_FvT
         hist = {}
         if self.fill_histograms:
             if not self.run_systematics:
                 ## this can be simplified
-                hist = filling_nominal_histograms(selev, self.apply_JCM,
-                                                  processName=self.processName,
-                                                  year=self.year,
-                                                  isMC=self.config["isMC"],
-                                                  histCuts=self.histCuts,
-                                                  apply_FvT=self.apply_FvT,
-                                                  run_SvB=self.run_SvB,
-                                                  run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
-                                                  top_reconstruction=self.top_reconstruction,
-                                                  isDataForMixed=self.config['isDataForMixed'],
-                                                  event_metadata=event.metadata)
+                hist = filling_nominal_histograms(
+                    selev, 
+                    self.apply_JCM,
+                    processName=self.processName,
+                    year=self.year,
+                    isMC=self.config["isMC"],
+                    histCuts=self.histCuts,
+                    apply_FvT=apply_FvT,
+                    run_SvB=self.run_SvB,
+                    run_dilep_ttbar_crosscheck=self.run_dilep_ttbar_crosscheck,
+                    top_reconstruction=self.top_reconstruction,
+                    isDataForMixed=self.config['isDataForMixed'],
+                    event_metadata=event.metadata
+                    )
 
             #
             # Run systematics
             #
             else:
-                hist = filling_syst_histograms(selev, weights,
-                                               analysis_selections,
-                                               shift_name=shift_name,
-                                               processName=self.processName,
-                                               year=self.year,
-                                               histCuts=self.histCuts)
+                hist = filling_syst_histograms(
+                    selev, 
+                    weights,
+                    analysis_selections,
+                    shift_name=shift_name,
+                    processName=self.processName,
+                    year=self.year,
+                    histCuts=self.histCuts
+                    )
 
         friends = { 'friends': {} }
         if self.make_top_reconstruction is not None:
@@ -757,6 +908,18 @@ class analysis(processor.ProcessorABC):
                 | dump_SvB(selev, self.make_friend_SvB, "SvB_MA", analysis_selections)
             )
 
+        # Log sizes of return objects
+        if self.debug_memory:
+            import sys
+            hist_size = sys.getsizeof(hist) / 1024 / 1024  # MB
+            output_size = sys.getsizeof(processOutput) / 1024 / 1024  # MB
+            friends_size = sys.getsizeof(friends) / 1024 / 1024  # MB
+            logging.info(f"Return object sizes - hist: {hist_size:.1f}MB, output: {output_size:.1f}MB, friends: {friends_size:.1f}MB")
+
+        # Explicit cleanup before returning
+        del selev, event, weights, analysis_selections
+        gc.collect()
+        
         return hist | processOutput | friends
 
     def postprocess(self, accumulator):
