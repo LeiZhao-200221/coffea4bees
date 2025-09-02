@@ -4,4 +4,4 @@ check-configs:
     - .base_classifier
   allow_failure: true
   script:
-    - python -m python.classifier.test.check_configs
+    - source python/scripts/check-configs.sh

@@ -314,3 +314,8 @@ rule SvB_friendtree_cutflow_job:
     log: f"{output_dir}/SvB_friendtree_cutflow_job.log"
     container: analysis_container
     shell: "source python/scripts/SvB-friendtree-cutflow-job.sh {output_dir}/ 2>&1 | tee -a {log}"
+
+rule check_configs:
+    log: f"{output_dir}/check_configs.log"
+    container: analysis_container
+    shell: "source python/scripts/check-configs.sh {output_dir}/ 2>&1 | tee -a {log}"

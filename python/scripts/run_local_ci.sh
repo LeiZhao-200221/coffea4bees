@@ -30,4 +30,4 @@ else
   return 0
 fi
 
-./run_container snakemake --snakefile $SNAKEFILE --use-apptainer --cores 1 $JOB_NAME
+./run_container snakemake --snakefile $SNAKEFILE --use-apptainer --apptainer-args "--bind $PWD:/srv --pwd /srv" --cores 1 $JOB_NAME
