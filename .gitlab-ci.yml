@@ -17,7 +17,10 @@ workflow:
     # Run for pushes to branches WITHOUT open merge requests
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS == null'
       when: always
-     # Run for web-triggered pipelines
+    # Run for scheduled pipelines
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    # Run for web-triggered pipelines
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: always
 
