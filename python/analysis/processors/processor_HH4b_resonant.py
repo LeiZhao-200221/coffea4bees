@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING
 import awkward as ak
 import numpy as np
 import yaml
-from python.analysis.helpers.common import apply_jerc_corrections, update_events
+from src.physics.objects.jet_corrections import apply_jerc_corrections
+from src.physics.common import update_events
 from python.analysis.helpers.cutflow import cutflow_4b
 from python.analysis.helpers.event_weights import (
     add_btagweights,

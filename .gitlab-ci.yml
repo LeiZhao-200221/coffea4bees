@@ -17,7 +17,10 @@ workflow:
     # Run for pushes to branches WITHOUT open merge requests
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS == null'
       when: always
-     # Run for web-triggered pipelines
+    # Run for scheduled pipelines
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    # Run for web-triggered pipelines
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: always
 
@@ -36,6 +39,7 @@ variables:
 
 include:
   - local: 'software/dockerfiles/stages_build.yml'
+  - local: 'src/workflows/gitlab-CI/stages_proxy.yml'
   - local: 'python/workflows/gitlab-CI/stages_*.yml'
   - project: 'authoring/documentation/mkdocs-ci'
     file: 'mkdocs-gitlab-pages.gitlab-ci.yml'

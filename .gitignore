@@ -147,6 +147,7 @@ sync.sh
 *.code-workspace
 **/*.code-workspace
 .shell
+pixi.*
 
 # mypy
 .mypy_cache/
