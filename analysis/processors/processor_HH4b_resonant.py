@@ -78,8 +78,8 @@ class analysis(processor.ProcessorABC):
         SvB_MA: str|list[HCRModelMetadata] = None,
         blind: bool = False,
         apply_JCM: bool = True,
-        # JCM_file: str = "python/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
-        JCM_file: str = "python/analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
+        # JCM_file: str = "coffea4bees/analysis/weights/JCM/AN_24_089_v3/jetCombinatoricModel_SB_6771c35.yml",
+        JCM_file: str = "coffea4bees/analysis/hists/testJCM_Coffea/jetCombinatoricModel_SB_.yml",
         apply_trigWeight: bool = True,
         apply_btagSF: bool = True,
         apply_FvT: bool = True,
@@ -309,12 +309,12 @@ class analysis(processor.ProcessorABC):
         if self.apply_boosted_veto:
 
             if self.dataset.startswith("GluGluToHHTo4B_cHHH1"):
-                boosted_file = load("python/metadata/boosted_overlap_signal.coffea")['boosted']
+                boosted_file = load("coffea4bees/metadata/boosted_overlap_signal.coffea")['boosted']
                 boosted_events = boosted_file.get(self.dataset, {}).get('event', event.event)
                 boosted_events_set = set(boosted_events)
                 event['notInBoostedSel'] = np.array([e not in boosted_events_set for e in event.event.to_numpy()])
             elif self.dataset.startswith("data"):
-                boosted_file = load("python/metadata/boosted_overlap_data.coffea")
+                boosted_file = load("coffea4bees/metadata/boosted_overlap_data.coffea")
                 mask = np.array(boosted_file['BDTcat_index']) > 0  ### > 0 is all boosted categories, 1 is most sensitive
                 filtered_runs = np.array(boosted_file['run'])[mask]
                 filtered_lumis = np.array(boosted_file['luminosityBlock'])[mask]

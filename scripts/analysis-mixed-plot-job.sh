@@ -10,11 +10,11 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running test processor"
-python python/plots/makePlotsMixed.py python/analysis/hists/testMixedBkg_master.coffea python/analysis/hists/testMixedData_master.coffea --combine_input_files -m python/plots/metadata/plotsMixed.yml   -o ${OUTPUT_DIR}
+python coffea4bees/plots/makePlotsMixed.py coffea4bees/analysis/hists/testMixedBkg_master.coffea coffea4bees/analysis/hists/testMixedData_master.coffea --combine_input_files -m coffea4bees/plots/metadata/plotsMixed.yml   -o ${OUTPUT_DIR}
 echo "############### Checking if pdf files exist"
 ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/
 
-#python python/plots/makePlots.py python/analysis/hists/test.coffea    -o ${OUTPUT_DIR} -m python/plots/metadata/plotsAll.yml
+#python coffea4bees/plots/makePlots.py coffea4bees/analysis/hists/test.coffea    -o ${OUTPUT_DIR} -m coffea4bees/plots/metadata/plotsAll.yml
 #ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.pdf
 #ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/SvB_MA_ps_hh.pdf
 #ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR_vs_SB/data/SvB_MA_ps.pdf

@@ -11,8 +11,8 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running dump cutflow test"
-python python/analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_SvB_friend.coffea -o $OUTPUT_DIR/test_dump_cutflow_SvB_friend.yml
+python coffea4bees/analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_SvB_friend.coffea -o $OUTPUT_DIR/test_dump_cutflow_SvB_friend.yml
 echo "############### Running cutflow test"
-python python/analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_SvB_friend.coffea --knownCounts python/analysis/tests/known_Counts_SvB_friendtree.yml
+python coffea4bees/analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_SvB_friend.coffea --knownCounts coffea4bees/analysis/tests/known_Counts_SvB_friendtree.yml
 ls $OUTPUT_DIR/test_dump_cutflow_SvB_friend.yml
 

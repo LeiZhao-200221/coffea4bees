@@ -24,9 +24,9 @@ python src/scripts/merge_yaml_datasets.py -m $INPUT_DIR/datasets_HH4b.yml -f $IN
 cat $OUTPUT_DIR/datasets_HH4b.yml
 
 echo "############### Changing metadata"
-sed -e "s/apply_FvT.*/apply_FvT: false/" -e "s/apply_trig.*/apply_trigWeight: false/" -e "s/run_SvB.*/run_SvB: false/" -e "s/top_reco.*/top_reconstruction: 'fast'/"  python/analysis/metadata/HH4b.yml > $OUTPUT_DIR/HH4b.yml
+sed -e "s/apply_FvT.*/apply_FvT: false/" -e "s/apply_trig.*/apply_trigWeight: false/" -e "s/run_SvB.*/run_SvB: false/" -e "s/top_reco.*/top_reconstruction: 'fast'/"  coffea4bees/analysis/metadata/HH4b.yml > $OUTPUT_DIR/HH4b.yml
 cat $OUTPUT_DIR/HH4b.yml
 
 echo "############### Running test processor"
-python runner.py -o test_skimmer.coffea -d GluGluToHHTo4B_cHHH0 -p python/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/HH4b.yml -m $OUTPUT_DIR/datasets_HH4b.yml
+python runner.py -o test_skimmer.coffea -d GluGluToHHTo4B_cHHH0 -p coffea4bees/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/HH4b.yml -m $OUTPUT_DIR/datasets_HH4b.yml
 

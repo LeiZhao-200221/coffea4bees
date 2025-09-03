@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-m",
         "--metadata",
-        default="python/metadata/datasets_HH4b.yml",
+        default="coffea4bees/metadata/datasets_HH4b.yml",
         help="metadata path",
     )
     parser.add_argument(

@@ -156,9 +156,9 @@ class TrigEmulatorTool:
     def config2018Filters(self):
         logging.info("TrigEmulatorTool::configuring for 2018 ")
 
-        fileName2018 = "python/analysis/trigger_emulator/data/haddOutput_All_Data2018_11Nov_fittedTurnOns.yaml"
+        fileName2018 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_Data2018_11Nov_fittedTurnOns.yaml"
         if self.m_useMCTurnOns:
-            fileName2018 = "python/analysis/trigger_emulator/data/haddOutput_All_MC2018_11Nov_fittedTurnOns.yaml"
+            fileName2018 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_MC2018_11Nov_fittedTurnOns.yaml"
         logging.info(f"TrigEmulatorTool::using file {fileName2018}\n")
 
         with open(fileName2018, 'r') as infile:
@@ -250,9 +250,9 @@ class TrigEmulatorTool:
     def config2017Filters(self):
         logging.info("TrigEmulatorTool::configuring for 2017 ")
 
-        fileName2017 = "python/analysis/trigger_emulator/data/haddOutput_All_Data2017_11Nov_fittedTurnOns.yaml"
+        fileName2017 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_Data2017_11Nov_fittedTurnOns.yaml"
         if self.m_useMCTurnOns:
-            fileName2017 = "python/analysis/trigger_emulator/data/haddOutput_All_MC2017_11Nov_fittedTurnOns.yaml"
+            fileName2017 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_MC2017_11Nov_fittedTurnOns.yaml"
         logging.info(f"TrigEmulatorTool::using file {fileName2017}\n")
 
         with open(fileName2017, 'r') as infile:
@@ -341,9 +341,9 @@ class TrigEmulatorTool:
     def config2016Filters(self):
         logging.info("TrigEmulatorTool::configuring for 2016 ")
 
-        fileName2016 = "python/analysis/trigger_emulator/data/haddOutput_All_Data2016_11Nov_fittedTurnOns.yaml"
+        fileName2016 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_Data2016_11Nov_fittedTurnOns.yaml"
         if self.m_useMCTurnOns:
-            fileName2016 = "python/analysis/trigger_emulator/data/haddOutput_All_MC2016_11Nov_fittedTurnOns.yaml"
+            fileName2016 = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_MC2016_11Nov_fittedTurnOns.yaml"
         logging.info(f"TrigEmulatorTool::using file {fileName2016}\n")
 
         with open(fileName2016, 'r') as infile:

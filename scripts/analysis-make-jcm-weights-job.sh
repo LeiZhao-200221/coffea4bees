@@ -11,7 +11,7 @@ if [ ! -d $OUTPUT_DIR ]; then
 fi
 
 echo "############### Running JCM weights test"
-python python/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i python/analysis/tests/HistsFromROOTFile.coffea
-python python/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
-python python/analysis/tests/make_weights_test.py --path $OUTPUT_DIR
+python coffea4bees/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_ROOT   -c passPreSel -r SB --ROOTInputs --i coffea4bees/analysis/tests/HistsFromROOTFile.coffea
+python coffea4bees/analysis/jcm_tools/make_jcm_weights.py -o $OUTPUT_DIR/testJCM_Coffea -c passPreSel -r SB -i $INPUT_DIR/test.coffea
+python coffea4bees/analysis/tests/make_weights_test.py --path $OUTPUT_DIR
 

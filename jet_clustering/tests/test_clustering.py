@@ -32,11 +32,11 @@ class clusteringTestCase(unittest.TestCase):
         #
         #  Read in the pdfs
         #
-        #  Make with ../python/scripts/synthetic-dataset-plot-job.sh
+        #  Make with ../coffea4bees/scripts/synthetic-dataset-plot-job.sh
         # input_pdf_file_name = "analysis/plots_synthetic_datasets/clustering_pdfs.yml"
-        #input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-07-00/clustering_pdfs_vs_pT.yml"
-        input_pdf_file_name = "python/jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_UL18.yml"
-        #input_pdf_file_name = "python/jet_clustering/clustering_PDFs/clustering_pdfs_vs_pT.yml"
+        #input_pdf_file_name = "coffea4bees/jet_clustering/jet-splitting-PDFs-00-07-00/clustering_pdfs_vs_pT.yml"
+        input_pdf_file_name = "coffea4bees/jet_clustering/jet-splitting-PDFs-00-09-00/clustering_pdfs_vs_pT_UL18.yml"
+        #input_pdf_file_name = "coffea4bees/jet_clustering/clustering_PDFs/clustering_pdfs_vs_pT.yml"
         with open(input_pdf_file_name, 'r') as input_file:
             self.input_pdfs = yaml.safe_load(input_file)
 

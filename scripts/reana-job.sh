@@ -18,7 +18,7 @@ else
     hash="$(git rev-parse --short HEAD)"
 fi
 
-sed -e 's|--githash.*|--githash '${hash}'"|' -i python/workflows/inputs_reana.yaml
+sed -e 's|--githash.*|--githash '${hash}'"|' -i coffea4bees/workflows/inputs_reana.yaml
 git diff HEAD > gitdiff.txt
-cat python/workflows/inputs_reana.yaml
-reana-client run -f python/workflows/reana.yaml -w ${workflow_name}
+cat coffea4bees/workflows/inputs_reana.yaml
+reana-client run -f coffea4bees/workflows/reana.yaml -w ${workflow_name}

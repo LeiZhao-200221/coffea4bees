@@ -6,5 +6,5 @@ source "src/scripts/common.sh"
 INPUT_DIR="${1:-"output"}/analysis_merge_test_job"
 
 echo "############### Running iPlot test"
-python python/plots/tests/iPlot_test.py --inputFile $INPUT_DIR/test.coffea
+python coffea4bees/plots/tests/iPlot_test.py --inputFile $INPUT_DIR/test.coffea
 

@@ -4,5 +4,5 @@ source "src/scripts/common.sh"
 
 
 echo "############### Running makeweights test"
-python python/analysis/tests/topCand_test.py
+python coffea4bees/analysis/tests/topCand_test.py
 

@@ -114,7 +114,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_singleFile(self):
 
-        metadata = "python/plots/metadata/plotsAll.yml"
+        metadata = "coffea4bees/plots/metadata/plotsAll.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile]
@@ -129,7 +129,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_multipleFiles(self):
 
-        metadata = "python/plots/metadata/plotsAll.yml"
+        metadata = "coffea4bees/plots/metadata/plotsAll.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile, self.inputFile]
@@ -173,7 +173,7 @@ class iPlotTestCase(unittest.TestCase):
 
     def test_NoFvT(self):
 
-        metadata = "python/plots/metadata/plotsAllNoFvT.yml"
+        metadata = "coffea4bees/plots/metadata/plotsAllNoFvT.yml"
         cfg.plotConfig = load_config(metadata)
 
         input_files = [self.inputFile]

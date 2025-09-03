@@ -6,7 +6,7 @@ source "src/scripts/common.sh"
 setup_proxy
 
 display_section_header "Input Datasets"
-DATASETS=${DATASET:-"python/metadata/datasets_HH4b.yml"}
+DATASETS=${DATASET:-"coffea4bees/metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
 INPUT_DIR="${1:-"output"}/weights_trigger_friendtree_job"
@@ -18,13 +18,13 @@ fi
 
 echo "############### Modifying config"
 if [[ $(hostname) = *fnal* ]]; then
-    sed -e "s|trigWeight: .*|trigWeight: \/srv\/$INPUT_DIR\/trigger_weights_friends.json@@trigWeight|" python/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/trigger_weights_HH4b.yml
+    sed -e "s|trigWeight: .*|trigWeight: \/srv\/$INPUT_DIR\/trigger_weights_friends.json@@trigWeight|" coffea4bees/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/trigger_weights_HH4b.yml
 else
-    sed -e "s|trigWeight: .*|trigWeight: /builds/${CI_PROJECT_PATH}/$INPUT_DIR/trigger_weights_friends.json@@trigWeight|" python/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/trigger_weights_HH4b.yml
+    sed -e "s|trigWeight: .*|trigWeight: /builds/${CI_PROJECT_PATH}/$INPUT_DIR/trigger_weights_friends.json@@trigWeight|" coffea4bees/analysis/metadata/HH4b_signals.yml > $OUTPUT_DIR/trigger_weights_HH4b.yml
 fi
 cat $OUTPUT_DIR/trigger_weights_HH4b.yml
 
 echo "############### Running test processor"
-python runner.py -t -o test_trigWeight.coffea -d GluGluToHHTo4B_cHHH1 -p python/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/trigger_weights_HH4b.yml -m $DATASETS
+python runner.py -t -o test_trigWeight.coffea -d GluGluToHHTo4B_cHHH1 -p coffea4bees/analysis/processors/processor_HH4b.py -y UL18 -op $OUTPUT_DIR -c $OUTPUT_DIR/trigger_weights_HH4b.yml -m $DATASETS
 ls -lR ${OUTPUT_DIR}
 

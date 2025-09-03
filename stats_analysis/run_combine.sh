@@ -148,7 +148,7 @@ do
                 combineTool.py -M Impacts -d ${datacard}.root -o impacts_combine_${iclass}_exp.json -m 125 -n ${iclass}
 
                 if [[ ! -d "${currentDir}/stats_analysis" ]]; then
-                    tmpDir=${currentDir}/python/stats_analysis
+                    tmpDir=${currentDir}/coffea4bees/stats_analysis
                 else
                     tmpDir=${currentDir}/stats_analysis
                 fi

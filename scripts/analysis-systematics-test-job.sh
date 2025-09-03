@@ -15,13 +15,13 @@ create_output_directory "$OUTPUT"
 
 display_section_header "Modifying HH4b_signals.yml"
 sed -e "s|condor_memory: 2GB|chunksize: 10000|g" \
-    python/analysis/metadata/HH4b_signals.yml > $OUTPUT/HH4b_signals_modified.yml
+    coffea4bees/analysis/metadata/HH4b_signals.yml > $OUTPUT/HH4b_signals_modified.yml
 
 
 # Call the main run_analysis_processor.sh script
-bash python/scripts/run_analysis_processor.sh \
+bash coffea4bees/scripts/run_analysis_processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
-    --dataset-metadata "python/metadata/datasets_HH4b_v1p2.yml" \
+    --dataset-metadata "coffea4bees/metadata/datasets_HH4b_v1p2.yml" \
     --datasets "GluGluToHHTo4B_cHHH1" \
     --year "UL18" \
     --output-filename "test_systematics.coffea" \

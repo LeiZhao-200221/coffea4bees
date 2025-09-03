@@ -137,7 +137,7 @@ class trigger_emulator_TestCase(unittest.TestCase):
 
 
     def test_yaml(self):
-        input_file_name = "python/analysis/trigger_emulator/data/haddOutput_All_MC2016_11Nov_fittedTurnOns.yaml"
+        input_file_name = "coffea4bees/analysis/trigger_emulator/data/haddOutput_All_MC2016_11Nov_fittedTurnOns.yaml"
         with open(input_file_name, 'r') as infile:
             data = yaml.safe_load(infile)
 

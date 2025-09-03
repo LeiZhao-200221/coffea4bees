@@ -564,7 +564,7 @@ def main():
     parser.add_argument('--scipy_optimize', action="store_true",
                         help='Use scipy.optimize.minimize instead of curve_fit')
     parser.add_argument('-m', '--metadata', dest="metadata",
-                        default="python/plots/metadata/plotsJCM.yml",
+                        default="coffea4bees/plots/metadata/plotsJCM.yml",
                         help='Metadata file for plots configuration')
     parser.add_argument('--no-plots', dest="no_plots", action="store_true",
                         help='Skip creating plots')
