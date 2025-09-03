@@ -65,7 +65,8 @@ setup_workspace:
   image: alpine/git:latest
   script:
     - echo "Setting up barista workspace"
-    - git clone --recursive --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
+    - echo $BARISTA_BRANCH $BARISTA_REPO
+    - git clone --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
     - cd barista_framework
     # Create the coffea4bees directory and copy current repository content
     - mkdir -p coffea4bees/
