@@ -29,7 +29,7 @@ runner:
 
 config:
   # base_path: root://cmseos.fnal.gov//store/user/algomez/XX4b/2024_v2_boosted/
-  base_path: /srv/python/output/skimmer/test/   ### local
+  base_path: /srv/output/skimmer/test/   ### local
   step: 100000
   pico_base_name: picoAOD_boosted
   campaign: HH4b_boosted

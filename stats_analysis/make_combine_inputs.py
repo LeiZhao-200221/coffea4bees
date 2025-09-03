@@ -46,7 +46,7 @@ def create_combine_root_file( file_to_convert,
                                 output_dir,
                                 systematics_file,
                                 bkg_systematics_file,
-                                metadata_file='python/metadata/HH4b.yml',
+                                metadata_file='coffea4bees/stats_analysis/metadata/HH4b.yml',
                                 mixeddata_file=None,
                                 variable_binning=False,
                                 stat_only=False ):
@@ -376,7 +376,7 @@ if __name__ == '__main__':
     parser.add_argument('--mixeddata_file', dest='mixeddata_file',
                         default='', help="File contain mixeddata")                    
     parser.add_argument('-m', '--metadata', dest='metadata',
-                        default='stats_analysis/python/metadata/HH4b.yml', help="File contain systematic variations")
+                        default='coffea4bees/stats_analysis/metadata/HH4b.yml', help="File contain systematic variations")
     parser.add_argument('--stat_only', dest='stat_only', action="store_true",
                         default=False, help="Create stat only inputs")
     args = parser.parse_args()

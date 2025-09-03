@@ -213,7 +213,7 @@ if __name__ == '__main__':
     #
     #  K-lambda
     #
-    cfg.plotConfig = load_config("plots/python/metadata/plotsAll_klambda.yml")
+    cfg.plotConfig = load_config("coffea4bees/plots/metadata/plotsAll_klambda.yml")
 
     makeRocPlot(cfg, plot_name="SvB_MA_ps_hh_kl",
                 vars_to_plot=[{"var":"SvB_MA.ps_hh_fine","name":"k-lambda -5",  "color": "blue",     "sig":["HH4b_kl-5"], "bkg":["TTbar","Multijet"],"year":"RunII"},

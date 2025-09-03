@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--signal', dest='signal',
                         default='GluGluToHHTo4B_cHHH1', help="Signal to plot")
     parser.add_argument('-m', '--metadata', dest='metadata',
-                        default='python/stats_analysis/python/metadata/HH4b.yml', help="Metadata file")
+                        default='coffea4bees/stats_analysis/metadata/HH4b.yml', help="Metadata file")
     # parser.add_argument('-r', '--rebin', dest='rebin', type=int,
     #                     default=15, help="Rebin")
     args = parser.parse_args()
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     label_tt = metadata['processes']['background']['tt']['label']
     label_signal = metadata['processes']['signal'][args.signal]['label']
 
-    with open('python/stats_analysis/nuisance_names.json', 'r') as f:
+    with open('coffea4bees/stats_analysis/nuisance_names.json', 'r') as f:
         nuisance_names = json.load(f)
 
     root_hists = ROOT.TFile.Open(args.inputfile)
