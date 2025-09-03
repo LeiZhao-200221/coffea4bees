@@ -5,7 +5,7 @@ weights-trigger-friendtree-job:
   needs: 
     - voms_proxy
   script:
-    - source python/scripts/weights-trigger-friendtree-job.sh
+    - source coffea4bees/scripts/weights-trigger-friendtree-job.sh
   artifacts: 
     paths:
       - output/weights_trigger_friendtree_job/trigger_weights_friends.json
@@ -18,7 +18,7 @@ classifier-friendtree-job:
   needs: 
     - voms_proxy
   script:
-    - source python/scripts/classifier-friendtree-job.sh
+    - source coffea4bees/scripts/classifier-friendtree-job.sh
   artifacts: 
     paths:
       - output/classifier_friendtree_job/classifier_friendtree.yml
@@ -35,7 +35,7 @@ topreco-friendtree-job:
   needs: 
     - voms_proxy
   script:
-    - source python/scripts/topreco-friendtree-job.sh
+    - source coffea4bees/scripts/topreco-friendtree-job.sh
   artifacts: 
     paths:
       - output/topreco_friendtree_job/top_reconstruction_friendtree.json
@@ -52,7 +52,7 @@ SvB-friendtree-job:
   needs:
     - voms_proxy
   script:
-    - source python/scripts/SvB-friendtree-job.sh
+    - source coffea4bees/scripts/SvB-friendtree-job.sh
   artifacts:
     paths:
       - output/SvB_friendtree_job/make_friend_SvB.json

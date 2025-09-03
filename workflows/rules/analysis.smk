@@ -7,8 +7,8 @@ rule analysis_processor:
     params:
         datasets = "",
         years = "",
-        metadata = "python/analysis/metadata/HH4b_noJCM.yml",
-        processor = "python/analysis/processors/processor_HH4b.py",
+        metadata = "coffea4bees/analysis/metadata/HH4b_noJCM.yml",
+        processor = "coffea4bees/analysis/processors/processor_HH4b.py",
         datasets_file = config.get("datasets", "datasets/"),
         blind = False,
         run_performance = False,
@@ -73,7 +73,7 @@ rule merging_coffea_files:
         mkdir -p $MPLCONFIGDIR
         
         echo "Merging all the coffea files" 2>&1 | tee -a {log}
-        cmd="mprof run -C -o /tmp/mprofile_merge_$(basename {log} .log).dat python python/analysis/tools/merge_coffea_files.py -f {input} -o {output}"
+        cmd="mprof run -C -o /tmp/mprofile_merge_$(basename {log} .log).dat python coffea4bees/analysis/tools/merge_coffea_files.py -f {input} -o {output}"
         echo $cmd 2>&1 | tee -a {log}
         $cmd 2>&1 | tee -a {log}
         if [ "{params.run_performance}" = "True" ]; then
@@ -97,11 +97,11 @@ rule make_JCM:
         mkdir -p $MPLCONFIGDIR
         
         echo "Computing JCM" 2>&1 | tee -a {log}
-        python python/analysis/make_jcm_weights.py -o {params.output_dir} -c passPreSel -r SB -i {input} -w 2024_v2 2>&1 | tee -a {log}
+        python coffea4bees/analysis/make_jcm_weights.py -o {params.output_dir} -c passPreSel -r SB -i {input} -w 2024_v2 2>&1 | tee -a {log}
         ls {params.output_dir}
         # echo "Modifying metadata file"
-        # sed -i 's|JCM.*|JCM: ../output/JCM/jetCombinatoricModel_SB_reana.yml|' python/analysis/metadata/HH4b.yml
-        # cat python/analysis/metadata/HH4b.yml
+        # sed -i 's|JCM.*|JCM: ../output/JCM/jetCombinatoricModel_SB_reana.yml|' coffea4bees/analysis/metadata/HH4b.yml
+        # cat coffea4bees/analysis/metadata/HH4b.yml
         """
 
 rule make_plots:
@@ -118,5 +118,5 @@ rule make_plots:
         mkdir -p $MPLCONFIGDIR
         
         echo "Making plots" 2>&1 | tee -a {log}
-        python python/plots/makePlots.py {input} -o {params.output_dir} -m python/plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
+        python coffea4bees/plots/makePlots.py {input} -o {params.output_dir} -m coffea4bees/plots/metadata/plotsAll.yml -s xW 2>&1 | tee -a {log}
         """

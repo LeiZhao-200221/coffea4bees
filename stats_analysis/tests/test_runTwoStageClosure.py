@@ -25,8 +25,8 @@ class TestRunTwoStageClosure(unittest.TestCase):
         self.inputROOTFile = ROOT.TFile(inputFileName, "READ")
 
         #  Make these numbers with:
-        #  >  python3     python/stats_analysis/tests/dumpTwoStageInputs.py --input [inputFileName] -o [outputFielName]
-        #    (python3 python/stats_analysis/tests/dumpTwoStageInputs.py --input python/stats_analysis/hists_closure_3bDvTMix4bDvT_New.root --output python/stats_analysis/tests/twoStageClosureInputsCounts.yml)
+        #  >  python3     coffea4bees/stats_analysis/tests/dumpTwoStageInputs.py --input [inputFileName] -o [outputFielName]
+        #    (python3 coffea4bees/stats_analysis/tests/dumpTwoStageInputs.py --input coffea4bees/stats_analysis/hists_closure_3bDvTMix4bDvT_New.root --output coffea4bees/stats_analysis/tests/twoStageClosureInputsCounts.yml)
         knownCountFile = wrapper.args["knownCounts"] 
         self.knownCounts = yaml.safe_load(open(knownCountFile, 'r'))
         print(self.knownCounts.keys())
@@ -77,8 +77,8 @@ class TestRunTwoStageClosure(unittest.TestCase):
     def test_yaml_content(self):
         
         for test_pair in [
-                ('python/stats_analysis/tests/known_0_variance_results_SvB_MA_ps_hh.yml', f'{self.output_path}/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/0_variance_results.yml'),
-                ('python/stats_analysis/tests/known_1_bias_results_SvB_MA_ps_hh.yml',     f'{self.output_path}/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/1_bias_results.yml')
+                ('coffea4bees/stats_analysis/tests/known_0_variance_results_SvB_MA_ps_hh.yml', f'{self.output_path}/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/0_variance_results.yml'),
+                ('coffea4bees/stats_analysis/tests/known_1_bias_results_SvB_MA_ps_hh.yml',     f'{self.output_path}/3bDvTMix4bDvT/SvB_MA/rebin1/SR/hh/1_bias_results.yml')
         ]:
             
             reference_file = test_pair[0]

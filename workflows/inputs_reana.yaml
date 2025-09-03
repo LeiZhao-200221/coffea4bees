@@ -59,4 +59,4 @@ container_wrapper: "source /cvmfs/cms.cern.ch/cmsset_default.sh && cd /home/cmsu
 
 output_path: "output"
 # output_path: "hists/coffea4bees_20250808_1e803886"
-dataset_location: "python/metadata/datasets_HH4b_v1p2.yml"
+dataset_location: "coffea4bees/metadata/datasets_HH4b_v1p2.yml"

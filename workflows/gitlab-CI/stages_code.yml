@@ -3,35 +3,35 @@ analysis-helpers-job:
   extends:
     - .base_analysis
   script:
-    - source python/scripts/analysis-helpers-job.sh
+    - source coffea4bees/scripts/analysis-helpers-job.sh
 
 kappa-framework:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source python/scripts/baseclass-kappa-framework.sh
+    - source coffea4bees/scripts/baseclass-kappa-framework.sh
 
 hist-collection:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source python/scripts/baseclass-hist-collection.sh
+    - source coffea4bees/scripts/baseclass-hist-collection.sh
 
 jet-clustering:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source python/scripts/jet-clustering-tests.sh
+    - source coffea4bees/scripts/jet-clustering-tests.sh
 
 trig-emulator:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source python/scripts/trig-emulator-tests.sh
+    - source coffea4bees/scripts/trig-emulator-tests.sh
 
 memory-test:
   stage: code
@@ -40,7 +40,7 @@ memory-test:
   extends:
     - .base_analysis
   script:
-    - source python/scripts/memory_test.sh
+    - source coffea4bees/scripts/memory_test.sh
   allow_failure: true
   artifacts:
     paths:

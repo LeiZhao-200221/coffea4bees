@@ -38,7 +38,7 @@ rule two_stage_closure:
     shell:
         '''
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/stats_analysis/runTwoStageClosure.py  --var {params.variable}  \
+            python3 coffea4bees/stats_analysis/runTwoStageClosure.py  --var {params.variable}  \
                 --rebin {params.rebin} --use_kfold {VARBIN} \
                 --outputPath {params.outputPath} \
                 --input_file_TT {INPUT_DIR}/histMixedBkg_TT.root \
@@ -60,7 +60,7 @@ rule make_combine_inputs:
     shell:
         '''
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/stats_analysis/make_combine_inputs.py --var {params.variable} \
+            python3 coffea4bees/stats_analysis/make_combine_inputs.py --var {params.variable} \
                 -f {INPUT_DIR}/histAll.json {VARBIN} \
                 --syst_file {INPUT_DIR}/histAll_signals_cHHHX.json \
                 --bkg_syst_file {input} \
@@ -96,7 +96,7 @@ rule make_syst_plots:
     shell:
         """
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/plots/make_syst_plots.py -i {input.root} -o {params.output} -d {input.datacard} -v {params.variable}
+            python3 coffea4bees/plots/make_syst_plots.py -i {input.root} -o {params.output} -d {input.datacard} -v {params.variable}
         """
 
 rule run_postfit:
@@ -110,9 +110,9 @@ rule run_postfit:
         source workflows/helpers/shell_combine.sh {params.container} \
             source stats_analysis/run_combine.sh {params.output_dir} --postfit
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t prefit
+            python3 coffea4bees/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t prefit
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t fit_s
+            python3 coffea4bees/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t fit_s
         source workflows/helpers/shell_combine.sh {params.container} \
-            python3 python/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t fit_b
+            python3 coffea4bees/plots/make_postfit_plot.py -i {params.output_dir}/fitDiagnostics_SvB_MA_prefit_sb.root -o {params.output_dir}/plots/ -t fit_b
         """

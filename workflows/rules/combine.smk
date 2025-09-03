@@ -300,13 +300,13 @@ rule postfit:
         echo "[$(date)] Running postfit plots for b-only" >> $LOG
 
         {params.container_wrapper} \
-            python3 python/plots/make_postfit_plot.py \
+            python3 coffea4bees/plots/make_postfit_plot.py \
                 -i $(dirname {input})/fitDiagnostics_$(basename {input} .root)_prefit_sb.root \
                 -o $(dirname {input})/plots/ \
                 -c {params.channel} \
                 -s {params.signal} \
                 --log {params.ylog} \
-                -m python/stats_analysis/metadata/{params.channel}.yml
+                -m coffea4bees/stats_analysis/metadata/{params.channel}.yml
 
         echo "[$(date)] Completed postfit rule with signal {params.signallabel}" >> $LOG
         """

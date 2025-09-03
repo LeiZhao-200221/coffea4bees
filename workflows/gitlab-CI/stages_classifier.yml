@@ -4,4 +4,4 @@ check-configs:
     - .base_classifier
   allow_failure: true
   script:
-    - source python/scripts/check-configs.sh
+    - source coffea4bees/scripts/check-configs.sh
