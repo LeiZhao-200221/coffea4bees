@@ -83,13 +83,14 @@ setup_workspace:
   needs:
     - voms_proxy
     - setup_workspace
-  image: ${CI_REGISTRY_IMAGE}:test
+  image: gitlab-registry.cern.ch/cms-cmu/barista:latest
   tags:
     - k8s-cvmfs
-  artifacts: 
-    expire_in: 1 day
-    paths:
-      - 'template'
+  before_script:
+    - cp -r proxy/ barista_framework/
+    - cd barista_framework/
+    - pwd && ls -la
+    - ls -la coffea4bees/
   retry: 2
 
 .base_combine:
