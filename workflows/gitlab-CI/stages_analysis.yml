@@ -1,5 +1,5 @@
 analysis-test-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -9,7 +9,7 @@ analysis-test-job:
       - output/analysis_test_job/test_databkgs.coffea
 
 analysis-signals-test-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -19,7 +19,7 @@ analysis-signals-test-job:
       - output/analysis_signals_test_job/test_signal.coffea
 
 analysis-merge-test-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs:
@@ -32,7 +32,7 @@ analysis-merge-test-job:
       - output/analysis_merge_test_job/test.coffea
 
 analysis-test-job-Run3:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -43,7 +43,7 @@ analysis-test-job-Run3:
 
 
 analysis-test-job-truthStudy:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -54,7 +54,7 @@ analysis-test-job-truthStudy:
 
 
 synthetic-dataset-cluster:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -65,7 +65,7 @@ synthetic-dataset-cluster:
 
 
 analysis-test-job-unsup:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -75,7 +75,7 @@ analysis-test-job-unsup:
       - output/analysis_test_job_unsup/test_unsup.coffea
 
 analysis-test-mixed-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -97,7 +97,7 @@ analysis-test-mixed-job:
 
 
 analysis-systematics-test-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   script:
@@ -107,7 +107,7 @@ analysis-systematics-test-job:
       - output/analysis_systematics_test_job/test_systematics.coffea
 
 skimmer-analysis-test-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs: 
@@ -120,7 +120,7 @@ skimmer-analysis-test-job:
       - output/skimmer_analysis_test_job/test_skimmer.coffea
 
 synthetic-dataset-analyze:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs:
@@ -133,7 +133,7 @@ synthetic-dataset-analyze:
       - output/synthetic_dataset_analyze/test_synthetic_datasets.coffea
 
 synthetic-dataset-analyze-Run3:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs:
@@ -147,7 +147,7 @@ synthetic-dataset-analyze-Run3:
 
 
 weights-trigger-analysis-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs:
@@ -160,7 +160,7 @@ weights-trigger-analysis-job:
       - output/weights_trigger_analysis_job/test_trigWeight.coffea
 
 SvB-friendtree-analysis-job:   
-  stage: analysis-test   
+  stage: analysis   
   extends:
     - .base_analysis
   needs:

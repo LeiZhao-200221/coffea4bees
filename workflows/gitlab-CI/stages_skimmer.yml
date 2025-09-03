@@ -1,5 +1,5 @@
 skimmer-test-job:   
-  stage: skimmer-test   
+  stage: skimmer   
   extends:
     - .base_analysis
   script:
@@ -12,14 +12,14 @@ skimmer-test-job:
       - output/skimmer_test_job/datasets_HH4b.yml
 
 skimmer-basic-test-job:   
-  stage: skimmer-test   
+  stage: skimmer   
   extends:
     - .base_analysis
   script:
     - source coffea4bees/scripts/skimmer-basic-test-job.sh
 
 synthetic-dataset-make-dataset:
-  stage: skimmer-test
+  stage: skimmer
   extends:
     - .base_analysis
   script:
@@ -35,7 +35,7 @@ synthetic-dataset-make-dataset:
 
 
 synthetic-dataset-make-dataset-Run3:
-  stage: skimmer-test
+  stage: skimmer
   extends:
     - .base_analysis
   script:
@@ -47,7 +47,7 @@ synthetic-dataset-make-dataset-Run3:
       - output/synthetic_dataset_make_dataset_Run3/data_2023_BPixE/picoAOD_seed5.root
 
 skimmer-boosted-job:   
-  stage: skimmer-test   
+  stage: skimmer   
   extends:
     - .base_analysis
   script:

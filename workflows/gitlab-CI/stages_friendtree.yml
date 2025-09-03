@@ -1,5 +1,5 @@
 weights-trigger-friendtree-job:   
-  stage: friendtree-test   
+  stage: friendtree   
   extends:
     - .base_analysis
   needs: 
@@ -12,7 +12,7 @@ weights-trigger-friendtree-job:
       - output/weights_trigger_friendtree_job/GluGluToHHTo4B_cHHH1_UL18/trigWeight.chunk1.root
 
 classifier-friendtree-job:   
-  stage: friendtree-test   
+  stage: friendtree   
   extends:
     - .base_analysis
   needs: 
@@ -29,7 +29,7 @@ classifier-friendtree-job:
       - output/classifier_friendtree_job/data2018D/
 
 topreco-friendtree-job:   
-  stage: friendtree-test   
+  stage: friendtree   
   extends:
     - .base_analysis
   needs: 
@@ -46,7 +46,7 @@ topreco-friendtree-job:
       - output/topreco_friendtree_job/data2018D/
 
 SvB-friendtree-job:
-  stage: friendtree-test
+  stage: friendtree
   extends:
     - .base_analysis
   needs:

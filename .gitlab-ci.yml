@@ -1,0 +1,106 @@
+workflow:
+  rules:
+    # Do not run if only markdown files changed
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH'
+      changes:
+        - "**/*.md"
+      when: never
+    # Do not run for tags
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    # Do not run for branches with 'test' in the name
+    - if: '$CI_COMMIT_BRANCH =~ /test/'
+      when: never
+    # Run for merge requests
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    # Run for pushes to branches WITHOUT open merge requests
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS == null'
+      when: always
+    # Run for scheduled pipelines
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    # Run for web-triggered pipelines
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
+
+variables:
+  COFFEA4BEES_REPO: 'https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.cern.ch/cms-cmu/barista.git'
+  COFFEA4BEES_BRANCH: 'master'
+  DATASET: coffea4bees/metadata/datasets_HH4b_v1p1.yml
+  DATASET_RUN3: coffea4bees/metadata/datasets_synthetic_test_Run3.yml
+  # DATASET: metadata/datasets_HH4b_cernbox.yml
+  # DATASET_RUN3: metadata/datasets_HH4b_Run3_cernbox.yml
+
+include:
+  - local: 'workflows/gitlab-CI/stages*yml'
+  - project: 'cms-cmu/barista'
+    ref: 'master'
+    file: 'src/workflows/gitlab-CI/stages_proxy.yml'
+
+stages:  
+  - setup
+  - code 
+  - skimmer
+  - friendtree
+  - analysis
+  - fits
+  - plot
+  - cutflow
+  - classifier
+  - reana
+
+
+# Setup job that clones barista once
+setup_workspace:
+  stage: setup
+  image: alpine/git:latest
+  script:
+    - echo "Setting up barista workspace"
+    - git clone --recursive --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
+    - cd barista_framework
+    # Create the bbww directory and copy current repository content
+    - mkdir -p bbww
+    - cp -r $CI_PROJECT_DIR/* bbww/ 2>/dev/null || true
+    - ls -la bbww/
+  artifacts:
+    paths:
+      - barista_framework/
+    expire_in: 8 hours
+  tags:
+    - k8s-cvmfs
+
+.base_analysis:
+  needs:
+    - voms_proxy
+    - setup_workspace
+  image: ${CI_REGISTRY_IMAGE}:test
+  tags:
+    - k8s-cvmfs
+  artifacts: 
+    expire_in: 1 day
+    paths:
+      - 'template'
+  retry: 2
+
+.base_combine:
+  image: gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0
+  before_script:
+    - source /cvmfs/cms.cern.ch/cmsset_default.sh
+    - cd /home/cmsusr/CMSSW_11_3_4/
+    - cmsenv || true
+    - cd -
+  tags:
+    - k8s-cvmfs
+
+.base_classifier:
+  needs:
+    - voms_proxy
+    - setup_repositories
+  image: registry.hub.docker.com/chuyuanliu/heptools:ml-cpu # TODO change to central repo
+  before_script:
+    - source /entrypoint.sh
+  tags:
+    - k8s-cvmfs
+  artifacts:
+    expire_in: 1 day
