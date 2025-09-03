@@ -1,9 +1,9 @@
 include:
-  - local: stages_analysis-test.yml
-  - local: stages_classifier.yml
-  - local: stages_code.yml
-  - local: stages_cutflow.yml
-  - local: stages_fits.yml
-  - local: stages_friendtree.yml
-  - local: stages_plots.yml 
-  - local: stages_skimmer-test.yml 
+  - local: workflows/gitlab-CI/stages_analysis-test.yml
+  - local: workflows/gitlab-CI/stages_classifier.yml
+  - local: workflows/gitlab-CI/stages_code.yml
+  - local: workflows/gitlab-CI/stages_cutflow.yml
+  - local: workflows/gitlab-CI/stages_fits.yml
+  - local: workflows/gitlab-CI/stages_friendtree.yml
+  - local: workflows/gitlab-CI/stages_plots.yml
+  - local: workflows/gitlab-CI/stages_skimmer-test.yml
