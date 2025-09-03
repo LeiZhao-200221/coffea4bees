@@ -1,7 +1,7 @@
 import numpy as np
 import awkward as ak
 import logging
-from python.analysis.helpers.object_selection import (
+from coffea4bees.analysis.helpers.object_selection import (
     lepton_selection,
     jet_selection,
     lowpt_jet_selection

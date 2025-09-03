@@ -66,7 +66,7 @@ class torch_set_sharing_strategy:
 
 
 def setup_context():
-    from python.classifier.config.setting import Multiprocessing as cfg
+    from coffea4bees.classifier.config.setting import Multiprocessing as cfg
 
     from . import get_context
 

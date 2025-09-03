@@ -7,16 +7,16 @@ from itertools import chain
 from typing import TYPE_CHECKING, Iterable
 
 from src.utils import unique
-from python.classifier.config.main._utils import progress_advance
-from python.classifier.task import ArgParser, Dataset, converter, parse
+from coffea4bees.classifier.config.main._utils import progress_advance
+from coffea4bees.classifier.task import ArgParser, Dataset, converter, parse
 
 from ..setting import IO as IOSetting
 
 if TYPE_CHECKING:
     import pandas as pd
     from src.data_formats.root import Chunk, Friend
-    from python.classifier.df.io import FromRoot, ToTensor
-    from python.classifier.df.tools import DFProcessor
+    from coffea4bees.classifier.df.io import FromRoot, ToTensor
+    from coffea4bees.classifier.df.tools import DFProcessor
 
 
 class LoadRoot(ABC, Dataset):
@@ -77,7 +77,7 @@ class LoadRoot(ABC, Dataset):
     )
 
     def __init__(self):
-        from python.classifier.df.io import ToTensor
+        from coffea4bees.classifier.df.io import ToTensor
 
         self._to_tensor = ToTensor()
         self._preprocessors: list[DFProcessor] = []
@@ -135,9 +135,9 @@ class LoadRoot(ABC, Dataset):
         from concurrent.futures import ProcessPoolExecutor
 
         from src.data_formats.root import Chunk
-        from python.classifier.monitor.progress import Progress
-        from python.classifier.process import pool, status
-        from python.classifier.root.dataset import FriendTreeEvalDataset
+        from coffea4bees.classifier.monitor.progress import Progress
+        from coffea4bees.classifier.process import pool, status
+        from coffea4bees.classifier.root.dataset import FriendTreeEvalDataset
 
         from_roots = [*self._from_root()]
         with ProcessPoolExecutor(
@@ -277,8 +277,8 @@ class _load_root:
 
         import pandas as pd
         from src.data_formats.root import Chunk
-        from python.classifier.monitor.progress import Progress
-        from python.classifier.process import pool, status
+        from coffea4bees.classifier.monitor.progress import Progress
+        from coffea4bees.classifier.process import pool, status
 
         with ProcessPoolExecutor(
             max_workers=self._max_workers,

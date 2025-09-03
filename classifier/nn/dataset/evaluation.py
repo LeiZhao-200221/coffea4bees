@@ -16,9 +16,9 @@ from typing import (
     overload,
 )
 
-from python.classifier.config.setting.ml import DataLoader as cfg
-from python.classifier.monitor.progress import MessageType, Progress
-from python.classifier.process import status
+from coffea4bees.classifier.config.setting.ml import DataLoader as cfg
+from coffea4bees.classifier.monitor.progress import MessageType, Progress
+from coffea4bees.classifier.process import status
 
 if sys.version_info >= (3, 11):
     from typing import TypeVarTuple, Unpack
@@ -32,7 +32,7 @@ _ChainResultT = TypeVarTuple("_ChainResultT")
 _OtherChainResultT = TypeVarTuple("_OtherChainResultT")
 
 if TYPE_CHECKING:
-    from python.classifier.ml import BatchType
+    from coffea4bees.classifier.ml import BatchType
 
     BatchLoader = Callable[[], BatchType]
 

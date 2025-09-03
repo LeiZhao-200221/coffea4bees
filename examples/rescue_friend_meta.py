@@ -12,7 +12,7 @@ import yaml
 from src.data_formats.root import Chunk, Friend
 from src.storage.eos import EOS
 from src.utils.json import DefaultEncoder
-from python.classifier.process.pool import CallbackExecutor
+from coffea4bees.classifier.process.pool import CallbackExecutor
 from rich.pretty import pprint
 from rich.progress import (
     BarColumn,

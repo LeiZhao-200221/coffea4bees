@@ -5,9 +5,9 @@ from functools import cached_property
 from inspect import getmro
 from typing import Callable, Iterable
 
-from python.classifier.config.setting.cms import CollisionData, MC_HH_ggF, MC_TTbar
-from python.classifier.config.state import Flags
-from python.classifier.task import ArgParser, Dataset, parse
+from coffea4bees.classifier.config.setting.cms import CollisionData, MC_HH_ggF, MC_TTbar
+from coffea4bees.classifier.config.state import Flags
+from coffea4bees.classifier.task import ArgParser, Dataset, parse
 
 
 class _PicoAOD(Dataset):

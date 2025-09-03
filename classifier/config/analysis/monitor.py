@@ -1,7 +1,7 @@
 import json
 
 import fsspec
-from python.classifier.task import Analysis, ArgParser
+from coffea4bees.classifier.task import Analysis, ArgParser
 
 from ..setting import IO
 
@@ -23,7 +23,7 @@ class Usage(Analysis):
     def analyze(self, _):
         path = self.opts.usage
         if path is None:
-            from python.classifier.monitor.usage import Usage as _Usage
+            from coffea4bees.classifier.monitor.usage import Usage as _Usage
 
             data = _Usage._serialize()
             if data is None:
@@ -40,6 +40,6 @@ class _usage_report:
         self._step = step
 
     def __call__(self):
-        from python.classifier.monitor.usage.analyze import generate_report
+        from coffea4bees.classifier.monitor.usage.analyze import generate_report
 
         generate_report(self._data, IO.report / "usage", time_step=self._step)

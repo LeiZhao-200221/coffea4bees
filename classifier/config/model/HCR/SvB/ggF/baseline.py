@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from python.classifier.task import ArgParser
+from coffea4bees.classifier.task import ArgParser
 
 from . import one_kl, all_kl
 

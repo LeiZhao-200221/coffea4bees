@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from python.classifier.task import GlobalSetting
+from coffea4bees.classifier.task import GlobalSetting
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike

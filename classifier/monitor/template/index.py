@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import fsspec
 from src.storage.eos import EOS, PathLike
-from python.classifier.config.setting import IO
+from coffea4bees.classifier.config.setting import IO
 
 from ..core import MonitorProxy, post_to_monitor
 

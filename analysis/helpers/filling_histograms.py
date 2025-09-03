@@ -1,4 +1,4 @@
-from python.analysis.helpers.hist_templates import (
+from coffea4bees.analysis.helpers.hist_templates import (
     FvTHists,
     QuadJetHistsSelected,
     QuadJetHistsMinDr,

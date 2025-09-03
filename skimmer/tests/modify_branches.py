@@ -6,7 +6,7 @@ import numpy as np
 from src.storage.eos import PathLike
 
 from src.skimmer.picoaod import PicoAOD, _branch_filter
-from python.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
 
 warnings.filterwarnings(
     "ignore", category=RuntimeWarning, message="Missing cross-reference .*"

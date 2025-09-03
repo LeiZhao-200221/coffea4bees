@@ -4,9 +4,9 @@ import operator as op
 from functools import partial, reduce
 from typing import TYPE_CHECKING
 
-from python.classifier.config.setting.df import Columns
-from python.classifier.config.state.label import MultiClass
-from python.classifier.task import ArgParser, converter, parse
+from coffea4bees.classifier.config.setting.df import Columns
+from coffea4bees.classifier.config.state.label import MultiClass
+from coffea4bees.classifier.task import ArgParser, converter, parse
 
 from . import _group, _picoAOD
 from ._common import CommonEval, CommonTrain
@@ -34,7 +34,7 @@ class _common_selection:
         return df[selection]
 
     def __repr__(self):
-        from python.classifier.df.tools import _iter_str, _type_str
+        from coffea4bees.classifier.df.tools import _iter_str, _type_str
 
         selections = [self.ntags, *self.regions]
         if self.passHLT:
@@ -109,7 +109,7 @@ class Background(_picoAOD.Background, _Train):
     )
 
     def __init__(self):
-        from python.classifier.df.tools import drop_columns
+        from coffea4bees.classifier.df.tools import drop_columns
 
         super().__init__()
         self.postprocessors.insert(0, partial(self.normalize, norm=self.opts.norm))

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from python.classifier.config.setting import monitor as cfg
+from coffea4bees.classifier.config.setting import monitor as cfg
 
 from ..backends import Platform
 from ..core import MonitorProxy, Recorder, post_to_monitor

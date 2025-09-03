@@ -2,8 +2,8 @@ from collections import defaultdict
 from itertools import chain, cycle
 
 import fsspec
-from python.classifier.config.setting import IO, ResultKey
-from python.classifier.task import Analysis, ArgParser
+from coffea4bees.classifier.config.setting import IO, ResultKey
+from coffea4bees.classifier.task import Analysis, ArgParser
 
 
 class LossROC(Analysis):
@@ -187,14 +187,14 @@ class _plot_loss_auc:
 
     @property
     def plot(self):
-        from python.classifier.monitor.plot.basic import plot_multiphase_scalar
+        from coffea4bees.classifier.monitor.plot.basic import plot_multiphase_scalar
 
         return plot_multiphase_scalar
 
     def __call__(self):
         from bokeh.embed import file_html
         from bokeh.resources import CDN, INLINE
-        from python.classifier.monitor import Index
+        from coffea4bees.classifier.monitor import Index
 
         resources = INLINE if self._inline else CDN
         path = IO.report / "HCR" / self.filename.format(group=self._group)
@@ -216,7 +216,7 @@ class _list_loss_auc(_plot_loss_auc):
 
     @property
     def plot(self):
-        from python.classifier.monitor.plot.basic import list_last_scalar
+        from coffea4bees.classifier.monitor.plot.basic import list_last_scalar
 
         return list_last_scalar
 
@@ -227,6 +227,6 @@ class _plot_roc(_plot_loss_auc):
 
     @property
     def plot(self):
-        from python.classifier.monitor.plot.basic import plot_multiphase_curve
+        from coffea4bees.classifier.monitor.plot.basic import plot_multiphase_curve
 
         return plot_multiphase_curve

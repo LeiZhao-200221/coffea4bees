@@ -17,14 +17,14 @@ from coffea.analysis_tools import Weights, PackedSelection
 from src.hist import Collection, Fill
 from src.hist.object import LorentzVector, Jet
 
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 from src.physics.common import apply_btag_sf, update_events
-from python.analysis.helpers.truth_tools import find_genpart
+from coffea4bees.analysis.helpers.truth_tools import find_genpart
 
 from src.physics.event_selection import apply_event_selection
-from python.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
 
 import logging
 

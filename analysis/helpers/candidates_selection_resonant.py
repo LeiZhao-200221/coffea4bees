@@ -1,7 +1,7 @@
 import numpy as np
 import awkward as ak
 from src.math.random import Squares
-from python.analysis.helpers.SvB_helpers import compute_SvB
+from coffea4bees.analysis.helpers.SvB_helpers import compute_SvB
 from coffea.nanoevents.methods import vector
 import logging
 

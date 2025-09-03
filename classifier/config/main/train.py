@@ -5,14 +5,14 @@ from datetime import datetime
 from itertools import chain
 from typing import TYPE_CHECKING
 
-from python.classifier.task import ArgParser, EntryPoint, Model, TaskOptions, converter
+from coffea4bees.classifier.task import ArgParser, EntryPoint, Model, TaskOptions, converter
 
 from ..setting import ResultKey
 from ._utils import LoadTrainingSets, SelectDevice, progress_advance
 
 if TYPE_CHECKING:
-    from python.classifier.process.device import Device
-    from python.classifier.task.model import ModelTrainer
+    from coffea4bees.classifier.process.device import Device
+    from coffea4bees.classifier.task.model import ModelTrainer
     from torch.utils.data import StackDataset
 
 
@@ -45,8 +45,8 @@ class Main(SelectDevice, LoadTrainingSets):
     def run(self, parser: EntryPoint):
         from concurrent.futures import ProcessPoolExecutor
 
-        from python.classifier.monitor.progress import Progress
-        from python.classifier.process import pool, status
+        from coffea4bees.classifier.monitor.progress import Progress
+        from coffea4bees.classifier.process import pool, status
 
         # load datasets in parallel
         datasets = self.load_training_sets(parser)

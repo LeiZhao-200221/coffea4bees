@@ -1,1 +1,1 @@
-python -m python.classifier.test.check_configs
+python -m coffea4bees.classifier.test.check_configs

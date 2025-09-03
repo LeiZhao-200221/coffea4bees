@@ -7,16 +7,16 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 import fsspec
-from python.classifier.task import ArgParser, Model, converter, parse
+from coffea4bees.classifier.task import ArgParser, Model, converter, parse
 from rich.pretty import pretty_repr
 
 from ..setting import ResultKey
 
 if TYPE_CHECKING:
     from src.storage.eos import PathLike
-    from python.classifier.ml.evaluation import Evaluation
-    from python.classifier.ml.skimmer import Splitter
-    from python.classifier.ml.training import MultiStageTraining
+    from coffea4bees.classifier.ml.evaluation import Evaluation
+    from coffea4bees.classifier.ml.skimmer import Splitter
+    from coffea4bees.classifier.ml.training import MultiStageTraining
 
 
 class KFoldTrain(ABC, Model):
@@ -83,7 +83,7 @@ class KFoldTrain(ABC, Model):
     def initializer(self, splitter: Splitter, **kwargs) -> MultiStageTraining: ...
 
     def train(self):
-        from python.classifier.ml.skimmer import KFold, RandomKFold
+        from coffea4bees.classifier.ml.skimmer import KFold, RandomKFold
 
         if self.kfolds == 1:
             return [self.initializer(KFold(kfolds=1, offset=1)).train]
@@ -145,7 +145,7 @@ class KFoldEval(ABC, Model):
 
 def _find_models(args: list[list[str]], no_kfold: bool = False) -> list[dict]:
     from src.storage.eos import EOS
-    from python.classifier.ml.skimmer import KFold, RandomKFold
+    from coffea4bees.classifier.ml.skimmer import KFold, RandomKFold
 
     models = []
     for arg in args:

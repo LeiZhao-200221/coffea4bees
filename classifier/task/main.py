@@ -24,7 +24,7 @@ from .task import _DASH, Task
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from python.classifier.config.state import Flags
+    from coffea4bees.classifier.config.state import Flags
 
 _CLASSIFIER = "classifier"
 _TEST = "test"
@@ -112,7 +112,7 @@ class EntryPoint:
         mock_flags: Flags = None,
         force_ctx: list[_ModCtx] = None,
     ) -> tuple[ModuleType, type[Task], tuple[str, str]]:
-        from python.classifier.config.state import Flags
+        from coffea4bees.classifier.config.state import Flags
 
         if mock_flags is None:
             mock_flags = Flags
@@ -136,7 +136,7 @@ class EntryPoint:
         return None, None, (modname, clsname)
 
     def _fetch_all(self, *cats: str):
-        from python.classifier.config.state import Flags
+        from coffea4bees.classifier.config.state import Flags
 
         self.tasks: dict[str, list[Task]] = {}
         for cat in cats:
@@ -176,7 +176,7 @@ class EntryPoint:
         return mod, opts
 
     def _expand(self, *files: str, fetch_main: bool = False, formatter: str = None):
-        from python.classifier.config.state import Flags
+        from coffea4bees.classifier.config.state import Flags
 
         from . import parse
 
@@ -192,7 +192,7 @@ class EntryPoint:
                 Flags.set(*args[_FLAG])
 
     def __init__(self, argv: list[str] = None, initializer: Callable[[], None] = None):
-        from python.classifier.config.state import Flags, System
+        from coffea4bees.classifier.config.state import Flags, System
 
         if initializer is not None:
             initializer()
@@ -280,9 +280,9 @@ class EntryPoint:
         self.main: Main = new(cls, self.args[_MAIN][1])
 
     def run(self, reproducible: Callable = None):
-        from python.classifier.config import setting as cfg
-        from python.classifier.config.main.analyze import run_analyzer
-        from python.classifier.config.state import System
+        from coffea4bees.classifier.config import setting as cfg
+        from coffea4bees.classifier.config.main.analyze import run_analyzer
+        from coffea4bees.classifier.config.state import System
 
         from ..monitor import Recorder, wait_for_monitor
 
@@ -304,7 +304,7 @@ class EntryPoint:
         # dump result
         if (result is not None) and (not cfg.IO.result.is_null):
             from src.utils.json import DefaultEncoder
-            from python.classifier.config.setting import ResultKey
+            from coffea4bees.classifier.config.setting import ResultKey
 
             result[ResultKey.uuid] = str(uuid.uuid1())
             result[ResultKey.command] = self.cmd

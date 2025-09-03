@@ -1,7 +1,7 @@
 import numpy as np
 import awkward as ak
 from coffea.nanoevents.methods import vector
-from python.jet_clustering.sample_jet_templates import sample_PDFs_vs_pT
+from coffea4bees.jet_clustering.sample_jet_templates import sample_PDFs_vs_pT
 
 # _MAX_NUM_JET_RETRY = 4
 # _MAX_NUM_EVENT_RETRY = 4

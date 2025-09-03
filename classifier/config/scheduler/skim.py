@@ -1,10 +1,10 @@
-from python.classifier.nn.schedule import Schedule
-from python.classifier.utils import NOOP, noop
+from coffea4bees.classifier.nn.schedule import Schedule
+from coffea4bees.classifier.utils import NOOP, noop
 
 
 class _SkimBS(NOOP):
     def __init__(self, dataset):
-        from python.classifier.nn.dataset import skim_loader
+        from coffea4bees.classifier.nn.dataset import skim_loader
 
         self.dataloader = skim_loader(dataset, shuffle=False, drop_last=False)
 

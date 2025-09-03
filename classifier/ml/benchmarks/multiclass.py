@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, Literal, TypedDict
 
-from python.classifier.config.state.label import MultiClass
+from coffea4bees.classifier.config.state.label import MultiClass
 from torch import Tensor
 
 from ...algorithm.hist import RegularAxis

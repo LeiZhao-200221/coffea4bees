@@ -8,8 +8,8 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.event_selection import apply_boosted_4b_selection, apply_4b_selection
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.event_selection import apply_boosted_4b_selection, apply_4b_selection
 from src.physics.event_selection import apply_event_selection
 
 import logging
@@ -105,7 +105,7 @@ class analysis(processor.ProcessorABC):
         #
         #  Adding infor for preliminary Boosted Synthetic data study
         #
-        # from python.analysis.helpers.write_debug_info import add_debug_info_for_Boosted_Synthetic
+        # from coffea4bees.analysis.helpers.write_debug_info import add_debug_info_for_Boosted_Synthetic
         # add_debug_info_for_Boosted_Synthetic(boosted_events, processOutput)
 
         # print("\n")

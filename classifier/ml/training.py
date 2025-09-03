@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Iterable
 
 import torch
 import torch.types as tt
-from python.classifier.config.setting import IO as cfg_IO
-from python.classifier.config.setting import ml as cfg
+from coffea4bees.classifier.config.setting import IO as cfg_IO
+from coffea4bees.classifier.config.setting import ml as cfg
 from rich.pretty import pretty_repr
 from torch import Tensor, nn
 from torch.utils.data import Dataset

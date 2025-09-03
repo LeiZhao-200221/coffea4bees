@@ -2,8 +2,8 @@ import getpass
 import os
 from datetime import datetime
 
-from python.classifier.task import GlobalState
-from python.classifier.task.state import _SET
+from coffea4bees.classifier.task import GlobalState
+from coffea4bees.classifier.task.state import _SET
 
 
 class System(GlobalState):

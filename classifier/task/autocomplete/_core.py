@@ -8,8 +8,8 @@ from collections import deque
 from multiprocessing.connection import Listener
 from typing import Iterable
 
-from python.classifier.config.main.help import _walk_configs
-from python.classifier.config.state import Flags
+from coffea4bees.classifier.config.main.help import _walk_configs
+from coffea4bees.classifier.config.state import Flags
 
 from .. import main as m
 from ..special import TaskBase

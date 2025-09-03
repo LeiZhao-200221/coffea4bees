@@ -1,13 +1,13 @@
 import yaml
 from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
-from python.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
 from src.physics.event_selection import apply_event_selection
 from coffea.nanoevents import NanoEventsFactory
 
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 from src.math.random import Squares
-from python.analysis.helpers.event_weights import add_btagweights
-from python.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.event_weights import add_btagweights
+from coffea4bees.analysis.helpers.processor_config import processor_config
 from src.physics.event_weights import add_weights
 
 from coffea.analysis_tools import Weights, PackedSelection

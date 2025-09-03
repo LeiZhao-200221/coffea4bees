@@ -21,7 +21,7 @@ from typing import (
 )
 
 from src.typetools import check_subclass, get_partial_type_hints
-from python.classifier.typetools import Method
+from coffea4bees.classifier.typetools import Method
 
 from ..utils import noop
 

@@ -2,16 +2,16 @@ import yaml
 from src.skimmer.picoaod import PicoAOD, fetch_metadata, resize
 from coffea.nanoevents import NanoEventsFactory
 from collections import OrderedDict
-from python.analysis.helpers.cutflow import cutFlow
+from coffea4bees.analysis.helpers.cutflow import cutFlow
 
-from python.jet_clustering.declustering import make_synthetic_event
-from python.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.jet_clustering.declustering import make_synthetic_event
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
 
 from src.math.random import Squares
 from src.physics.event_selection import apply_event_selection
 
 from src.data_formats.root import Chunk, TreeReader
-from python.analysis.helpers.load_friend import (
+from coffea4bees.analysis.helpers.load_friend import (
     FriendTemplate,
     parse_friends
 )
@@ -195,7 +195,7 @@ class DeClustererBoosted(PicoAOD):
         #
 
 
-        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
+        # from coffea4bees.analysis.helpers.write_debug_info import add_debug_info_to_output_declustering_outputs
         # add_debug_info_to_output_declustering_outputs(selev, declustered_jets, processOutput)
 
 

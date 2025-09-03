@@ -2,7 +2,7 @@ import unittest
 import sys
 import os
 sys.path.insert(0, os.getcwd())
-from python.stats_analysis.tests.parser import wrapper
+from coffea4bees.stats_analysis.tests.parser import wrapper
 import ROOT
 import numpy as np
 import yaml

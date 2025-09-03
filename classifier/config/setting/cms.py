@@ -1,4 +1,4 @@
-from python.classifier.task import GlobalSetting
+from coffea4bees.classifier.task import GlobalSetting
 
 
 class CollisionData(GlobalSetting):

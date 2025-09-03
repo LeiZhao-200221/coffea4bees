@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Iterable
 
-from python.classifier.config.setting import monitor as cfg
-from python.classifier.config.state.static import GitRepo
+from coffea4bees.classifier.config.setting import monitor as cfg
+from coffea4bees.classifier.config.state.static import GitRepo
 
 from ..backends import Platform
 from ..core import Recorder, post_to_monitor

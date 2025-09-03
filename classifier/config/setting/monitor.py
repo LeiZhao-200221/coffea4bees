@@ -1,7 +1,7 @@
 from typing import Callable, Protocol, TypeVar
 
 from src.utils.wrapper import MethodDecorator
-from python.classifier.task.state import GlobalSetting
+from coffea4bees.classifier.task.state import GlobalSetting
 
 from . import Monitor
 
@@ -138,7 +138,7 @@ class Gmail(GlobalSetting):
     @classmethod
     def get__address(cls, value: str) -> str:
         if value is None:
-            from python.classifier.monitor.input import RemoteInput
+            from coffea4bees.classifier.monitor.input import RemoteInput
 
             value = RemoteInput.get("Gmail address")
             cls.address = value
@@ -147,7 +147,7 @@ class Gmail(GlobalSetting):
     @classmethod
     def get__password(cls, value: str) -> str:
         if value is None:
-            from python.classifier.monitor.input import RemoteInput
+            from coffea4bees.classifier.monitor.input import RemoteInput
 
             value = RemoteInput.get("Google app password", password=True)
             cls.password = value

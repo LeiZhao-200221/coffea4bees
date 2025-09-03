@@ -1,4 +1,4 @@
-from python.classifier.task import ArgParser, main
+from coffea4bees.classifier.task import ArgParser, main
 
 
 class Main(main.Main):

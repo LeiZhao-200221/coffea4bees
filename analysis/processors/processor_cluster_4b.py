@@ -12,27 +12,27 @@ from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea import processor
 from coffea.util import load
 from coffea.analysis_tools import Weights, PackedSelection
-from python.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.processor_config import processor_config
 
 from src.hist import Collection, Fill
 from src.hist.object import LorentzVector, Jet, Muon, Elec
-#from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
-from python.jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
-from python.jet_clustering.clustering   import cluster_bs, cluster_bs_fast
-from python.jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
+#from coffea4bees.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHists
+from coffea4bees.jet_clustering.clustering_hist_templates import ClusterHists, ClusterHistsDetailed
+from coffea4bees.jet_clustering.clustering   import cluster_bs, cluster_bs_fast
+from coffea4bees.jet_clustering.declustering import compute_decluster_variables, make_synthetic_event, get_list_of_splitting_types, clean_ISR, get_list_of_ISR_splittings, get_list_of_combined_jet_types, get_list_of_all_sub_splittings, get_splitting_name, get_list_of_splitting_names
 
-from python.analysis.helpers.networks import HCREnsemble
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.networks import HCREnsemble
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
 
 
-from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from coffea4bees.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import apply_btag_sf, update_events
 from src.physics.event_weights import add_weights
 
-from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from python.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
 from src.physics.event_selection import apply_event_selection
 
 import logging
@@ -372,7 +372,7 @@ class analysis(processor.ProcessorABC):
         #     print(f'{chunk}\n\n')
 
 
-        # from python.jet_clustering.dumpTestVectors   import dumpTestVectors_bbj
+        # from coffea4bees.jet_clustering.dumpTestVectors   import dumpTestVectors_bbj
         # dumpTestVectors_bbj(chunk, selev, jets_for_clustering)
 
         #

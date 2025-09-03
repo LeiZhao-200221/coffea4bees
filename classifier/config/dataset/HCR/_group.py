@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 if TYPE_CHECKING:
-    from python.classifier.df.tools import DFProcessor
+    from coffea4bees.classifier.df.tools import DFProcessor
 
     ProcessorGenerator = Callable[[frozenset[str]], Iterable[DFProcessor]]
 
@@ -75,13 +75,13 @@ class add_column(_regex):
     _unique = True
 
     def any(self, matches: tuple[re.Match, ...]):
-        from python.classifier.df.tools import add_columns
+        from coffea4bees.classifier.df.tools import add_columns
 
         yield add_columns(**{self.key: self.dtype(matches[0].group(self.key))})
 
     def none(self):
         if self.default is not None:
-            from python.classifier.df.tools import add_columns
+            from coffea4bees.classifier.df.tools import add_columns
 
             yield add_columns(**{self.key: self.default})
 
@@ -104,7 +104,7 @@ class add_single_label(_regex):
     _unique = True
 
     def any(self, matches: tuple[re.Match, ...]):
-        from python.classifier.df.tools import add_label_index
+        from coffea4bees.classifier.df.tools import add_label_index
 
         label = matches[0].group(self.key)
         if self.rename is not None:

@@ -6,7 +6,7 @@ import warnings
 from typing import TYPE_CHECKING, Literal
 
 import fsspec
-from python.classifier.task.state import GlobalSetting, _share_global_state
+from coffea4bees.classifier.task.state import GlobalSetting, _share_global_state
 
 from ..state import System
 

@@ -1,4 +1,4 @@
-from python.classifier.task import ArgParser
+from coffea4bees.classifier.task import ArgParser
 
 from . import one_kl
 

@@ -11,27 +11,27 @@ import numpy as np
 import yaml
 from src.physics.objects.jet_corrections import apply_jerc_corrections
 from src.physics.common import update_events
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.event_weights import (
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.event_weights import (
     add_btagweights,
     add_pseudotagweights,
 )
-from python.analysis.helpers.filling_histograms import (
+from coffea4bees.analysis.helpers.filling_histograms import (
     filling_nominal_histograms,
     filling_syst_histograms,
 )
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
-from python.analysis.helpers.processor_config import processor_config
-from python.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
-from python.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
-from python.analysis.helpers.topCandReconstruction import (
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from coffea4bees.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from coffea4bees.analysis.helpers.SvB_helpers import setSvBVars, subtract_ttbar_with_SvB
+from coffea4bees.analysis.helpers.topCandReconstruction import (
     adding_top_reco_to_event,
     buildTop,
     find_tops,
     find_tops_slow,
 )
-from python.analysis.helpers.event_selection import apply_4b_lowpt_selection
+from coffea4bees.analysis.helpers.event_selection import apply_4b_lowpt_selection
 from src.physics.event_selection import apply_event_selection
 from src.physics.event_weights import add_weights
 from src.hist import Fill
@@ -51,7 +51,7 @@ from ..helpers.load_friend import (
 
 if TYPE_CHECKING:
     from ..helpers.classifier.HCR import HCRModelMetadata
-from python.analysis.helpers.truth_tools import find_genpart
+from coffea4bees.analysis.helpers.truth_tools import find_genpart
 
 #
 # Setup
@@ -382,7 +382,7 @@ class analysis(processor.ProcessorABC):
         #
         # Example of how to write out event numbers
         #
-        #from python.analysis.helpers.write_debug_info import add_debug_Run3_data
+        #from coffea4bees.analysis.helpers.write_debug_info import add_debug_Run3_data
         #add_debug_Run3_data(event, processOutput)
 
         selev = event[analysis_selections]
@@ -438,7 +438,7 @@ class analysis(processor.ProcessorABC):
         #
         # Example of how to write out event numbers
         #
-        # from python.analysis.helpers.write_debug_info import add_debug_info_to_output
+        # from coffea4bees.analysis.helpers.write_debug_info import add_debug_info_to_output
         # add_debug_info_to_output(event, processOutput, weights, list_weight_names, analysis_selections)
 
 

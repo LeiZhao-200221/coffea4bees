@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from python.classifier.config.setting.df import Columns
-from python.classifier.df.tools import _type_str
+from coffea4bees.classifier.config.setting.df import Columns
+from coffea4bees.classifier.df.tools import _type_str
 
 if TYPE_CHECKING:
     import pandas as pd

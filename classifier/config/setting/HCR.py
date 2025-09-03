@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from python.classifier.task import GlobalSetting
+from coffea4bees.classifier.task import GlobalSetting
 
 
 class InputBranch(GlobalSetting):

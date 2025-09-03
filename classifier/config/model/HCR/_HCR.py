@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable, Iterable
 
-from python.classifier.config.setting.HCR import Input, Output
-from python.classifier.task import ArgParser, parse
+from coffea4bees.classifier.config.setting.HCR import Input, Output
+from coffea4bees.classifier.task import ArgParser, parse
 
 from .._kfold import KFoldEval, KFoldTrain
 
@@ -11,9 +11,9 @@ _SCHEDULER = "classifier.config.scheduler"
 
 
 if TYPE_CHECKING:
-    from python.classifier.ml import BatchType
-    from python.classifier.ml.benchmarks.multiclass import ROC
-    from python.classifier.ml.skimmer import Splitter
+    from coffea4bees.classifier.ml import BatchType
+    from coffea4bees.classifier.ml.benchmarks.multiclass import ROC
+    from coffea4bees.classifier.ml.skimmer import Splitter
     from torch import Tensor
 
 ROC_BIN = (1000, 0, 1)
@@ -61,7 +61,7 @@ class HCRTrain(KFoldTrain):
     )
 
     def initializer(self, splitter: Splitter, **kwargs):
-        from python.classifier.ml.models.HCR import (
+        from coffea4bees.classifier.ml.models.HCR import (
             GBNSchedule,
             HCRArch,
             HCRBenchmarks,
@@ -92,7 +92,7 @@ class HCREval(KFoldEval):
     output_definition: Callable[[BatchType], BatchType]
 
     def initializer(self, model, splitter, **kwargs):
-        from python.classifier.ml.models.HCR import HCREvaluation
+        from coffea4bees.classifier.ml.models.HCR import HCREvaluation
 
         return HCREvaluation(
             saved_model=model,

@@ -4,7 +4,7 @@ from collections import defaultdict
 from functools import reduce
 from typing import Iterable
 
-from python.classifier.task import Analysis, ArgParser, converter
+from coffea4bees.classifier.task import Analysis, ArgParser, converter
 
 from ..setting import IO, ResultKey
 
@@ -63,7 +63,7 @@ class Merge(Analysis):
     )
 
     def analyze(self, results: list[dict]):
-        from python.classifier.root.kfold import MergeMean, MergeStd, merge_kfolds
+        from coffea4bees.classifier.root.kfold import MergeMean, MergeStd, merge_kfolds
 
         kfolds = _load_friends(self.opts.stage, results)
         if len(kfolds) > 1:

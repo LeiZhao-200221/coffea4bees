@@ -5,10 +5,10 @@ from textwrap import indent
 
 import fsspec
 
-from python.classifier.task import ArgParser, EntryPoint, Task, main, parse
-from python.classifier.task.special import Deprecated, WorkInProgress
-from python.classifier.task.task import _INDENT
-from python.classifier.test.utils.import_check import walk_packages
+from coffea4bees.classifier.task import ArgParser, EntryPoint, Task, main, parse
+from coffea4bees.classifier.task.special import Deprecated, WorkInProgress
+from coffea4bees.classifier.task.task import _INDENT
+from coffea4bees.classifier.test.utils.import_check import walk_packages
 
 from .. import setting as cfg
 from ..state import Flags

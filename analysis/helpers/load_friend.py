@@ -14,7 +14,7 @@ def parse_friends(args: dict[str, str | FriendTemplate]) -> dict[str, Friend]:
     if args is None:
         return friends
 
-    from python.classifier.task import parse
+    from coffea4bees.classifier.task import parse
 
     for name, path in args.items():
         if isinstance(path, str):

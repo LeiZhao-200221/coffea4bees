@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from python.classifier.task import GlobalSetting
+from coffea4bees.classifier.task import GlobalSetting
 
 
 class DataLoader(GlobalSetting):

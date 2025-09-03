@@ -13,7 +13,7 @@ import time
 
 import os
 sys.path.insert(0, os.getcwd())
-from python.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from coffea4bees.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 
 
 class quadJetTestCase(unittest.TestCase):

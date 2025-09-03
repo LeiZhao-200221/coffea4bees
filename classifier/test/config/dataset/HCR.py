@@ -1,4 +1,4 @@
-from python.classifier.config.dataset import HCR
+from coffea4bees.classifier.config.dataset import HCR
 
 from .._root import LoadGroupedRootForTest
 

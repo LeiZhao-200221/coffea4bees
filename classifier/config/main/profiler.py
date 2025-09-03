@@ -1,8 +1,8 @@
 import logging
 import os
 
-from python.classifier.task import ArgParser, EntryPoint, converter
-from python.classifier.task.special import WorkInProgress
+from coffea4bees.classifier.task import ArgParser, EntryPoint, converter
+from coffea4bees.classifier.task.special import WorkInProgress
 
 from .. import setting as cfg
 from ._utils import LoadTrainingSets, SelectDevice
@@ -49,7 +49,7 @@ class Main(WorkInProgress, SelectDevice, LoadTrainingSets):
         import numpy as np
         import torch.nn.functional as F
         import torch.optim as optim
-        from python.classifier.nn.blocks.HCR import HCR
+        from coffea4bees.classifier.nn.blocks.HCR import HCR
         from torch.profiler import ProfilerActivity, profile, schedule
         from torch.utils.data import DataLoader, Subset
 

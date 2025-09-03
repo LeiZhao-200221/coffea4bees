@@ -4,15 +4,15 @@ import awkward as ak
 import yaml
 import numpy as np
 from src.physics.objects.jet_corrections import apply_jerc_corrections
-from python.analysis.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
+from coffea4bees.analysis.trigger_emulator.TrigEmulatorTool   import TrigEmulatorTool
 from src.physics.event_selection import apply_event_selection
-from python.analysis.helpers.event_selection import apply_4b_selection
-from python.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.candidates_selection import create_cand_jet_dijet_quadjet
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 from coffea.nanoevents import NanoAODSchema
-from python.analysis.helpers.dump_friendtrees import dump_trigger_weight
-from python.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.dump_friendtrees import dump_trigger_weight
+from coffea4bees.analysis.helpers.processor_config import processor_config
 
 #
 #  Setup

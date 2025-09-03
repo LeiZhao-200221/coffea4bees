@@ -6,7 +6,7 @@ from .special import interface
 from .task import Task
 
 if TYPE_CHECKING:
-    from python.classifier.nn.dataset.evaluation import EvalDatasetLike
+    from coffea4bees.classifier.nn.dataset.evaluation import EvalDatasetLike
     from torch.utils.data import StackDataset
 
     from ..process.device import Device

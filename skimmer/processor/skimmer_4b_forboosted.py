@@ -4,7 +4,7 @@ import awkward as ak
 import numpy as np
 from coffea.util import load
 from src.skimmer.picoaod import PicoAOD #, fetch_metadata, resize
-from python.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
 
 class Skimmer(PicoAOD):
     def __init__(

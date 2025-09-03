@@ -3,9 +3,9 @@ from collections import defaultdict
 
 import fsspec
 import yaml
-from python.classifier.task import ArgParser, EntryPoint, main
-from python.classifier.task.parse._dict import _mapping_schema, mapping
-from python.classifier.utils import YamlIndentSequence
+from coffea4bees.classifier.task import ArgParser, EntryPoint, main
+from coffea4bees.classifier.task.parse._dict import _mapping_schema, mapping
+from coffea4bees.classifier.utils import YamlIndentSequence
 from yaml.representer import Representer
 
 from .. import setting as cfg

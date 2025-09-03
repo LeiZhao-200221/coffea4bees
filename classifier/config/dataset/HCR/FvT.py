@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from python.classifier.task import ArgParser
+from coffea4bees.classifier.task import ArgParser
 
 from . import _group, _picoAOD
 from ._common import CommonEval, CommonTrain
@@ -63,7 +63,7 @@ class Train(CommonTrain):
     )
 
     def preprocess_by_group(self):
-        from python.classifier.df.tools import add_label_index_from_column, prescale
+        from coffea4bees.classifier.df.tools import add_label_index_from_column, prescale
 
         ps = [
             _group.fullmatch(

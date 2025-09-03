@@ -5,10 +5,10 @@ import logging
 import fsspec
 import torch
 import torch.nn.functional as F
-from python.classifier.config.scheduler import SkimStep
-from python.classifier.config.setting.HCR import Input, InputBranch, Output
-from python.classifier.config.setting.ml import SplitterKeys
-from python.classifier.config.state.label import MultiClass
+from coffea4bees.classifier.config.scheduler import SkimStep
+from coffea4bees.classifier.config.setting.HCR import Input, InputBranch, Output
+from coffea4bees.classifier.config.setting.ml import SplitterKeys
+from coffea4bees.classifier.config.state.label import MultiClass
 
 from ...utils import MemoryViewIO
 from .. import BatchType

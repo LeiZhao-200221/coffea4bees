@@ -13,7 +13,7 @@ import time
 
 import os
 sys.path.insert(0, os.getcwd())
-from python.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, buildTop
+from coffea4bees.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, buildTop
 
 
 class topCandRecoTestCase(unittest.TestCase):
@@ -25,7 +25,7 @@ class topCandRecoTestCase(unittest.TestCase):
 
         #
         # Test vectors from picos
-        #   (from python.analysis.helpers.topCandReconstruction import dumpTopCandidateTestVectors
+        #   (from coffea4bees.analysis.helpers.topCandReconstruction import dumpTopCandidateTestVectors
         #   python runner.py -t -o test.coffea -d GluGluToHHTo4B_cHHH1 -p coffea4bees/analysis/processors/processor_HH4b.py -y UL17  -op coffea4bees/analysis/hists/ -m $DATASETS
         #
         self.input_jet_pt   = [[140.16835021972656, 135.59121704101562, 58.99290084838867, 46.69675827026367], [112.66857147216797, 81.65150451660156, 87.19490051269531, 68.40691375732422], [172.73770141601562, 82.6832504272461, 86.10943603515625, 62.091487884521484, 46.807315826416016, 44.72425079345703], [182.73670959472656, 173.9521942138672, 54.7447624206543, 53.8582649230957, 51.38298034667969, 45.54498291015625], [165.2755889892578, 115.32014465332031, 92.5178451538086, 85.9405746459961], [194.4156951904297, 186.0968475341797, 173.39366149902344, 82.69761657714844, 54.27119827270508], [119.172607421875, 62.03846740722656, 68.98473358154297, 56.673439025878906], [281.00933837890625, 216.72657775878906, 89.45651245117188, 74.25934600830078], [145.6790008544922, 103.01795196533203, 83.05353546142578, 60.624359130859375], [173.36849975585938, 75.07015228271484, 80.28221893310547, 60.64315414428711, 49.678794860839844]]

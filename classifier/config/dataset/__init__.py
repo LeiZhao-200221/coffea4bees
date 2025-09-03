@@ -4,7 +4,7 @@ import logging
 import math
 
 import fsspec
-from python.classifier.task import ArgParser, Dataset, EntryPoint, parse
+from coffea4bees.classifier.task import ArgParser, Dataset, EntryPoint, parse
 
 from ..setting import ResultKey
 

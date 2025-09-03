@@ -1,10 +1,10 @@
-from python.classifier.task import Main as _Main
+from coffea4bees.classifier.task import Main as _Main
 
 
 class Main(_Main):
     def run(self, _):
-        from python.classifier.monitor import Monitor
-        from python.classifier.monitor.usage import Usage
+        from coffea4bees.classifier.monitor import Monitor
+        from coffea4bees.classifier.monitor.usage import Usage
 
         Usage.stop()
         try:

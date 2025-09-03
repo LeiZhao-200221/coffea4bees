@@ -1,6 +1,6 @@
 import logging
 
-from python.classifier.config.setting import monitor as cfg
+from coffea4bees.classifier.config.setting import monitor as cfg
 
 
 @cfg.check(cfg.Notification, cfg.Gmail)

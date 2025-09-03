@@ -19,18 +19,18 @@ from src.hist import Collection, Fill
 from src.hist import H, Template
 from src.hist.object import LorentzVector, Jet, Muon, Elec
 
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.topCandReconstruction import find_tops, dumpTopCandidateTestVectors, buildTop
-from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.topCandReconstruction import find_tops, dumpTopCandidateTestVectors, buildTop
+from coffea4bees.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
 from functools import partial
 from multiprocessing import Pool
 
-from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from coffea4bees.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from src.physics.common import apply_btag_sf, update_events
 from src.physics.event_selection import apply_event_selection
-from python.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
 import logging
 
 
@@ -399,7 +399,7 @@ class analysis(processor.ProcessorABC):
 
         friends = {}
         if self.make_classifier_input is not None:
-            from python.analysis.helpers.dump_friendtrees import dump_unsup_friend
+            from coffea4bees.analysis.helpers.dump_friendtrees import dump_unsup_friend
             friends["friends"] = dump_unsup_friend(
                 selev,
                 self.make_classifier_input,   #### output file: return pathlike

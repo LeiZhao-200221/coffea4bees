@@ -9,14 +9,14 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 from coffea.analysis_tools import PackedSelection
 import hist
-from python.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
 
 from src.physics.event_selection import apply_event_selection
 from src.hist import Collection, Fill
-from python.jet_clustering.clustering_hist_templates import ClusterHistsBoosted
+from coffea4bees.jet_clustering.clustering_hist_templates import ClusterHistsBoosted
 from src.hist.object import Jet
 
-from python.jet_clustering.declustering import compute_decluster_variables
+from coffea4bees.jet_clustering.declustering import compute_decluster_variables
 
 import logging
 import vector

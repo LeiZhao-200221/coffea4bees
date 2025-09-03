@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from python.classifier.config.setting.HCR import Input
-from python.classifier.config.state.label import MultiClass
-from python.classifier.task import ArgParser
+from coffea4bees.classifier.config.setting.HCR import Input
+from coffea4bees.classifier.config.state.label import MultiClass
+from coffea4bees.classifier.task import ArgParser
 
 from . import _remove_sig
 
 if TYPE_CHECKING:
-    from python.classifier.ml import BatchType
+    from coffea4bees.classifier.ml import BatchType
 
 
 class _remove_ggf:

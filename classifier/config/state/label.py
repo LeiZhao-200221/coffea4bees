@@ -1,4 +1,4 @@
-from python.classifier.task import GlobalState
+from coffea4bees.classifier.task import GlobalState
 
 from ..setting import ml
 

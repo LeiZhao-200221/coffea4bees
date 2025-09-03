@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from python.classifier.config.setting.HCR import Input, MassRegion, Output
-from python.classifier.config.state.label import MultiClass
-from python.classifier.task import ArgParser
+from coffea4bees.classifier.config.setting.HCR import Input, MassRegion, Output
+from coffea4bees.classifier.config.state.label import MultiClass
+from coffea4bees.classifier.task import ArgParser
 
 from .._HCR import ROC_BIN, HCREval, HCRTrain, roc_nominal_selection
 
 if TYPE_CHECKING:
-    from python.classifier.ml import BatchType
+    from coffea4bees.classifier.ml import BatchType
 
 
 def _roc_data_selection(batch: BatchType):
@@ -59,7 +59,7 @@ class Train(HCRTrain):
 
     @property
     def rocs(self):
-        from python.classifier.ml.benchmarks.multiclass import ROC
+        from coffea4bees.classifier.ml.benchmarks.multiclass import ROC
 
         rocs = [
             ROC(

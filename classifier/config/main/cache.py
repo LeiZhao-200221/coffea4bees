@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import fsspec
-from python.classifier.task import ArgParser, EntryPoint, converter
+from coffea4bees.classifier.task import ArgParser, EntryPoint, converter
 
 from ...utils import MemoryViewIO
 from ..setting import IO as IOSetting
@@ -62,8 +62,8 @@ class Main(LoadTrainingSets):
         from concurrent.futures import ProcessPoolExecutor
 
         import numpy as np
-        from python.classifier.monitor.progress import Progress
-        from python.classifier.process import pool, status
+        from coffea4bees.classifier.monitor.progress import Progress
+        from coffea4bees.classifier.process import pool, status
 
         # cache states
         states = dict.fromkeys(self.opts.states, None)
@@ -127,8 +127,8 @@ class _save_cache:
 
     def __call__(self, chunk: int, indices: npt.ArrayLike):
         import torch
-        from python.classifier.nn.dataset import skim_loader, subset
-        from python.classifier.nn.dataset.sliceable import NamedTensorDataset
+        from coffea4bees.classifier.nn.dataset import skim_loader, subset
+        from coffea4bees.classifier.nn.dataset.sliceable import NamedTensorDataset
 
         dataset = subset(self.dataset, indices)
         if isinstance(dataset, NamedTensorDataset):

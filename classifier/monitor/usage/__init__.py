@@ -5,8 +5,8 @@ from threading import Lock, Thread
 from typing import TypedDict
 
 import psutil
-from python.classifier.config.setting import monitor as cfg
-from python.classifier.config.state import System
+from coffea4bees.classifier.config.setting import monitor as cfg
+from coffea4bees.classifier.config.state import System
 
 from ..core import MonitorProxy, Node, Recorder, post_to_monitor
 

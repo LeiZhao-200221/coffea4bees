@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 
 import numpy as np
-from python.classifier.df.tools import _iter_str, _map_str, _type_str
-from python.classifier.task import parse
-from python.classifier.typetools import new_TypedDict
+from coffea4bees.classifier.df.tools import _iter_str, _map_str, _type_str
+from coffea4bees.classifier.task import parse
+from coffea4bees.classifier.typetools import new_TypedDict
 
 if TYPE_CHECKING:
     import pandas as pd

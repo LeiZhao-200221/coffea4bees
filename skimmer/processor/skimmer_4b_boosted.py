@@ -9,9 +9,9 @@ from src.skimmer.mc_weight_outliers import OutlierByMedian
 from src.skimmer.picoaod import PicoAOD
 from src.physics.event_selection import apply_event_selection
 
-from python.analysis.helpers.processor_config import processor_config
-from python.analysis.helpers.event_selection import apply_boosted_4b_selection
-from python.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.event_selection import apply_boosted_4b_selection
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
 
 class Skimmer(PicoAOD):
     def __init__(

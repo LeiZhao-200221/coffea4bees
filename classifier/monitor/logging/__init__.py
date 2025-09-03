@@ -4,7 +4,7 @@ import logging
 import sys
 
 import tblib.pickling_support
-from python.classifier.config.setting import monitor as cfg
+from coffea4bees.classifier.config.setting import monitor as cfg
 
 from ..core import Recorder
 from ._redirect import MultiPlatformHandler

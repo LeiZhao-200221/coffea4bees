@@ -1,4 +1,4 @@
 #!/bin/bash
-python -m python.classifier.task.autocomplete._bind exit
-pkill -9 -u $USER -xf "python -m python.classifier.task.autocomplete._core"
+python -m coffea4bees.classifier.task.autocomplete._bind exit
+pkill -9 -u $USER -xf "python -m coffea4bees.classifier.task.autocomplete._core"
 complete -r "./pyml.py"

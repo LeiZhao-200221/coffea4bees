@@ -19,19 +19,19 @@ from src.hist import Collection, Fill
 from src.hist import H, Template
 from src.hist.object import LorentzVector, Jet, Muon, Elec
 
-from python.analysis.helpers.processor_config import processor_config
-from python.analysis.helpers.FriendTreeSchema import FriendTreeSchema
-from python.analysis.helpers.cutflow import cutflow_4b
-from python.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, dumpTopCandidateTestVectors, buildTop
-from python.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
+from coffea4bees.analysis.helpers.processor_config import processor_config
+from coffea4bees.analysis.helpers.FriendTreeSchema import FriendTreeSchema
+from coffea4bees.analysis.helpers.cutflow import cutflow_4b
+from coffea4bees.analysis.helpers.topCandReconstruction import find_tops, find_tops_slow, dumpTopCandidateTestVectors, buildTop
+from coffea4bees.analysis.helpers.hist_templates import SvBHists, FvTHists, QuadJetHistsUnsup, WCandHists, TopCandHists
 
 from functools import partial
 from multiprocessing import Pool
 
-from python.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
+from coffea4bees.analysis.helpers.jetCombinatoricModel import jetCombinatoricModel
 from src.physics.common import apply_btag_sf, update_events
 from src.physics.event_selection import apply_event_selection
-from python.analysis.helpers.event_selection import apply_4b_selection
+from coffea4bees.analysis.helpers.event_selection import apply_4b_selection
 import logging
 
 

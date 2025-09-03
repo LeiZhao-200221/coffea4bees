@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Iterable
 
-from python.classifier.nn.schedule import MultiStepBS, Schedule
+from coffea4bees.classifier.nn.schedule import MultiStepBS, Schedule
 
 if TYPE_CHECKING:
     from torch.optim.lr_scheduler import ReduceLROnPlateau
