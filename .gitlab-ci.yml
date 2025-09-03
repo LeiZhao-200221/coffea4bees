@@ -106,7 +106,7 @@ setup_workspace:
 .base_classifier:
   needs:
     - voms_proxy
-    - setup_repositories
+    - setup_workspace
   image: registry.hub.docker.com/chuyuanliu/heptools:ml-cpu # TODO change to central repo
   before_script:
     - source /entrypoint.sh
