@@ -25,8 +25,8 @@ workflow:
       when: always
 
 variables:
-  COFFEA4BEES_REPO: 'https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.cern.ch/cms-cmu/barista.git'
-  COFFEA4BEES_BRANCH: 'master'
+  BARISTA_REPO: 'https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.cern.ch/cms-cmu/barista.git'
+  BARISTA_BRANCH: 'master'
   DATASET: coffea4bees/metadata/datasets_HH4b_v1p1.yml
   DATASET_RUN3: coffea4bees/metadata/datasets_synthetic_test_Run3.yml
   # DATASET: metadata/datasets_HH4b_cernbox.yml
