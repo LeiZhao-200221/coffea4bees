@@ -3,6 +3,7 @@ analysis-make-jcm-weights-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-merge-test-job
   script:
     - source coffea4bees/scripts/analysis-make-jcm-weights-job.sh
@@ -15,6 +16,7 @@ twoStageClosure-test-job:
   extends:
     - .base_combine
   needs: 
+    - setup_workspace
     - analysis-test-mixed-job
   script:
     - source coffea4bees/scripts/analysis-runTwoStageClosure-ROOT.sh

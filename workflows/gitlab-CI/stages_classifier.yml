@@ -2,6 +2,5 @@ check-configs:
   stage: classifier
   extends:
     - .base_classifier
-  allow_failure: true
   script:
     - source coffea4bees/scripts/check-configs.sh

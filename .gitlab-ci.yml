@@ -59,10 +59,10 @@ setup_workspace:
     - echo "Setting up barista workspace"
     - git clone --recursive --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
     - cd barista_framework
-    # Create the bbww directory and copy current repository content
-    - mkdir -p bbww
-    - cp -r $CI_PROJECT_DIR/* bbww/ 2>/dev/null || true
-    - ls -la bbww/
+    # Create the coffea4bees directory and copy current repository content
+    - mkdir -p coffea4bees/
+    - cp -r $CI_PROJECT_DIR/* coffea4bees/ 2>/dev/null || true
+    - ls -la coffea4bees/
   artifacts:
     paths:
       - barista_framework/
@@ -85,6 +85,8 @@ setup_workspace:
 
 .base_combine:
   image: gitlab-registry.cern.ch/cms-analysis/general/combine-container:CMSSW_11_3_4-combine_v9.1.0-harvester_v2.1.0
+  needs:
+    - setup_workspace
   before_script:
     - source /cvmfs/cms.cern.ch/cmsset_default.sh
     - cd /home/cmsusr/CMSSW_11_3_4/

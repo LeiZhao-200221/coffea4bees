@@ -23,6 +23,7 @@ analysis-merge-test-job:
   extends:
     - .base_analysis
   needs:
+    - setup_workspace
     - analysis-test-job
     - analysis-signals-test-job
   script:
@@ -112,6 +113,7 @@ skimmer-analysis-test-job:
     - .base_analysis
   needs: 
     - voms_proxy
+    - setup_workspace
     - skimmer-test-job
   script:
     - source coffea4bees/scripts/skimmer-analysis-test-job.sh
@@ -123,6 +125,7 @@ synthetic-dataset-analyze:
   stage: analysis   
   extends:
     - .base_analysis
+    - setup_workspace
   needs:
     - voms_proxy
     - synthetic-dataset-make-dataset
@@ -138,6 +141,7 @@ synthetic-dataset-analyze-Run3:
     - .base_analysis
   needs:
     - voms_proxy
+    - setup_workspace
     - synthetic-dataset-make-dataset-Run3
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-Run3.sh
@@ -152,6 +156,7 @@ weights-trigger-analysis-job:
     - .base_analysis
   needs:
     - voms_proxy
+    - setup_workspace
     - weights-trigger-friendtree-job
   script:
     - source coffea4bees/scripts/weights-trigger-analysis-job.sh
@@ -165,6 +170,7 @@ SvB-friendtree-analysis-job:
     - .base_analysis
   needs:
     - voms_proxy
+    - setup_workspace
     - SvB-friendtree-job
   script:
     - source coffea4bees/scripts/SvB-friendtree-analysis-job.sh

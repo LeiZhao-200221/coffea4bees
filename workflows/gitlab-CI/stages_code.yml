@@ -37,6 +37,7 @@ memory-test:
   stage: code
   needs:
     - voms_proxy
+    - setup_workspace
   extends:
     - .base_analysis
   script:

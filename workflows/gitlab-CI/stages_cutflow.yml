@@ -3,6 +3,7 @@ analysis-cutflow-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-merge-test-job
   script:
     - source coffea4bees/scripts/analysis-cutflow-job.sh
@@ -15,6 +16,7 @@ analysis-cutflow-job-Run3:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-test-job-Run3
   script:
     - source coffea4bees/scripts/analysis-cutflow-job-Run3.sh
@@ -28,6 +30,7 @@ analysis-mixed-cutflow-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-test-mixed-job
   script:
     - source coffea4bees/scripts/analysis-mixed-cutflow-job.sh
@@ -41,6 +44,7 @@ skimmer-analysis-cutflow-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - skimmer-analysis-test-job
   script:
     - source coffea4bees/scripts/skimmer-analysis-cutflow-job.sh
@@ -54,6 +58,7 @@ analysis-systematics-cutflow-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-systematics-test-job
   script:
     - source coffea4bees/scripts/analysis-systematics-cutflow-job.sh
@@ -62,59 +67,64 @@ analysis-systematics-cutflow-job:
       - output/analysis_systematics_cutflow_job/test_dump_systematics_cutflow.yml
 
 analysis-cutflow-job-unsup:    
- stage: cutflow
- extends:
-   - .base_analysis
- needs: 
-   - analysis-test-job-unsup
- script:
-   - source coffea4bees/scripts/analysis-cutflow-job-unsup.sh
- artifacts:
-   paths:
-     - output/analysis_cutflow_job_unsup/test_dump_cutflow_job_unsup.yml
+  stage: cutflow
+  extends:
+    - .base_analysis
+  needs: 
+    - setup_workspace
+    - analysis-test-job-unsup
+  script:
+    - source coffea4bees/scripts/analysis-cutflow-job-unsup.sh
+  artifacts:
+    paths:
+      - output/analysis_cutflow_job_unsup/test_dump_cutflow_job_unsup.yml
 
 synthetic-dataset-analyze-cutflow:
- stage: cutflow
- extends:
-   - .base_analysis
- needs: 
-   - synthetic-dataset-analyze
- script:
-   - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh
- artifacts:
-   paths:
-     - output/synthetic_dataset_analyze_cutflow/test_dump_cutflow_synthetic_datasets.yml
+  stage: cutflow
+  extends:
+    - .base_analysis
+  needs: 
+    - setup_workspace
+    - synthetic-dataset-analyze
+  script:
+    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh
+  artifacts:
+    paths:
+      - output/synthetic_dataset_analyze_cutflow/test_dump_cutflow_synthetic_datasets.yml
 
 synthetic-dataset-analyze-cutflow-Run3:
- stage: cutflow
- extends:
-   - .base_analysis
- needs: 
-   - synthetic-dataset-analyze-Run3
- script:
-   - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh
- artifacts:
-   paths:
-     - output/synthetic_dataset_analyze_cutflow_Run3/test_dump_cutflow_synthetic_datasets.yml
+  stage: cutflow
+  extends:
+    - .base_analysis
+  needs: 
+    - setup_workspace
+    - synthetic-dataset-analyze-Run3
+  script:
+    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh
+  artifacts:
+    paths:
+      - output/synthetic_dataset_analyze_cutflow_Run3/test_dump_cutflow_synthetic_datasets.yml
 
 
 weights-trigger-cutflow:
- stage: cutflow
- extends:
-   - .base_analysis
- needs: 
-   - weights-trigger-analysis-job
- script:
-   - source coffea4bees/scripts/weights-trigger-cutflow-job.sh
- artifacts:
-   paths:
-     - output/weights_trigger_cutflow_job/test_dump_cutflow_trigWeight.yml
- 
+  stage: cutflow
+  extends:
+    - .base_analysis
+  needs: 
+    - setup_workspace
+    - weights-trigger-analysis-job
+  script:
+    - source coffea4bees/scripts/weights-trigger-cutflow-job.sh
+  artifacts:
+    paths:
+      - output/weights_trigger_cutflow_job/test_dump_cutflow_trigWeight.yml
+
 SvB-friendtree-cutflow-job:
   stage: cutflow
   extends:
     - .base_analysis
   needs:
+    - setup_workspace
     - SvB-friendtree-analysis-job
   script:
     - source coffea4bees/scripts/SvB-friendtree-cutflow-job.sh
@@ -127,6 +137,7 @@ analysis-cutflow-dilepttbar-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-test-job
   script:
     - source coffea4bees/scripts/analysis-cutflow-dilepttbar-job.sh

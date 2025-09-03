@@ -1,6 +1,6 @@
 reana-job:
   stage: reana
-  image: gitlab-registry.cern.ch/$CONTAINER_HOST/coffea4bees:reana_latest
+  image: gitlab-registry.cern.ch/$CONTAINER_HOST/barista:reana_latest
   tags:
     - k8s-cvmfs
   script:

@@ -3,6 +3,7 @@ analysis-plot-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-merge-test-job
   script:
     - source coffea4bees/scripts/analysis-plot-job.sh
@@ -15,6 +16,7 @@ analysis-plot-job-unsup:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-test-job-unsup
   script:
     - source coffea4bees/scripts/analysis-plot-job-unsup.sh
@@ -27,6 +29,7 @@ analysis-iplot-job:
   extends:
     - .base_analysis
   needs:
+    - setup_workspace
     - analysis-merge-test-job
   script:
     - source coffea4bees/scripts/analysis-iplot-job.sh
@@ -36,6 +39,7 @@ baseclass-test-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - analysis-merge-test-job
   script:
     - source coffea4bees/scripts/baseclass-test-job.sh
@@ -59,6 +63,7 @@ synthetic-dataset-plot-job:
   extends:
     - .base_analysis
   needs: 
+    - setup_workspace
     - synthetic-dataset-cluster
   script:
     - source coffea4bees/scripts/synthetic-dataset-plot-job.sh
