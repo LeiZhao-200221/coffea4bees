@@ -114,7 +114,7 @@ skimmer-analysis-test-job:
   needs: 
     - voms_proxy
     - setup_workspace
-    - skimmer-test-job
+    - skimmer_test
   script:
     - source coffea4bees/scripts/skimmer-analysis-test-job.sh
   artifacts: 

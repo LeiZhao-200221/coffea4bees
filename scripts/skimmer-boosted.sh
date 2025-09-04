@@ -23,7 +23,7 @@ sed -e "s|base_path: .*|base_path: ${OUTPUT_DIR}|" \
     -e "s|\#test.*|test_files: 1|" \
     -e "s|2024_.*|tmp\/|" \
     coffea4bees/skimmer/metadata/HH4b_boosted.yml > $JOB_CONFIG
-# fi
+[[ $(hostname) = *runner* ]] && sed -i "s|T3_US_FNALLPC|T3_CH_PSI|" $JOB_CONFIG
 cat $JOB_CONFIG; echo
 
 display_section_header "Changing datasets"
