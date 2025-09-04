@@ -1,48 +1,20 @@
-analysis-helpers-job:
+code-analysis-helpers:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-helpers-job.sh
+    - source coffea4bees/scripts/code-analysis-helpers
 
-kappa-framework:
+code_jet_clustering:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/baseclass-kappa-framework.sh
+    - source coffea4bees/scripts/code_jet_clustering.sh
 
-hist-collection:
+code_trig_emulator:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/baseclass-hist-collection.sh
-
-jet-clustering:
-  stage: code
-  extends:
-    - .base_analysis
-  script:
-    - source coffea4bees/scripts/jet-clustering-tests.sh
-
-trig-emulator:
-  stage: code
-  extends:
-    - .base_analysis
-  script:
-    - source coffea4bees/scripts/trig-emulator-tests.sh
-
-memory-test:
-  stage: code
-  needs:
-    - voms_proxy
-    - setup_workspace
-  extends:
-    - .base_analysis
-  script:
-    - source coffea4bees/scripts/memory_test.sh
-  allow_failure: true
-  artifacts:
-    paths:
-      - output/memory_test/mprofile_ci_test.png
+    - source coffea4bees/scripts/code_trig_emulator.sh

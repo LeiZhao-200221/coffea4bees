@@ -1,6 +1,8 @@
 
 # Coffea4bees Python Package
 
+[![pipeline status](https://gitlab.cern.ch/cms-cmu/coffea4bees/badges/master/pipeline.svg)](https://gitlab.cern.ch/cms-cmu/coffea4bees/-/commits/master)
+
 This directory contains the main Python code for the Coffea4bees project, built on top of the [barista](https://gitlab.cern.ch/cms-cmu/barista) framework for high-energy physics analyses.
 
 ## Purpose

@@ -5,8 +5,7 @@ output_dir = "CI_output"
 
 ## since we are not going to run the entire workflow, we only need some outputs
 outputs = [ 
-    f"{output_dir}/analysis_helpers_job.log",
-    f"{output_dir}/kappa_framework.log",
+    f"{output_dir}/code_analysis_helpers.log",
     f"{output_dir}/jet_clustering.log",
     f"{output_dir}/trig_emulator.log",
     f"{output_dir}/memory_test.log"
@@ -18,25 +17,20 @@ rule all:
 
 ###### THIS IS WHERE THE RULES START ######
 
-rule analysis_helpers_job:
+rule code_analysis_helpers:
     container: analysis_container
-    log: f"{output_dir}/analysis_helpers_job.log"
-    shell: "source coffea4bees/scripts/analysis-helpers-job.sh {output_dir}/ 2>&1 | tee -a {log}"
+    log: f"{output_dir}/code_analysis_helpers.log"
+    shell: "source coffea4bees/scripts/code_analysis_helpers.sh 2>&1 | tee -a {log}"
 
-rule kappa_framework:
+rule code_jet_clustering:
     container: analysis_container
-    log: f"{output_dir}/kappa_framework.log"
-    shell: "source coffea4bees/scripts/baseclass-kappa-framework.sh {output_dir}/ 2>&1 | tee -a {log}"
+    log: f"{output_dir}/code_jet_clustering.log"
+    shell: "source coffea4bees/scripts/code_jet_clustering.sh 2>&1 | tee -a {log}"
 
-rule jet_clustering:
+rule code_trig_emulator:
     container: analysis_container
-    log: f"{output_dir}/jet_clustering.log"
-    shell: "source coffea4bees/scripts/jet-clustering-tests.sh {output_dir}/ 2>&1 | tee -a {log}"
-
-rule trig_emulator:
-    container: analysis_container
-    log: f"{output_dir}/trig_emulator.log"
-    shell: "source coffea4bees/scripts/trig-emulator-tests.sh {output_dir}/ 2>&1 | tee -a {log}"
+    log: f"{output_dir}/code_trig_emulator.log"
+    shell: "source coffea4bees/scripts/code_trig_emulator.sh 2>&1 | tee -a {log}"
 
 rule memory_test:
     container: analysis_container
