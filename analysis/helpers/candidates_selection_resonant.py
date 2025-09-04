@@ -1,19 +1,27 @@
 import numpy as np
 import awkward as ak
-from src.math.random import Squares
-from coffea4bees.analysis.helpers.SvB_helpers import compute_SvB
-from coffea.nanoevents.methods import vector
 import logging
+from src.math.random import Squares
+from python.analysis.helpers.SvB_helpers import compute_SvB
+from python.analysis.helpers.FvT_helpers import compute_FvT
+from coffea.nanoevents.methods import vector
+from coffea.analysis_tools import Weights
 
 def create_cand_jet_dijet_quadjet(
     selev,
     apply_FvT: bool = False,
+    classifier_FvT=None,
     run_SvB: bool = False,
     run_systematics: bool = False,
     classifier_SvB=None,
     classifier_SvB_MA=None,
     processOutput=None,
     isRun3=False,
+    include_lowptjets=False,
+    label3b: str = "threeTag",
+    weights: Weights = None,
+    list_weight_names: list[str] = None,
+    analysis_selections: ak.Array = None,
 ):
     """
     Creates candidate jets, dijets, and quadjets for event selection.
@@ -52,8 +60,22 @@ def create_cand_jet_dijet_quadjet(
     # Build and select boson candidate jets with bRegCorr applied
     #
     sorted_idx = ak.argsort( selev.Jet.btagScore * selev.Jet.selected, axis=1, ascending=False )
-    canJet_idx = sorted_idx[:, 0:4]
-    notCanJet_idx = sorted_idx[:, 4:]
+    if include_lowptjets:
+        sorted_idx_lowpt = ak.argsort( selev.Jet.btagScore * selev.Jet.selected_lowpt, axis=1, ascending=False )
+        canJet_idx = ak.concatenate([sorted_idx[:, 0:3], sorted_idx_lowpt[:, :1]], axis=1)
+        logging.debug(f"lowpt selected {(selev.Jet.selected_lowpt)[:1]}")
+        logging.debug(f"both lowpt {(selev.Jet.btagScore * selev.Jet.selected_lowpt)[:1]}")
+        logging.debug(f"sorted_idx_lowpt {sorted_idx_lowpt[:1]}")
+
+    else:
+        canJet_idx = sorted_idx[:, 0:4]
+    # Exclude canJet_idx from sorted_idx
+    mask = ~ak.any(canJet_idx[:, :, np.newaxis] == sorted_idx[:, np.newaxis, :], axis=1)
+    notCanJet_idx = sorted_idx[mask]
+    
+    logging.debug(f"canJet_idx {canJet_idx[:1]}")
+    logging.debug(f"notCanJet_idx {notCanJet_idx[:1]}\n\n")
+    
 
     # # apply bJES to canJets
     canJet = selev.Jet[canJet_idx] * selev.Jet[canJet_idx].bRegCorr
@@ -240,15 +262,22 @@ def create_cand_jet_dijet_quadjet(
         #
         quadJet["rank"] = ( 10 * quadJet.passDiJetMass + quadJet.lead.passMDR + quadJet.subl.passMDR + quadJet.random )
         quadJet["selected"] = quadJet.rank == np.max(quadJet.rank, axis=1)
-
-        # a, b, m, d = -323, -70, 1.2, 2.13
-        # passabovecurve = (quadJet.dr - d) * (m4j[:,0]+b) >  m * (m4j[:,0] + a)
-
         quadJet["SR"] = (quadJet.rank >= 12) & (quadJet.ZZSR | quadJet.ZHSR | quadJet.HHSR) #& passabovecurve
         quadJet["SB"] = quadJet.passDiJetMass & ~quadJet.SR & (quadJet.rank >= 12) #& passabovecurve
 
+    if classifier_FvT is not None:
+        logging.info("Computing FvT scores with classifier")
 
-    if apply_FvT:
+        compute_FvT(selev, selev[label3b], FvT=classifier_FvT)
+        weight_FvT = np.ones(len(weights.weight()), dtype=float)
+        weight_FvT[analysis_selections] *= ak.to_numpy(selev.FvT.FvT)
+        weights.add("FvT", weight_FvT)
+        list_weight_names.append("FvT")
+        logging.debug( f"FvT {weights.partial_weight(include=['FvT'])[:10]}\n" )
+        apply_FvT = True
+
+    if apply_FvT and ("FvT" in selev.fields):
+
         quadJet["FvT_q_score"] = np.concatenate( [
             selev.FvT.q_1234[:, np.newaxis],
             selev.FvT.q_1324[:, np.newaxis],
@@ -258,7 +287,7 @@ def create_cand_jet_dijet_quadjet(
     if run_SvB:
 
         if (classifier_SvB is not None) | (classifier_SvB_MA is not None):
-
+            
             if run_systematics: tmp_mask = (selev.fourTag & quadJet[quadJet.selected][:, 0].SR)
             else: tmp_mask = np.full(len(selev), True)
             compute_SvB(selev,
@@ -460,10 +489,36 @@ def create_cand_jet_dijet_quadjet(
     ###     processOutput[out_k] = {}
     ###     processOutput[out_k][selev.metadata['dataset']] = list(out_v)
 
-
-
     if run_SvB:
         selev["passSvB"] = selev["SvB_MA"].ps > 0.80
         selev["failSvB"] = selev["SvB_MA"].ps < 0.05
+
+    # After building canJet_idx and notCanJet_idx
+    del sorted_idx
+    if include_lowptjets:
+        del sorted_idx_lowpt
+    del canJet_idx, notCanJet_idx
+
+    # After building canJet and notCanJet
+    del canJet, notCanJet
+
+    # After building diJet, diJetDr, pairing
+    del diJet, diJetDr, pairing
+
+    # After building quadJet and all quadJet selection logic
+    del quadJet
+
+    # After Run3 selection logic
+    if isRun3:
+        del quadJet_min_dhh_mask, quadJet_min_dhh, quadJet_min2_dhh_mask, quadJet_min2_dhh
+        del dhh_sorted, dhh_sorted_arg, delta_dhh
+        del boost_vec_v4j, quadJet_min_dhh_lead_CM, quadJet_min2_dhh_lead_CM, use_dhh2_mask
+
+    # After region/CR selection
+    del arg_min_close_dr
+
+    # Final cleanup
+    import gc
+    gc.collect()
 
     return selev
