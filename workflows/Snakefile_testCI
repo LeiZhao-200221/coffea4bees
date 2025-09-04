@@ -142,7 +142,7 @@ rule synthetic_dataset_analyze_Run3:
     output: f"{output_dir}/synthetic_dataset_analyze_Run3/test_synthetic_datasets.coffea" 
     log: f"{output_dir}/synthetic_dataset_analyze_Run3.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/synthetic-dataset-analyze-Run3.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/synthetic-dataset-analyze-Run3.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 
 rule weights_trigger_analysis_job:
@@ -281,7 +281,7 @@ rule synthetic_dataset_make_dataset_Run3:
     output: f"{output_dir}/synthetic_dataset_make_dataset_Run3/picoaod_datasets_declustered_test_2023_BPix.yml"
     log: f"{output_dir}/synthetic_dataset_make_dataset_Run3.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/synthetic-dataset-make-dataset-Run3.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/synthetic-dataset-make-dataset-Run3.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 
 rule SvB_friendtree_job:
