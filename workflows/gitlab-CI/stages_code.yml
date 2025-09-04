@@ -3,7 +3,7 @@ code-analysis-helpers:
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/code-analysis-helpers
+    - source coffea4bees/scripts/code-analysis-helpers.sh
 
 code_jet_clustering:
   stage: code
