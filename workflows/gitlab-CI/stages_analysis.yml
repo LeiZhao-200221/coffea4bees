@@ -114,7 +114,7 @@ skimmer-analysis-test-job:
   needs: 
     - voms_proxy
     - setup_workspace
-    - skimmer_test
+    - skimmer_test_coffea4bees
   script:
     - source coffea4bees/scripts/skimmer-analysis-test-job.sh
   artifacts: 
@@ -128,7 +128,7 @@ synthetic-dataset-analyze:
     - setup_workspace
   needs:
     - voms_proxy
-    - synthetic-dataset-make-dataset
+    - synthetic_dataset_make_dataset_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze.sh
   artifacts:
@@ -142,7 +142,7 @@ synthetic-dataset-analyze-Run3:
   needs:
     - voms_proxy
     - setup_workspace
-    - synthetic-dataset-make-dataset-Run3
+    - synthetic_dataset_make_dataset_Run3_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-Run3.sh
   artifacts:

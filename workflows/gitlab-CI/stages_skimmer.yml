@@ -24,7 +24,7 @@ skimmer_boosted_coffea4bees:
       - output/skimmer_boosted/GluGluToHHTo4B_cHHH0_UL18/picoAOD.chunk1.root
       - output/skimmer_boosted/datasets_HH4b.yml
 
-synthetic-dataset-make-dataset_coffea4bees:
+synthetic_dataset_make_dataset_coffea4bees:
   stage: skimmer
   extends:
     - .base_analysis
@@ -40,7 +40,7 @@ synthetic-dataset-make-dataset_coffea4bees:
       - output/synthetic_dataset_make_dataset/GluGluToHHTo4B_cHHH1_UL18/picoAOD_seed5.root
 
 
-synthetic-dataset-make-dataset-Run3_coffea4bees:
+synthetic_dataset_make_dataset_Run3_coffea4bees:
   stage: skimmer
   extends:
     - .base_analysis
