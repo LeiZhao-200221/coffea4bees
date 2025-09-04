@@ -43,15 +43,10 @@ rule skimmer_test_job:
     output: f"{output_dir}/skimmer_test_job/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml"
     shell: "source coffea4bees/scripts/skimmer-test-job.sh {output_dir}/ 2>&1 | tee -a {log}"
 
-rule skimmer_basic_test_job:
+rule skimmer_boosted:
     container: analysis_container
-    log: f"{output_dir}/skimmer_basic_test_job.log"
-    shell: "source coffea4bees/scripts/skimmer-basic-test-job.sh {output_dir}/ 2>&1 | tee -a {log}"  
-
-rule skimmer_boosted_job:
-    container: analysis_container
-    log: f"{output_dir}/skimmer_boosted_job.log"
-    shell: "source coffea4bees/scripts/skimmer-boosted-job.sh {output_dir}/ 2>&1 | tee -a {log}"  
+    log: f"{output_dir}/skimmer_boosted.log"
+    shell: "source coffea4bees/scripts/skimmer_boosted.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_make_dataset:
     container: analysis_container

@@ -1,18 +1,18 @@
-code-analysis-helpers:
+code_analysis_helpers_cofffea4bees:
   stage: code
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/code-analysis-helpers.sh
+    - source coffea4bees/scripts/code_analysis_helpers.sh
 
-code_jet_clustering:
+code_jet_clustering_coffea4bees:
   stage: code
   extends:
     - .base_analysis
   script:
     - source coffea4bees/scripts/code_jet_clustering.sh
 
-code_trig_emulator:
+code_trig_emulator_coffea4bees:
   stage: code
   extends:
     - .base_analysis
