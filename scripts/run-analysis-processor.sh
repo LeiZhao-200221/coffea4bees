@@ -177,7 +177,7 @@ cmd=(python runner.py
     -m "$METADATA_PATH" 
     -c "$CONFIG_PATH" 
     --triggers "$TRIGGERS_PATH"
-    # --luminosities "$LUMINOSITIES_PATH"
+    --luminosities "$LUMINOSITIES_PATH"
     -d $DATASETS 
     -y $YEAR
     -op "$OUTPUT_DIR" 
@@ -188,4 +188,4 @@ cmd=(python runner.py
 run_command "${cmd[@]}"
 
 echo "############### Output files"
-ls $OUTPUT_DIR
+ls -R $OUTPUT_DIR
