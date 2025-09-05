@@ -157,7 +157,7 @@ weights-trigger-analysis-job:
   needs:
     - voms_proxy
     - setup_workspace
-    - weights-trigger-friendtree-job
+    - weights_trigger_friendtree_coffea4bees
   script:
     - source coffea4bees/scripts/weights-trigger-analysis-job.sh
   artifacts:
@@ -171,7 +171,7 @@ SvB-friendtree-analysis-job:
   needs:
     - voms_proxy
     - setup_workspace
-    - SvB-friendtree-job
+    - SvB_friendtree_coffea4bees
   script:
     - source coffea4bees/scripts/SvB-friendtree-analysis-job.sh
   artifacts:

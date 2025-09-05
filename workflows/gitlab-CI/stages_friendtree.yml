@@ -30,7 +30,7 @@ topreco_friendtree_coffea4bees:
       - output/topreco_friendtree/data2018C/
       - output/topreco_friendtree/data2018D/
 
-SvB-friendtree:
+SvB_friendtree_coffea4bees:
   stage: friendtree
   extends:
     - .base_analysis
