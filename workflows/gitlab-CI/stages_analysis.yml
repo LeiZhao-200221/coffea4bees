@@ -3,7 +3,7 @@ analysis_test_coffea4bees:
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test.sh
+    - source coffea4bees/scripts/analysis-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/analysis_test/test_databkgs.coffea
@@ -13,7 +13,7 @@ analysis_signals_test_coffea4bees:
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-signals-test.sh
+    - source coffea4bees/scripts/analysis-signals-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/analysis_signals_test/test_signal.coffea

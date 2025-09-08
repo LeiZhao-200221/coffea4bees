@@ -7,7 +7,7 @@ tools_merge_test_coffea4bees:
     - analysis_test_coffea4bees
     - analysis_signals_test_coffea4bees
   script:
-    - source coffea4bees/scripts/tools-merge-test.sh
+    - source coffea4bees/scripts/tools-merge-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/tools_merge_test_coffea4bees/test.coffea
