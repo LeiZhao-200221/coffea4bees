@@ -138,7 +138,7 @@ analysis-cutflow-dilepttbar-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-test-job
+    - analysis_test_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-cutflow-dilepttbar-job.sh
   artifacts:
