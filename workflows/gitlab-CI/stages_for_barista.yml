@@ -4,6 +4,6 @@ include:
   # - local: workflows/gitlab-CI/stages_analysis.yml
   # - local: workflows/gitlab-CI/stages_classifier.yml
   # - local: workflows/gitlab-CI/stages_cutflow.yml
-  # - local: workflows/gitlab-CI/stages_fits.yml
+  # - local: workflows/gitlab-CI/stages_tools.yml
   # - local: workflows/gitlab-CI/stages_friendtree.yml
   # - local: workflows/gitlab-CI/stages_plots.yml

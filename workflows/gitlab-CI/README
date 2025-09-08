@@ -7,5 +7,5 @@ If you want to try the new `run_container` with the scripts, this is an example:
 
 ```bash
 cd coffea4bees/coffea4bees/
-run_container source scripts/analysis-test-job.sh
+run_container source scripts/analysis-test.sh
 ```

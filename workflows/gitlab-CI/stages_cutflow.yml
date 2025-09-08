@@ -4,7 +4,7 @@ analysis-cutflow-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-merge-test-job
+    - tools_merge_test_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-cutflow-job.sh
   artifacts:

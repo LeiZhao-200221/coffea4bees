@@ -68,24 +68,24 @@ rule topreco_friendtree:
     shell: "source coffea4bees/scripts/topreco-friendtree.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 
-rule analysis_test_job:
-    output: f"{output_dir}/analysis_test_job/test_databkgs.coffea" 
-    log: f"{output_dir}/analysis_test_job.log"
+rule analysis_test:
+    output: f"{output_dir}/analysis_test/test_databkgs.coffea" 
+    log: f"{output_dir}/analysis_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-job.sh --output-base {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-test.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
-rule analysis_signals_test_job:
-    output: f"{output_dir}/analysis_signals_test_job/test_signal.coffea" 
-    log: f"{output_dir}/analysis_signals_test_job.log"
+rule analysis_signals_test:
+    output: f"{output_dir}/analysis_signals_test/test_signal.coffea" 
+    log: f"{output_dir}/analysis_signals_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-signals-test-job.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-signals-test.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
-rule analysis_merge_test_job:
-    input: [f"{output_dir}/analysis_test_job/test_databkgs.coffea", f"{output_dir}/analysis_signals_test_job/test_signal.coffea"]
-    output: f"{output_dir}/analysis_merge_test_job/test.coffea" 
-    log: f"{output_dir}/analysis_merge_test_job.log"
+rule tools_merge_test:
+    input: [f"{output_dir}/analysis_test/test_databkgs.coffea", f"{output_dir}/analysis_signals_test/test_signal.coffea"]
+    output: f"{output_dir}/tools_merge_test/test.coffea" 
+    log: f"{output_dir}/tools_merge_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-merge-test-job.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/tools-merge-test.sh {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_test_job_truthStudy:
     output: f"{output_dir}/analysis_test_job_truthStudy/test_truthStudy.coffea" 
