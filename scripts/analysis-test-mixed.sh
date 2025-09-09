@@ -2,21 +2,21 @@
 # Source common functions
 source "src/scripts/common.sh"
 
-# Setup proxy if needed
-setup_proxy
-
-display_section_header "Input Datasets"
-DATASETS=${DATASET:-"coffea4bees/metadata/datasets_HH4b.yml"}
-echo "Using datasets file: $DATASETS"
-
-OUTPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
-echo "############### Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory. Default DIR=output/"
+    exit 1
 fi
+
+# Create output directory
+JOB="analysis_test_mixed"
+OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
+create_output_directory "$OUTPUT_DIR"
 
 echo "############### Running test processor"
 python runner.py -t -o testMixedBkg_TT.coffea -d   TTTo2L2Nu_for_mixed TTToHadronic_for_mixed TTToSemiLeptonic_for_mixed   -p coffea4bees/analysis/processors/processor_HH4b.py -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS -c coffea4bees/analysis/metadata/HH4b_nottcheck.yml
+
 python runner.py -t -o testMixedBkg_data_3b_for_mixed_kfold.coffea -d   data_3b_for_mixed  -p coffea4bees/analysis/processors/processor_HH4b.py -y 2017 2018 2016  -op $OUTPUT_DIR -m $DATASETS -c coffea4bees/analysis/metadata/HH4b_mixed_data.yml
 
 python runner.py -t -o testMixedBkg_data_3b_for_mixed.coffea -d   data_3b_for_mixed  -p coffea4bees/analysis/processors/processor_HH4b.py -y 2017 2018 2016  -op $OUTPUT_DIR -m $DATASETS -c coffea4bees/analysis/metadata/HH4b_nottcheck.yml

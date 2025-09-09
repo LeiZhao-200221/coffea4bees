@@ -104,19 +104,19 @@ rule analysis_test_unsup:
     output: f"{output_dir}/analysis_test_unsup/test_unsup.coffea" 
     log: f"{output_dir}/analysis_test_unsup.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-job-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-test-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_test_mixed_job:
     output: [f"{output_dir}/analysis_test_mixed_job/testMixedData.json", f"{output_dir}/analysis_test_mixed_job/testMixedData.coffea"]
     log: f"{output_dir}/analysis_test_mixed_job.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-mixed-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-test-mixed.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_systematics_test_job:
     output: f"{output_dir}/analysis_systematics_test_job/test_systematics.coffea" 
     log: f"{output_dir}/analysis_systematics_test_job.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-systematics-test-job.sh --output-base {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-systematics-test.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 rule skimmer_analysis_test:
     input: f"{output_dir}/skimmer_test/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml"

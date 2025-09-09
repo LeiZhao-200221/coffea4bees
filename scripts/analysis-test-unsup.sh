@@ -10,21 +10,19 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create output directory
-JOB="analysis_test_Run3"
+JOB="analysis_test_unsup"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-display_section_header "Input Datasets"
-DATASETS=${DATASET_RUN3:-"coffea4bees/metadata/datasets_HH4b_Run3.yml"}
-echo "Using datasets file: $DATASETS"
-
 echo "############### Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
+    --processor "coffea4bees/analysis/processors/processor_unsup.py" \
     --output-base "$OUTPUT_BASE_DIR" \
-    --datasets "data" \
-    --dataset-metadata "$DATASETS" \
-    --year "2022_EE 2022_preEE 2023_BPix 2023_preBPix" \
-    --output-filename "test.coffea" \
+    --dataset-metadata coffea4bees/analysis/metadata/unsup4b.yml \
+    --datasets "mixeddata data_3b_for_mixed TTToHadronic TTToSemiLeptonic TTTo2L2Nu" \
+    --year "UL17 UL18 UL16_preVFP UL16_postVFP" \
+    --output-filename "test_unsup.coffea" \
     --output-subdir "$JOB" \
-    --config coffea4bees/analysis/metadata/HH4b_run_fastTopReco.yml \
+    --config coffea4bees/analysis/metadata/unsup4b.yml \
     # --additional-flags "--debug"
+    

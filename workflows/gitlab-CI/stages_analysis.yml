@@ -39,58 +39,57 @@ analysis_test_truthStudy_coffea4bees:
       - output/analysis_test_truthStudy/testTruth.coffea
 
 
-synthetic-dataset-cluster:   
+synthetic_dataset_cluster_coffea4bees:
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/synthetic-dataset-cluster.sh
+    - source coffea4bees/scripts/synthetic-dataset-cluster.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/synthetic_dataset_cluster/test_synthetic_datasets.coffea
 
-
-analysis-test-job-unsup:   
+analysis_test_unsup_coffea4bees:   
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test-job-unsup.sh
+    - source coffea4bees/scripts/analysis-test-unsup.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/analysis_test_job_unsup/test_unsup.coffea
 
-analysis-test-mixed-job:   
+analysis_test_mixed_coffea4bees:   
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test-mixed-job.sh
+    - source coffea4bees/scripts/analysis-test-mixed.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/analysis_test_mixed_job/testMixedBkg_TT.coffea
-      - output/analysis_test_mixed_job/testMixedBkg_data_3b_for_mixed.coffea
-      - output/analysis_test_mixed_job/testMixedBkg_data_3b_for_mixed_kfold.coffea
-      - output/analysis_test_mixed_job/testMixedData.coffea
-      - output/analysis_test_mixed_job/testMixedBkg_TT.json
-      - output/analysis_test_mixed_job/testMixedBkg_data_3b_for_mixed.json
-      - output/analysis_test_mixed_job/testMixedBkg_data_3b_for_mixed_kfold.json      
-      - output/analysis_test_mixed_job/testMixedData.json
-      - output/analysis_test_mixed_job/testSignal_preUL.coffea
-      - output/analysis_test_mixed_job/testSignal_preUL.json
-      - output/analysis_test_mixed_job/testSignal_UL.coffea
-      - output/analysis_test_mixed_job/testSignal_UL.json
+      - output/analysis_test_mixed/testMixedBkg_TT.coffea
+      - output/analysis_test_mixed/testMixedBkg_data_3b_for_mixed.coffea
+      - output/analysis_test_mixed/testMixedBkg_data_3b_for_mixed_kfold.coffea
+      - output/analysis_test_mixed/testMixedData.coffea
+      - output/analysis_test_mixed/testMixedBkg_TT.json
+      - output/analysis_test_mixed/testMixedBkg_data_3b_for_mixed.json
+      - output/analysis_test_mixed/testMixedBkg_data_3b_for_mixed_kfold.json      
+      - output/analysis_test_mixed/testMixedData.json
+      - output/analysis_test_mixed/testSignal_preUL.coffea
+      - output/analysis_test_mixed/testSignal_preUL.json
+      - output/analysis_test_mixed/testSignal_UL.coffea
+      - output/analysis_test_mixed/testSignal_UL.json
 
 
-analysis-systematics-test-job:   
+analysis_systematics_test_coffea4bees:   
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-systematics-test-job.sh
+    - source coffea4bees/scripts/analysis-systematics-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/analysis_systematics_test_job/test_systematics.coffea
+      - output/analysis_systematics_test/test_systematics.coffea
 
 skimmer-analysis-test-job:   
   stage: analysis   
@@ -163,7 +162,7 @@ SvB-friendtree-analysis-job:
     paths:
       - output/SvB_friendtree_analysis_job/test_SvB_friend.coffea
 
-memory_test:
+memory_test_coffea4bees:
   stage: analysis
   needs:
     - voms_proxy

@@ -31,7 +31,7 @@ analysis-mixed-cutflow-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-test-mixed-job
+    - analysis_test_mixed_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-mixed-cutflow-job.sh
   artifacts:
@@ -59,7 +59,7 @@ analysis-systematics-cutflow-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-systematics-test-job
+    - analysis_systematics_test_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-systematics-cutflow-job.sh
   artifacts:
@@ -72,7 +72,7 @@ analysis-cutflow-job-unsup:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-test-job-unsup
+    - analysis-test-unsup_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-cutflow-job-unsup.sh
   artifacts:

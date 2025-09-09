@@ -31,7 +31,7 @@ twoStageClosure-test-job:
     - .base_combine
   needs: 
     - setup_workspace
-    - analysis-test-mixed-job
+    - analysis_test_mixed_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-runTwoStageClosure-ROOT.sh
 
