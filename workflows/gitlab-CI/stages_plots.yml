@@ -4,7 +4,7 @@ analysis-plot-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-merge-test-job
+    - tools_merge_test_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-plot-job.sh
   artifacts:
@@ -30,7 +30,7 @@ analysis-iplot-job:
     - .base_analysis
   needs:
     - setup_workspace
-    - analysis-merge-test-job
+    - tools_merge_test_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-iplot-job.sh
 
@@ -40,7 +40,7 @@ baseclass-test-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-merge-test-job
+    - tools_merge_test_coffea4bees
   script:
     - source coffea4bees/scripts/baseclass-test-job.sh
 
@@ -50,7 +50,7 @@ baseclass-test-job:
 #   extends:
 #     - .base_analysis
 #   needs: 
-#     - analysis-merge-test-job
+#     - tools_merge_test_coffea4bees
 #   script:
 #     - cd stats_analysis/
 #     - python convert_hist_to_json.py -o hists/histAll.json -i ../analysis/hists/test.coffea

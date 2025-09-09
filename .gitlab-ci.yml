@@ -26,7 +26,7 @@ workflow:
 
 variables:
   BARISTA_REPO: 'https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.cern.ch/cms-cmu/barista.git'
-  BARISTA_BRANCH: 'master'
+  BARISTA_BRANCH: '$CI_COMMIT_REF_NAME'
   DATASET: coffea4bees/metadata/datasets_HH4b_v1p1.yml
   DATASET_RUN3: coffea4bees/metadata/datasets_synthetic_test_Run3.yml
   # DATASET: metadata/datasets_HH4b_cernbox.yml
@@ -38,7 +38,7 @@ include:
   - local: workflows/gitlab-CI/stages_analysis.yml
   - local: workflows/gitlab-CI/stages_classifier.yml
   - local: workflows/gitlab-CI/stages_cutflow.yml
-  - local: workflows/gitlab-CI/stages_fits.yml
+  - local: workflows/gitlab-CI/stages_tools.yml
   - local: workflows/gitlab-CI/stages_friendtree.yml
   - local: workflows/gitlab-CI/stages_plots.yml
   - local: workflows/gitlab-CI/stages_reana.yml
@@ -52,7 +52,7 @@ stages:
   - skimmer
   - friendtree
   - analysis
-  - fits
+  - tools
   - plot
   - cutflow
   - classifier
@@ -63,14 +63,30 @@ stages:
 setup_workspace:
   stage: setup
   image: alpine/git:latest
+  needs:
+    - voms_proxy
   script:
     - echo "Setting up barista workspace"
-    - git clone --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
+    # --- Add fallback logic for cloning barista ---
+    - BARISTA_DEFAULT_BRANCH="master" 
+    - echo "Checking for branch '$BARISTA_BRANCH' in barista repository..."
+    # Check if the feature branch exists in barista. If not, use the default branch.
+    - git ls-remote --exit-code --heads "$BARISTA_REPO" "$BARISTA_BRANCH" || BARISTA_BRANCH="$BARISTA_DEFAULT_BRANCH"
+    
+    - echo "Cloning barista from branch '$BARISTA_BRANCH'"
+    - git clone --recursive --depth=1 --branch=$BARISTA_BRANCH $BARISTA_REPO barista_framework
     - cd barista_framework
-    # Create the coffea4bees directory and copy current repository content
-    - mkdir -p coffea4bees/
+
+    # Create the subdirectory for the current project and copy its content
+    # For coffea4bees repository, use 'coffea4bees'. For coffea4bees, use 'coffea4bees'.
+    - mkdir -p coffea4bees 
+    - echo "Copying content of $CI_PROJECT_NAME into barista_framework/coffea4bees/"
     - cp -r $CI_PROJECT_DIR/* coffea4bees/ 2>/dev/null || true
     - ls -la coffea4bees/
+
+    # Copy the proxy if it exists
+    - echo "Checking for proxy directory in $CI_PROJECT_DIR/proxy"
+    - if [ -d "$CI_PROJECT_DIR/proxy" ]; then cp -r $CI_PROJECT_DIR/proxy/ .; fi
   artifacts:
     paths:
       - barista_framework/
@@ -80,13 +96,11 @@ setup_workspace:
 
 .base_analysis:
   needs:
-    - voms_proxy
     - setup_workspace
   image: gitlab-registry.cern.ch/cms-cmu/barista:latest
   tags:
     - k8s-cvmfs
   before_script:
-    - cp -r proxy/ barista_framework/
     - cd barista_framework/
     - pwd && ls -la
     - ls -la coffea4bees/

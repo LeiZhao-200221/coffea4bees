@@ -1,36 +1,23 @@
-analysis-test-job:   
+analysis_test_coffea4bees:
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test-job.sh
+    - source coffea4bees/scripts/analysis-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/analysis_test_job/test_databkgs.coffea
+      - output/analysis_test/test_databkgs.coffea
 
-analysis-signals-test-job:   
-  stage: analysis   
+analysis_signals_test_coffea4bees:
+  stage: analysis
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-signals-test-job.sh
+    - source coffea4bees/scripts/analysis-signals-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/analysis_signals_test_job/test_signal.coffea
+      - output/analysis_signals_test/test_signal.coffea
 
-analysis-merge-test-job:   
-  stage: analysis   
-  extends:
-    - .base_analysis
-  needs:
-    - setup_workspace
-    - analysis-test-job
-    - analysis-signals-test-job
-  script:
-    - source coffea4bees/scripts/analysis-merge-test-job.sh
-  artifacts: 
-    paths:
-      - output/analysis_merge_test_job/test.coffea
 
 analysis-test-job-Run3:   
   stage: analysis   

@@ -6,7 +6,7 @@ weights_trigger_friendtree_coffea4bees:
     - voms_proxy
     - setup_workspace
   script:
-    - source coffea4bees/scripts/weights-trigger-friendtree.sh
+    - source coffea4bees/scripts/weights-trigger-friendtree.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/weights_trigger_friendtree/trigger_weights_friends.json
@@ -38,7 +38,7 @@ SvB_friendtree_coffea4bees:
     - voms_proxy
     - setup_workspace
   script:
-    - source coffea4bees/scripts/SvB-friendtree.sh
+    - source coffea4bees/scripts/SvB-friendtree.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
       - output/SvB_friendtree/make_friend_SvB.json
