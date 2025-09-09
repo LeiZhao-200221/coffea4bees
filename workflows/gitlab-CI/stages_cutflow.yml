@@ -72,7 +72,7 @@ analysis-cutflow-job-unsup:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-test-unsup_coffea4bees
+    - analysis_test_unsup_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-cutflow-job-unsup.sh
   artifacts:
