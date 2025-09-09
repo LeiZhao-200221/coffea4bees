@@ -63,6 +63,8 @@ stages:
 setup_workspace:
   stage: setup
   image: alpine/git:latest
+  needs:
+    - voms_proxy
   script:
     - echo "Setting up barista workspace"
     # --- Add fallback logic for cloning barista ---
@@ -81,6 +83,10 @@ setup_workspace:
     - echo "Copying content of $CI_PROJECT_NAME into barista_framework/coffea4bees/"
     - cp -r $CI_PROJECT_DIR/* coffea4bees/ 2>/dev/null || true
     - ls -la coffea4bees/
+
+    # Copy the proxy if it exists
+    - echo "Checking for proxy directory in $CI_PROJECT_DIR/proxy"
+    - if [ -d "$CI_PROJECT_DIR/proxy" ]; then cp -r $CI_PROJECT_DIR/proxy/ barista_framework/; fi
   artifacts:
     paths:
       - barista_framework/
@@ -90,13 +96,11 @@ setup_workspace:
 
 .base_analysis:
   needs:
-    - voms_proxy
     - setup_workspace
   image: gitlab-registry.cern.ch/cms-cmu/barista:latest
   tags:
     - k8s-cvmfs
   before_script:
-    - cp -r proxy/ barista_framework/
     - cd barista_framework/
     - pwd && ls -la
     - ls -la coffea4bees/
