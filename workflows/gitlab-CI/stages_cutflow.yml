@@ -112,7 +112,7 @@ weights-trigger-cutflow:
     - .base_analysis
   needs: 
     - setup_workspace
-    - weights-trigger-analysis-job
+    - weights_trigger_analysis_coffea4bees
   script:
     - source coffea4bees/scripts/weights-trigger-cutflow-job.sh
   artifacts:
@@ -125,7 +125,7 @@ SvB-friendtree-cutflow-job:
     - .base_analysis
   needs:
     - setup_workspace
-    - SvB-friendtree-analysis-job
+    - SvB_friendtree_analysis_coffea4bees
   script:
     - source coffea4bees/scripts/SvB-friendtree-cutflow-job.sh
   artifacts:

@@ -145,7 +145,7 @@ rule weights_trigger_analysis_job:
     output: f"{output_dir}/weights_trigger_analysis_job/test_trigWeight.coffea"
     log: f"{output_dir}/weights_trigger_analysis_job.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/weights-trigger-analysis-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/weights-trigger-analysis.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 
 rule analysis_make_jcm_weights_job:
@@ -286,15 +286,15 @@ rule SvB_friendtree:
     output: f"{output_dir}/SvB_friendtree/make_friend_SvB.json"
     shell: "source coffea4bees/scripts/SvB-friendtree.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
-rule SvB_friendtree_analysis_job:
+rule SvB_friendtree_analysis:
     input: f"{output_dir}/SvB_friendtree/make_friend_SvB.json"
-    output: f"{output_dir}/SvB_friendtree_analysis_job/test_SvB_friend.coffea"
-    log: f"{output_dir}/SvB_friendtree_analysis_job.log"
+    output: f"{output_dir}/SvB_friendtree_analysis/test_SvB_friend.coffea"
+    log: f"{output_dir}/SvB_friendtree_analysis.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/SvB-friendtree-analysis-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/SvB-friendtree-analysis.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule SvB_friendtree_cutflow_job:
-    input: f"{output_dir}/SvB_friendtree_analysis_job/test_SvB_friend.coffea"
+    input: f"{output_dir}/SvB_friendtree_analysis/test_SvB_friend.coffea"
     output: f"{output_dir}/SvB_friendtree_cutflow_job/test_dump_cutflow_SvB_friend.yml"
     log: f"{output_dir}/SvB_friendtree_cutflow_job.log"
     container: analysis_container

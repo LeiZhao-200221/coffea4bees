@@ -12,6 +12,20 @@ tools_merge_test_coffea4bees:
     paths:
       - output/tools_merge_test/test.coffea
 
+memory_test_coffea4bees:
+  stage: analysis
+  needs:
+    - setup_workspace
+    - analysis_systematics_test_coffea4bees
+  extends:
+    - .base_analysis
+  script:
+    - source coffea4bees/scripts/memory_test.sh
+  allow_failure: true
+  artifacts:
+    paths:
+      - output/memory_test/mprofile_ci_test.png
+
 analysis-make-jcm-weights-job:    
   stage: tools
   extends:

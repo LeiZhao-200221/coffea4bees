@@ -45,7 +45,7 @@ bash coffea4bees/scripts/run-analysis-processor.sh \
     --year "UL18" \
     --output-filename "test_skimmer.coffea" \
     --output-subdir "$JOB" \
-    --datasets-metadata $OUTPUT_DIR/datasets_HH4b.yml \
+    --dataset-metadata $OUTPUT_DIR/datasets_HH4b.yml \
     --config $OUTPUT_DIR/HH4b.yml \
     --no-test
     # --additional-flags "--debug"
