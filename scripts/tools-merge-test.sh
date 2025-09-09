@@ -14,7 +14,7 @@ JOB="tools_merge_test"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-echo "############### Merging coffea files"
+display_section_header "Merging coffea files"
 python coffea4bees/analysis/tools/merge_coffea_files.py \
     -f $OUTPUT_BASE_DIR/analysis_test/test_databkgs.coffea \
         $OUTPUT_BASE_DIR/analysis_signals_test/test_signal.coffea  \

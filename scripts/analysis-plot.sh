@@ -13,14 +13,14 @@ JOB="analysis_plot"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-echo "############### Running plotting test"
+display_section_header "Running plotting test"
 run_command python coffea4bees/plots/makePlots.py \
     $INPUT_DIR/test.coffea \
     --doTest \
     -o $OUTPUT_DIR \
     -m coffea4bees/plots/metadata/plotsAll.yml
 
-echo "############### Checking if pdf files exist"
+display_section_header "Checking if pdf files exist"
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.pdf
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.pdf
 ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_hh.pdf
@@ -33,7 +33,7 @@ ls $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/HH4b/quadJet_min_dr_close_vs_other_m.
 ls $OUTPUT_DIR/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_other_m.pdf 
 
 
-echo "############### check making the plots from yaml "
+display_section_header "check making the plots from yaml "
 run_command python coffea4bees/plots/plot_from_yaml.py \
     --input_yaml $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.yaml \
         $OUTPUT_DIR/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.yaml \
@@ -47,7 +47,7 @@ run_command python coffea4bees/plots/plot_from_yaml.py \
         $OUTPUT_DIR/RunII/passPreSel/threeTag/SR/Multijet/quadJet_min_dr_close_vs_other_m.yaml \
         --out $OUTPUT_DIR/test_plots_from_yaml 
 
-echo "############### Checking if pdf files exist"
+display_section_header "Checking if pdf files exist"
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.pdf
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zh.pdf
 ls $OUTPUT_DIR/test_plots_from_yaml/RunII/passPreSel/fourTag/SR/SvB_MA_ps_hh.pdf

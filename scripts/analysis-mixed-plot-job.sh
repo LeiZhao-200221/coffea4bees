@@ -4,14 +4,14 @@ source "src/scripts/common.sh"
 
 
 OUTPUT_DIR="${1:-"output"}/analysis_mixed_plot_job/"
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 python coffea4bees/plots/makePlotsMixed.py coffea4bees/analysis/hists/testMixedBkg_master.coffea coffea4bees/analysis/hists/testMixedData_master.coffea --combine_input_files -m coffea4bees/plots/metadata/plotsMixed.yml   -o ${OUTPUT_DIR}
-echo "############### Checking if pdf files exist"
+display_section_header "Checking if pdf files exist"
 ls ${OUTPUT_DIR}/RunII/passPreSel/fourTag/SR/
 
 #python coffea4bees/plots/makePlots.py coffea4bees/analysis/hists/test.coffea    -o ${OUTPUT_DIR} -m coffea4bees/plots/metadata/plotsAll.yml

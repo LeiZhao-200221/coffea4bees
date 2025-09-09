@@ -3,13 +3,13 @@
 source "src/scripts/common.sh"
 
 
-echo "############### Checking and creating output/skimmer directory"
+display_section_header "Checking and creating output/skimmer directory"
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
-echo "############### Changing metadata"
+display_section_header "Changing metadata"
 if [[ $(hostname) = *fnal* ]]; then
     sed -e "s#base_path.*#base_path: \/srv\/${OUTPUT_DIR}\/#" -e "s/\#max.*/maxchunks: 1/" -e "s/\#test.*/test_files: 1/" -e "s/\workers:.*/workers: 1/" -e "s/chunksize:.*/chunksize: 1000/"  coffea4bees/skimmer/metadata/declustering_boosted.yml > $OUTPUT_DIR/declustering_boosted_for_test.yml
 elif [[ $(hostname) = *rogue* ]]; then
@@ -26,7 +26,7 @@ new_seed=0
 echo ${new_seed}
 sed -e "s/declustering_rand_seed:.*/declustering_rand_seed: $new_seed/" ${OUTPUT_DIR}/declustering_boosted_for_all.yml > ${OUTPUT_DIR}/declustering_boosted_seed_${new_seed}.yml
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 time python runner.py -s -p coffea4bees/skimmer/processor/make_declustered_data_boosted_4b.py -c ${OUTPUT_DIR}/declustering_boosted_seed_${new_seed}.yml -y UL18  -d data GluGluToHHTo4B_cHHH1   -op $OUTPUT_DIR -o picoaod_datasets_declustered_boosted_test_UL18.yml -m coffea4bees/metadata/datasets_HH4b_2024_v2_boosted.yml
 
 

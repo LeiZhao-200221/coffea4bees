@@ -9,9 +9,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Setup proxy if needed
-setup_proxy 
-
 # Create output directory
 OUTPUT_DIR="$OUTPUT_BASE_DIR/memory_test"
 create_output_directory "$OUTPUT_DIR"
@@ -20,7 +17,7 @@ display_section_header "Input Datasets"
 DATASETS="coffea4bees/metadata/datasets_HH4b_v1p2.yml"
 echo "Using datasets file: $DATASETS"
 
-python src/scripts/memory/memory_test.py \
+run_command python src/scripts/memory/memory_test.py \
     --threshold 2200 \
     -o $OUTPUT_DIR/mprofile_ci_test \
     --script runner.py \

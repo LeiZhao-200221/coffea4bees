@@ -21,7 +21,7 @@ sed -e "s|hist_cuts: .*|hist_cuts: [ passPreSel, passSvB, failSvB ]|" \
     coffea4bees/analysis/metadata/HH4b.yml > $JOB_CONFIG
 cat $JOB_CONFIG; echo
 
-echo "############### Running analysis processor for background datasets"
+display_section_header "Running analysis processor for background datasets"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
     --datasets "data TTToHadronic TTToSemiLeptonic TTTo2L2Nu" \

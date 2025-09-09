@@ -9,6 +9,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "############### Running iPlot test"
+display_section_header "Running iPlot test"
 run_command python coffea4bees/plots/tests/iPlot_test.py \
     --inputFile $OUTPUT_BASE_DIR/tools_merge_test/test.coffea

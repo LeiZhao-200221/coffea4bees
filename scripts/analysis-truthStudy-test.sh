@@ -24,3 +24,4 @@ bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-subdir "$JOB" \
     --config coffea4bees/analysis/metadata/HH4b_genmatch.yml \
     # --additional-flags "--debug"
+    

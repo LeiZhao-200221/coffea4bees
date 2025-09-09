@@ -6,12 +6,12 @@ source "src/scripts/common.sh"
 setup_proxy
 
 OUTPUT_DIR="${1:-"output"}/synthetic_dataset_make_dataset_all_2025"
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 
 #new_seed=0
 

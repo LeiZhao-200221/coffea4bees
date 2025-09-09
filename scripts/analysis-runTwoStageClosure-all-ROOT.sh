@@ -11,7 +11,7 @@ if [ "$(basename "$PWD")" == "python" ]; then
     echo "You are in the python directory."
 else
     return_to_base=true
-    echo "############### Moving to python folder"
+    display_section_header "Moving to python folder"
     cd coffea4bees/
 fi
 
@@ -37,7 +37,7 @@ echo "The input directory is: $INPUT_DIR"
 echo "The output directory is: $OUTPUT_DIR"
 
 
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi

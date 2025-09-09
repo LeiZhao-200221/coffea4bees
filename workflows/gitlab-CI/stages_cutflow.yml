@@ -45,7 +45,7 @@ skimmer-analysis-cutflow-job:
     - .base_analysis
   needs: 
     - setup_workspace
-    - skimmer-analysis-test-job
+    - skimmer_analysis_test_coffea4bees
   script:
     - source coffea4bees/scripts/skimmer-analysis-cutflow-job.sh
   artifacts:

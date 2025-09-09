@@ -14,7 +14,7 @@ JOB="synthetic_dataset_cluster"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --processor "coffea4bees/analysis/processors/processor_cluster_4b.py" \
     --output-base "$OUTPUT_BASE_DIR" \

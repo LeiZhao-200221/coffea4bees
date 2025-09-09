@@ -5,14 +5,14 @@ source "src/scripts/common.sh"
 
 INPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
 OUTPUT_DIR="${1:-"output"}/analysis_runTwoStageClosure_ROOT"
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
 ## In root envirornment
 
-echo "############### Convert json to root"
+display_section_header "Convert json to root"
 python3 coffea4bees/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedData.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
 python3 coffea4bees/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_TT.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
 python3 coffea4bees/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testMixedBkg_data_3b_for_mixed_kfold.json --output $OUTPUT_DIR --histos SvB_MA_ps_hh
@@ -23,14 +23,14 @@ python3 coffea4bees/stats_analysis/convert_json_to_root.py -f $INPUT_DIR/testSig
 #
 # Test it with the
 #
-echo "############### Run test runTwoStageClosure"
+display_section_header "Run test runTwoStageClosure"
 python3 coffea4bees/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal  --do_CI \
     --input_file_data3b $OUTPUT_DIR/testMixedBkg_data_3b_for_mixed.root \
     --input_file_TT     $OUTPUT_DIR/testMixedBkg_TT.root \
     --input_file_mix    $OUTPUT_DIR/testMixedData.root \
     --input_file_sig    $OUTPUT_DIR/testSignal_UL.root \
     
-echo "############### Run test runTwoStageClosure kfold"
+display_section_header "Run test runTwoStageClosure kfold"
 ls -lrt $OUTPUT_DIR/
 python3 coffea4bees/stats_analysis/runTwoStageClosure.py  --var SvB_MA_ps_hh  --rebin 1 --outputPath $OUTPUT_DIR/testsLocal_kfold/  --do_CI --use_kfold  \
     --input_file_data3b $OUTPUT_DIR/testMixedBkg_data_3b_for_mixed_kfold.root \

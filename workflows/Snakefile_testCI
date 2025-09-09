@@ -87,11 +87,11 @@ rule tools_merge_test:
     container: analysis_container
     shell: "source coffea4bees/scripts/tools-merge-test.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
-rule analysis_test_truthStudy:
-    output: f"{output_dir}/analysis_test_truthStudy/test_truthStudy.coffea" 
-    log: f"{output_dir}/analysis_test_truthStudy.log"
+rule analysis_truthStudy_test:
+    output: f"{output_dir}/analysis_truthStudy_test/test_truthStudy.coffea" 
+    log: f"{output_dir}/analysis_truthStudy_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-truthStudy.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-truthStudy-test.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_cluster:
     output: f"{output_dir}/synthetic_dataset_cluster/test_synthetic_datasets.coffea" 
@@ -123,7 +123,7 @@ rule skimmer_analysis_test:
     output: f"{output_dir}/skimmer_analysis_test/test_skimmer.coffea"
     log: f"{output_dir}/skimmer_analysis_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/skimmer-analysis-test-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/skimmer-analysis-test.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_analyze:
     input: f"{output_dir}/synthetic_dataset_make_dataset/picoaod_datasets_declustered_test_UL18.yml"

@@ -14,7 +14,7 @@ JOB="analysis_test_unsup"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --processor "coffea4bees/analysis/processors/processor_unsup.py" \
     --output-base "$OUTPUT_BASE_DIR" \

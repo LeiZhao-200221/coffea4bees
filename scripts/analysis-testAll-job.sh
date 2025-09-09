@@ -10,13 +10,13 @@ DATASETS=${DATASET:-"coffea4bees/metadata/datasets_HH4b.yml"}
 echo "Using datasets file: $DATASETS"
 
 OUTPUT_DIR="${1:-"output"}/analysis_testAll_job"
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 #python runner.py -o hist_databkgs.coffea  -d data TTToHadronic TTToSemiLeptonic TTTo2L2Nu ZZ4b ZH4b ggZH4b   -p coffea4bees/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
 #python runner.py -o hist_databkgs.coffea  -d data     -p coffea4bees/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor
 #python runner.py -o hist_TTbkgs.coffea  -d  TTToHadronic TTToSemiLeptonic TTTo2L2Nu    -p coffea4bees/analysis/processors/processor_HH4b.py  -y UL17 UL18 UL16_preVFP UL16_postVFP  -op $OUTPUT_DIR -m $DATASETS --condor

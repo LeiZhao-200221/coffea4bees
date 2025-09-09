@@ -18,7 +18,7 @@ display_section_header "Input Datasets"
 DATASETS=${DATASET_RUN3:-"coffea4bees/metadata/datasets_HH4b_Run3.yml"}
 echo "Using datasets file: $DATASETS"
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
     --datasets "data" \

@@ -25,7 +25,7 @@ usage() {
 
 # Function to display configuration
 display_config() {
-    echo "############### Configuration"
+    display_section_header "Configuration"
     echo "Processor:          $PROCESSOR_PATH"
     echo "Datasets Metadata:  $METADATA_PATH"
     echo "Config:             $CONFIG_PATH"
@@ -171,7 +171,7 @@ display_config
 OUTPUT_DIR="${OUTPUT_BASE}/${OUTPUT_SUBDIR}/"
 create_output_directory "$OUTPUT_DIR"
 
-echo "############### Running test processor"
+display_section_header "Running test processor"
 cmd=(python runner.py 
     -p "$PROCESSOR_PATH" 
     -m "$METADATA_PATH" 
@@ -187,5 +187,5 @@ cmd=(python runner.py
 )
 run_command "${cmd[@]}"
 
-echo "############### Output files"
+display_section_header "Output files"
 ls -R $OUTPUT_DIR

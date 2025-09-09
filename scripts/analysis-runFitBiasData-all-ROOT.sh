@@ -4,7 +4,7 @@ source "src/scripts/common.sh"
 
 
 OUTPUT_DIR="${1:-"output"}/analysis_runFitBiasData_all_ROOT"
-echo "############### Checking and creating output directory"
+display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
