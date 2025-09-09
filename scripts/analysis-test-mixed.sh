@@ -9,6 +9,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+setup_proxy
+
 DATASETS=${DATASETS:-"coffea4bees/metadata/datasets_HH4b.yml"}
 
 # Create output directory
