@@ -263,7 +263,7 @@ rule analysis_test_job_Run3:
     output: f"{output_dir}/analysis_test_job_Run3/test.coffea"
     log: f"{output_dir}/analysis_test_job_Run3.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-job-Run3.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-test-Run3.sh {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_cutflow_job_Run3:
     input: f"{output_dir}/analysis_test_job_Run3/test.coffea"

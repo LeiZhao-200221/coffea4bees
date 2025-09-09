@@ -17,7 +17,7 @@ analysis-cutflow-job-Run3:
     - .base_analysis
   needs: 
     - setup_workspace
-    - analysis-test-job-Run3
+    - analysis_test_Run3_coffea4bees
   script:
     - source coffea4bees/scripts/analysis-cutflow-job-Run3.sh
   artifacts:

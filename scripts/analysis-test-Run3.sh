@@ -10,26 +10,24 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create output directory
-JOB="analysis_test"
+JOB="analysis_test_Run3"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
 # Setup proxy if needed
 setup_proxy
 
-# Modify the config file
-display_section_header "Modifying config"
-JOB_CONFIG=$OUTPUT_DIR/HH4b.yml
-sed -e "s|hist_cuts: .*|hist_cuts: [ passPreSel, passSvB, failSvB ]|" \
-    coffea4bees/analysis/metadata/HH4b.yml > $JOB_CONFIG
-cat $JOB_CONFIG; echo
+display_section_header "Input Datasets"
+DATASETS=${DATASET_RUN3:-"coffea4bees/metadata/datasets_HH4b_Run3.yml"}
+echo "Using datasets file: $DATASETS"
 
-echo "############### Running analysis processor for background datasets"
+
+echo "############### Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
-    --datasets "data TTToHadronic TTToSemiLeptonic TTTo2L2Nu" \
-    --year "UL17 UL18 UL16_preVFP UL16_postVFP" \
+    --datasets "data" \
+    --year "2022_EE 2022_preEE 2023_BPix 2023_preBPix" \
     --output-filename "test_databkgs.coffea" \
     --output-subdir "$JOB" \
-    --config $JOB_CONFIG \
+    --config coffea4bees/analysis/metadata/HH4b_run_fastTopReco.yml \
     # --additional-flags "--debug"
