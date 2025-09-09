@@ -10,7 +10,7 @@ tools_merge_test_coffea4bees:
     - source coffea4bees/scripts/tools-merge-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/tools_merge_test_coffea4bees/test.coffea
+      - output/tools_merge_test/test.coffea
 
 analysis-make-jcm-weights-job:    
   stage: tools
