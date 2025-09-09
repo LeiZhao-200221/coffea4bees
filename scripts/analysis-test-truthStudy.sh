@@ -2,19 +2,26 @@
 # Source common functions
 source "src/scripts/common.sh"
 
-# Setup proxy if needed
-setup_proxy
-
-display_section_header "Input Datasets"
-DATASETS=${DATASET:-"coffea4bees/metadata/datasets_HH4b.yml"}
-echo "Using datasets file: $DATASETS"
-
-OUTPUT_DIR="${1:-"output"}/analysis_test_job_truthStudy"
-echo "############### Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory. Default DIR=output/"
+    exit 1
 fi
 
-echo "############### Running test processor"
-python runner.py -t    -o testTruth.coffea -d GluGluToHHTo4B_cHHH1 -p coffea4bees/analysis/processors/processor_genmatch_HH4b.py -y UL18  -op $OUTPUT_DIR -m $DATASETS  -c coffea4bees/analysis/metadata/HH4b_genmatch.yml
+# Create output directory
+JOB="analysis_test_thruthStudy"
+OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
+create_output_directory "$OUTPUT_DIR"
 
+echo "############### Running test processor"
+bash coffea4bees/scripts/run-analysis-processor.sh \
+    --processor "coffea4bees/analysis/processors/processor_genmatch_HH4b.py" \
+    --output-base "$OUTPUT_BASE_DIR" \
+    --datasets "GluGluToHHTo4B_cHHH1" \
+    --year "UL18" \
+    --output-filename "testTruth.coffea" \
+    --output-subdir "$JOB" \
+    --config coffea4bees/analysis/metadata/HH4b_genmatch.yml \
+    # --additional-flags "--debug"
+    

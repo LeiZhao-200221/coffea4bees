@@ -9,7 +9,7 @@ analysis_plot_coffea4bees:
     - source coffea4bees/scripts/analysis-plot.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_plot_job/RunII/
+      - output/analysis_plot/RunII/
 
 analysis-plot-job-unsup:    
   stage: plot 
@@ -24,7 +24,7 @@ analysis-plot-job-unsup:
     paths:
       - output/analysis_plot_job_unsup/RunII/
 
-analysis-iplot-job:    
+analysis_iplot_coffea4bees:
   stage: plot 
   extends:
     - .base_analysis
@@ -32,7 +32,7 @@ analysis-iplot-job:
     - setup_workspace
     - tools_merge_test_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-iplot-job.sh
+    - source coffea4bees/scripts/analysis-iplot.sh --output-base /builds/$CI_PROJECT_PATH/output
 
 baseclass-test-job:   
   stage: plot

@@ -8,7 +8,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create output directory
-INPUT_DIR="$OUTPUT_BASE_DIR/analysis_merge_test"
+INPUT_DIR="$OUTPUT_BASE_DIR/tools_merge_test"
 JOB="analysis_plot"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"

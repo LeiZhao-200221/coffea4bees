@@ -178,7 +178,7 @@ rule analysis_iplot_job:
     input: f"{output_dir}/analysis_merge_test_job/test.coffea"
     log: f"{output_dir}/analysis_iplot_job.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-iplot-job.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-iplot.sh {output_dir} 2>&1 | tee -a {log}"
 
 rule baseclass_test_job:
     input: f"{output_dir}/analysis_merge_test_job/test.coffea"
