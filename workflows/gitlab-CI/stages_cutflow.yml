@@ -85,7 +85,7 @@ synthetic-dataset-analyze-cutflow:
     - .base_analysis
   needs: 
     - setup_workspace
-    - synthetic-dataset-analyze
+    - synthetic_dataset_analyze_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh
   artifacts:
@@ -98,7 +98,7 @@ synthetic-dataset-analyze-cutflow-Run3:
     - .base_analysis
   needs: 
     - setup_workspace
-    - synthetic-dataset-analyze-Run3
+    - synthetic_dataset_analyze_Run3_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh
   artifacts:
