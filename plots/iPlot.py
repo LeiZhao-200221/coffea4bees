@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 
 # Local imports
 sys.path.insert(0, os.getcwd())
+from coffea4bees.plots.plots import load_config_4b
 from src.plotting.plots import (
-    makePlot, make2DPlot, load_config, load_hists,
+    makePlot, make2DPlot, load_hists,
     read_axes_and_cuts, parse_args, print_cfg
 )
 import src.plotting.iPlot_config as cfg
@@ -154,6 +155,7 @@ def handle_wildcards(var: Union[str, List[str]]) -> bool:
 def plot(var: Union[str, List[str]] = 'selJets.pt', *,
          cut: Union[str, List[str]] = "passPreSel",
          region: Union[str, List[str]] = "SR",
+         axis_opts: Dict = {},
          output_file: str = DEFAULT_OUTPUT_FILE,
          **kwargs) -> Optional[Tuple[plt.Figure, plt.Axes]]:
     """Create a 1D plot of the specified variable.
@@ -162,6 +164,7 @@ def plot(var: Union[str, List[str]] = 'selJets.pt', *,
         var: Variable(s) to plot. Can be a string or list of strings.
         cut: Selection cut to apply (default: "passPreSel")
         region: Region to plot (default: "SR")
+        axis_opts: Dictionary of axis options
         output_file: Name of the output file (default: "test.pdf")
         **kwargs: Additional plotting options
 
@@ -175,14 +178,24 @@ def plot(var: Union[str, List[str]] = 'selJets.pt', *,
     if handle_wildcards(var):
         return
 
+    # Add region to axis_opts
+    axis_opts["region"] = region
+
+    opts = {"var": var,
+            "cut": cut,
+            "axis_opts": axis_opts,
+            "outputFolder": cfg.outputFolder
+            }
+    opts.update(kwargs)
+
+    if len(cfg.hists) > 1:
+        opts["fileLabels"] = cfg.fileLabels
+
+
     try:
-        # Create plot with appropriate parameters
-        if len(cfg.hists) > 1:
-            fig, ax = makePlot(cfg, var=var, cut=cut, region=region,
-                         outputFolder=cfg.outputFolder, fileLabels=cfg.fileLabels, **kwargs)
-        else:
-            fig, ax = makePlot(cfg, var=var, cut=cut, region=region,
-                         outputFolder=cfg.outputFolder, **kwargs)
+        fig, ax = makePlot(cfg, **opts)
+
+
     except ValueError as e:
         print(f"Error creating plot: {e}")
         return
@@ -203,6 +216,7 @@ def plot2d(var: str = 'quadJet_selected.lead_vs_subl_m',
            *,
            cut: Union[str, List[str]] = "passPreSel",
            region: Union[str, List[str]] = "SR",
+           axis_opts: Dict = {},
            output_file: str = DEFAULT_OUTPUT_FILE,
            **kwargs) -> Optional[Tuple[plt.Figure, plt.Axes]]:
     """Create a 2D plot of the specified variable.
@@ -212,6 +226,7 @@ def plot2d(var: str = 'quadJet_selected.lead_vs_subl_m',
         process: Process to plot (default: "HH4b")
         cut: Selection cut to apply (default: "passPreSel")
         region: Region to plot (default: "SR")
+        axis_opts: Dictionary of axis options
         output_file: Name of the output file (default: "test.pdf")
         **kwargs: Additional plotting options
 
@@ -224,9 +239,12 @@ def plot2d(var: str = 'quadJet_selected.lead_vs_subl_m',
     if handle_wildcards(var):
         return
 
+    # Add region to axis_opts
+    axis_opts["region"] = region
+
     try:
         fig, ax = make2DPlot(cfg, process, var=var, cut=cut,
-                       region=region, outputFolder=cfg.outputFolder, **kwargs)
+                             axis_opts=axis_opts, outputFolder=cfg.outputFolder, **kwargs)
     except Exception as e:
         print(f"Error creating 2D plot: {e}")
         return
@@ -241,7 +259,7 @@ def plot2d(var: str = 'quadJet_selected.lead_vs_subl_m',
 def initialize_config() -> None:
     """Initialize the configuration from command line arguments."""
     args = parse_args()
-    cfg.plotConfig = load_config(args.metadata)
+    cfg.plotConfig = load_config_4b(args.metadata)
     cfg.outputFolder = args.outputFolder
     cfg.combine_input_files = args.combine_input_files
 
