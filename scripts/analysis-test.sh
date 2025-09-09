@@ -14,9 +14,6 @@ JOB="analysis_test"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-# Setup proxy if needed
-setup_proxy
-
 # Modify the config file
 display_section_header "Modifying config"
 JOB_CONFIG=$OUTPUT_DIR/HH4b.yml

@@ -14,18 +14,15 @@ JOB="analysis_test_Run3"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 
-# Setup proxy if needed
-setup_proxy
-
 display_section_header "Input Datasets"
 DATASETS=${DATASET_RUN3:-"coffea4bees/metadata/datasets_HH4b_Run3.yml"}
 echo "Using datasets file: $DATASETS"
-
 
 echo "############### Running test processor"
 bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-base "$OUTPUT_BASE_DIR" \
     --datasets "data" \
+    --metadata "$DATASETS" \
     --year "2022_EE 2022_preEE 2023_BPix 2023_preBPix" \
     --output-filename "test_databkgs.coffea" \
     --output-subdir "$JOB" \

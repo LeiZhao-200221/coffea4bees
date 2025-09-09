@@ -18,7 +18,6 @@ analysis_signals_test_coffea4bees:
     paths:
       - output/analysis_signals_test/test_signal.coffea
 
-
 analysis_test_Run3_coffea4bees:
   stage: analysis   
   extends:
@@ -29,13 +28,12 @@ analysis_test_Run3_coffea4bees:
     paths:
       - output/analysis_test_Run3/test.coffea
 
-
-analysis-test-job-truthStudy:   
+analysis_test_truthStudy_coffea4bees:   
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test-job-truthStudy.sh
+    - source coffea4bees/scripts/analysis-test-truthStudy.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
       - output/analysis_test_truthStudy/testTruth.coffea

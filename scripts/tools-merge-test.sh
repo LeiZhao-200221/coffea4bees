@@ -16,8 +16,8 @@ create_output_directory "$OUTPUT_DIR"
 
 echo "############### Merging coffea files"
 python coffea4bees/analysis/tools/merge_coffea_files.py \
-    -f $OUTPUT_BASE_DIR/analysis_test_job/test_databkgs.coffea \
-        $OUTPUT_BASE_DIR/analysis_signals_test_job/test_signal.coffea  \
+    -f $OUTPUT_BASE_DIR/analysis_test/test_databkgs.coffea \
+        $OUTPUT_BASE_DIR/analysis_signals_test/test_signal.coffea  \
     -o $OUTPUT_DIR/test.coffea
 
 ls $OUTPUT_DIR

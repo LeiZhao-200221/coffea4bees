@@ -91,7 +91,7 @@ rule analysis_test_job_truthStudy:
     output: f"{output_dir}/analysis_test_job_truthStudy/test_truthStudy.coffea" 
     log: f"{output_dir}/analysis_test_job_truthStudy.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-job-truthStudy.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-test-truthStudy.sh {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_cluster:
     output: f"{output_dir}/synthetic_dataset_cluster/test_synthetic_datasets.coffea" 
@@ -165,7 +165,7 @@ rule analysis_plot_job:
     output: f"{output_dir}/analysis_plot_job/RunII/passPreSel/fourTag/SR/SvB_MA_ps_zz.pdf"
     log: f"{output_dir}/analysis_plot_job.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-plot-job.sh {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-plot.sh {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_plot_job_unsup:
     input: f"{output_dir}/analysis_test_job_unsup/test_unsup.coffea"
