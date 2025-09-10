@@ -10,7 +10,7 @@ if [ ! -d $OUTPUT_DIR ]; then
     mkdir -p $OUTPUT_DIR
 fi
 display_section_header "Running base class test"
-python src/tests/dumpPlotCounts.py --input $INPUT_DIR/test.coffea --output $OUTPUT_DIR/test_dumpPlotCounts.yml
-python src/tests/plots_test.py --inputFile $INPUT_DIR/test.coffea --known src/tests/known_PlotCounts.yml
+python coffea4bees/tests/dumpPlotCounts.py --input $INPUT_DIR/test.coffea --output $OUTPUT_DIR/test_dumpPlotCounts.yml
+python coffea4bees/tests/plots_test.py --inputFile $INPUT_DIR/test.coffea --known src/tests/known_PlotCounts.yml
 ls $OUTPUT_DIR/test_dumpPlotCounts.yml
 
