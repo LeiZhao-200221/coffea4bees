@@ -39,7 +39,7 @@ tools_make_jcm_weights_coffea4bees:
     paths:
       - output/tools_make_jcm_weights/testJCM_ROOT/jetCombinatoricModel_SB_.yml
 
-twoStageClosure-test-job:   
+tools_twostageclosure_mixed_coffea4bees:
   stage: tools
   extends:
     - .base_combine
@@ -47,8 +47,10 @@ twoStageClosure-test-job:
     - setup_workspace
     - analysis_test_mixed_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-runTwoStageClosure-ROOT.sh
-
+    - source coffea4bees/scripts/tools-twostageclosure-mixed.sh --output-base /builds/$CI_PROJECT_PATH/output
+  artifacts:
+    paths:
+      - output/tools_twostageclosure_mixed/test_dump_twoStageClosureInputsCounts.yml
 
 # Needs review
 # histtojson-test-job:   

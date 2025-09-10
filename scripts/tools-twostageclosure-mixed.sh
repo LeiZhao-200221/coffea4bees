@@ -2,13 +2,18 @@
 # Source common functions
 source "src/scripts/common.sh"
 
-
-INPUT_DIR="${1:-"output"}/analysis_test_mixed_job"
-OUTPUT_DIR="${1:-"output"}/analysis_runTwoStageClosure_ROOT"
-display_section_header "Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory. Default DIR=output/"
+    exit 1
 fi
+
+# Create output directory
+JOB="tools_twostageclosure_mixed"
+INPUT_DIR=$OUTPUT_BASE_DIR/analysis_test_mixed
+OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
+create_output_directory "$OUTPUT_DIR"
 
 ## In root envirornment
 
