@@ -10,7 +10,8 @@ sys.path.insert(0, os.getcwd())
 
 from coffea4bees.plots.iPlot import plot, plot2d
 import src.plotting.iPlot_config as cfg
-from src.plotting.plots import load_config, load_hists, read_axes_and_cuts
+from coffea4bees.plots.plots import load_config_4b
+from src.plotting.plots import load_hists, read_axes_and_cuts
 from coffea4bees.analysis.tests.parser import wrapper
 
 
@@ -115,7 +116,7 @@ class iPlotTestCase(unittest.TestCase):
     def test_singleFile(self):
 
         metadata = "coffea4bees/plots/metadata/plotsAll.yml"
-        cfg.plotConfig = load_config(metadata)
+        cfg.plotConfig = load_config_4b(metadata)
 
         input_files = [self.inputFile]
         cfg.hists = load_hists(input_files)
@@ -130,7 +131,7 @@ class iPlotTestCase(unittest.TestCase):
     def test_multipleFiles(self):
 
         metadata = "coffea4bees/plots/metadata/plotsAll.yml"
-        cfg.plotConfig = load_config(metadata)
+        cfg.plotConfig = load_config_4b(metadata)
 
         input_files = [self.inputFile, self.inputFile]
         cfg.hists = load_hists(input_files)
@@ -174,7 +175,7 @@ class iPlotTestCase(unittest.TestCase):
     def test_NoFvT(self):
 
         metadata = "coffea4bees/plots/metadata/plotsAllNoFvT.yml"
-        cfg.plotConfig = load_config(metadata)
+        cfg.plotConfig = load_config_4b(metadata)
 
         input_files = [self.inputFile]
         cfg.hists = load_hists(input_files)
