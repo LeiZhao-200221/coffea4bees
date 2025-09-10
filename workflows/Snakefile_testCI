@@ -88,10 +88,17 @@ rule tools_merge_test:
     shell: "source coffea4bees/scripts/tools-merge-test.sh --output-base {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_truthStudy_test:
-    output: f"{output_dir}/analysis_truthStudy_test/test_truthStudy.coffea" 
+    output: f"{output_dir}/analysis_truthStudy_test/testTruth.coffea" 
     log: f"{output_dir}/analysis_truthStudy_test.log"
     container: analysis_container
     shell: "source coffea4bees/scripts/analysis-truthStudy-test.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+
+rule analysis_truthStudy_plot:
+    input: f"{output_dir}/analysis_truthStudy_test/testTruth.coffea"
+    output: f"{output_dir}/analysis_truthStudy_plot/RunII/pass4GenBJets00/fourTag/SR/otherGenJet00_pt.pdf"
+    log: f"{output_dir}/analysis_truthStudy_plot.log"
+    container: analysis_container
+    shell: "source coffea4bees/scripts/analysis-truthStudy-plot.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_cluster:
     output: f"{output_dir}/synthetic_dataset_cluster/test_synthetic_datasets.coffea" 
@@ -100,11 +107,11 @@ rule synthetic_dataset_cluster:
     shell: "source coffea4bees/scripts/synthetic-dataset-cluster.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 
-rule analysis_test_unsup:
-    output: f"{output_dir}/analysis_test_unsup/test_unsup.coffea" 
-    log: f"{output_dir}/analysis_test_unsup.log"
+rule analysis_unsup_test:
+    output: f"{output_dir}/analysis_unsup_test/test_unsup.coffea" 
+    log: f"{output_dir}/analysis_unsup_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-test-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-unsup-test.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_test_mixed_job:
     output: [f"{output_dir}/analysis_test_mixed_job/testMixedData.json", f"{output_dir}/analysis_test_mixed_job/testMixedData.coffea"]
@@ -168,12 +175,12 @@ rule analysis_plot:
     container: analysis_container
     shell: "source coffea4bees/scripts/analysis-plot.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
-rule analysis_plot_unsup:
-    input: f"{output_dir}/analysis_test_unsup/test_unsup.coffea"
-    output: f"{output_dir}/analysis_plot_unsup/RunII/passPreSel/fourTag/SR/mix_v0/v4j_mass.pdf"
-    log: f"{output_dir}/analysis_plot_unsup.log"
+rule analysis_unsup_plot:
+    input: f"{output_dir}/analysis_unsup_test/test_unsup.coffea"
+    output: f"{output_dir}/analysis_unsup_plot/RunII/passPreSel/fourTag/SR/mix_v0/v4j_mass.pdf"
+    log: f"{output_dir}/analysis_unsup_plot.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-plot-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-unsup-plot.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_iplot:
     input: f"{output_dir}/tools_merge_test/test.coffea"
@@ -231,12 +238,12 @@ rule analysis_systematics_cutflow:
     container: analysis_container
     shell: "source coffea4bees/scripts/analysis-systematics-cutflow.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
-rule analysis_cutflow_unsup:    
-    input: f"{output_dir}/analysis_test_unsup/test_unsup.coffea"
-    output: f"{output_dir}/analysis_cutflow_unsup/test_dump_cutflow_unsup.yml"
-    log: f"{output_dir}/analysis_cutflow_unsup.log"
+rule analysis_unsup_cutflow:    
+    input: f"{output_dir}/analysis_unsup_test/test_unsup.coffea"
+    output: f"{output_dir}/analysis_unsup_cutflow/test_dump_cutflow_unsup.yml"
+    log: f"{output_dir}/analysis_unsup_cutflow.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-cutflow-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-unsup-cutflow.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule synthetic_dataset_analyze_cutflow:
     input: f"{output_dir}/synthetic_dataset_analyze/test_synthetic_datasets.coffea"

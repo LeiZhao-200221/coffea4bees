@@ -11,7 +11,8 @@ from coffea.util import load
 import numpy as np
 
 sys.path.insert(0, os.getcwd())
-from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, parse_args
+from coffea4bees.plots.plots import load_config_4b
+from src.plotting.plots import makePlot, make2DPlot, load_hists, read_axes_and_cuts, parse_args
 import src.plotting.iPlot_config as cfg
 
 np.seterr(divide='ignore', invalid='ignore')
@@ -45,7 +46,7 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    cfg.plotConfig = load_config(args.metadata)
+    cfg.plotConfig = load_config_4b(args.metadata)
     cfg.outputFolder = args.outputFolder
 
     cfg.plotModifiers = yaml.safe_load(open(args.modifiers, 'r'))

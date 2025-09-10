@@ -130,6 +130,11 @@ setup_workspace:
   image: registry.hub.docker.com/chuyuanliu/heptools:ml-cpu # TODO change to central repo
   before_script:
     - source /entrypoint.sh
+    - cd -
+    - pwd && ls -la
+    - cd barista_framework/
+    - pwd && ls -la
+    - ls -la coffea4bees/
   tags:
     - k8s-cvmfs
   artifacts:
