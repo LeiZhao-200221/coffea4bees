@@ -173,7 +173,7 @@ rule analysis_plot_unsup:
     output: f"{output_dir}/analysis_plot_unsup/RunII/passPreSel/fourTag/SR/mix_v0/v4j_mass.pdf"
     log: f"{output_dir}/analysis_plot_unsup.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/analysis-plot-job-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/analysis-plot-unsup.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 rule analysis_iplot:
     input: f"{output_dir}/tools_merge_test/test.coffea"
@@ -181,19 +181,19 @@ rule analysis_iplot:
     container: analysis_container
     shell: "source coffea4bees/scripts/analysis-iplot.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
-rule baseclass_test_job:
+rule code_plot_test:
     input: f"{output_dir}/tools_merge_test/test.coffea"
-    output: f"{output_dir}/baseclass_test_job/test_dumpPlotCounts.yml"
-    log: f"{output_dir}/baseclass_test_job.log"
+    output: f"{output_dir}/code_plot_test/test_dumpPlotCounts.yml"
+    log: f"{output_dir}/code_plot_test.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/baseclass-test-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/code-plot-test.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
-rule synthetic_dataset_plot_job:
+rule synthetic_dataset_plot:
     input: f"{output_dir}/synthetic_dataset_cluster/test_synthetic_datasets.coffea"
-    output: f"{output_dir}/synthetic_dataset_plot_job/jet-splitting-PDFs-test/clustering_pdfs_vs_pT_RunII.yml"
-    log: f"{output_dir}/synthetic_dataset_plot_job.log"
+    output: f"{output_dir}/synthetic_dataset_plot/jet-splitting-PDFs-test/clustering_pdfs_vs_pT_RunII.yml"
+    log: f"{output_dir}/synthetic_dataset_plot.log"
     container: analysis_container
-    shell: "source coffea4bees/scripts/synthetic-dataset-plot-job.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
+    shell: "source coffea4bees/scripts/synthetic-dataset-plot.sh --output-base  {output_dir} 2>&1 | tee -a {log}"
 
 
 rule analysis_cutflow:    

@@ -11,7 +11,7 @@ analysis_plot_coffea4bees:
     paths:
       - output/analysis_plot/RunII/
 
-analysis-plot-job-unsup:    
+analysis_plot_unsup_coffea4bees:
   stage: plot 
   extends:
     - .base_analysis
@@ -19,10 +19,10 @@ analysis-plot-job-unsup:
     - setup_workspace
     - analysis_test_unsup_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-plot-job-unsup.sh
+    - source coffea4bees/scripts/analysis-plot-unsup.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_plot_job_unsup/RunII/
+      - output/analysis_plot_unsup/RunII/
 
 analysis_iplot_coffea4bees:
   stage: plot 
@@ -34,7 +34,7 @@ analysis_iplot_coffea4bees:
   script:
     - source coffea4bees/scripts/analysis-iplot.sh --output-base /builds/$CI_PROJECT_PATH/output
 
-baseclass-test-job:   
+code_plot_test_coffea4bees:
   stage: plot
   extends:
     - .base_analysis
@@ -42,17 +42,20 @@ baseclass-test-job:
     - setup_workspace
     - tools_merge_test_coffea4bees
   script:
-    - source coffea4bees/scripts/baseclass-test-job.sh
+    - source coffea4bees/scripts/code-plot-test.sh --output-base /builds/$CI_PROJECT_PATH/output
+  artifacts:
+    paths:
+      - output/code_plot_test/test_dumpPlotCounts.yml
 
-synthetic-dataset-plot-job:    
-  stage: plot 
+synthetic_dataset_plot_coffea4bees:
+  stage: plot
   extends:
     - .base_analysis
   needs: 
     - setup_workspace
     - synthetic_dataset_cluster_coffea4bees
   script:
-    - source coffea4bees/scripts/synthetic-dataset-plot-job.sh
+    - source coffea4bees/scripts/synthetic-dataset-plot.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/synthetic_dataset_plot_job/jet-splitting-PDFs-test/
+      - output/synthetic_dataset_plot/jet-splitting-PDFs-test/
