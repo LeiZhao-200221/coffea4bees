@@ -49,15 +49,15 @@ synthetic_dataset_cluster_coffea4bees:
     paths:
       - output/synthetic_dataset_cluster/test_synthetic_datasets.coffea
 
-analysis_test_unsup_coffea4bees:   
+analysis_unsup_test_coffea4bees:   
   stage: analysis   
   extends:
     - .base_analysis
   script:
-    - source coffea4bees/scripts/analysis-test-unsup.sh --output-base /builds/$CI_PROJECT_PATH/output
+    - source coffea4bees/scripts/analysis-unsup-test.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts: 
     paths:
-      - output/analysis_test_unsup/test_unsup.coffea
+      - output/analysis_unsup_test/test_unsup.coffea
 
 analysis_test_mixed_coffea4bees:   
   stage: analysis   
