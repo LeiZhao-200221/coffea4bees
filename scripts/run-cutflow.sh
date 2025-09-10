@@ -93,6 +93,7 @@ while [[ $# -gt 0 ]]; do
         --cutflow-list)
             CUTFLOW_LIST="$2"
             shift 2
+            ;;
         --help)
             usage
             ;;

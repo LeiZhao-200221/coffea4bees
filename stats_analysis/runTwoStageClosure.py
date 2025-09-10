@@ -12,7 +12,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 sys.path.insert(0, os.getcwd())
-import src.plotting.ROOTPlotTools as ROOTPlotTools
+import coffea4bees.plots.ROOTPlotTools as ROOTPlotTools
 from coffea4bees.stats_analysis.make_variable_binning import make_variable_binning, rebin_histogram
 
 CMURED = '#d34031'
