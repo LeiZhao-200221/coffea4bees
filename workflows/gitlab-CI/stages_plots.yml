@@ -44,20 +44,6 @@ baseclass-test-job:
   script:
     - source coffea4bees/scripts/baseclass-test-job.sh
 
-# Needs review
-# histtojson-test-job:   
-#   stage: plot
-#   extends:
-#     - .base_analysis
-#   needs: 
-#     - tools_merge_test_coffea4bees
-#   script:
-#     - cd stats_analysis/
-#     - python convert_hist_to_json.py -o hists/histAll.json -i ../analysis/hists/test.coffea
-#   artifacts: 
-#     paths:
-#       - stats_analysis/hists/histAll.json
-
 synthetic-dataset-plot-job:    
   stage: plot 
   extends:
