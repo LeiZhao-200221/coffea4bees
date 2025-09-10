@@ -1,4 +1,4 @@
-analysis-cutflow-job:    
+analysis_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -6,12 +6,12 @@ analysis-cutflow-job:
     - setup_workspace
     - tools_merge_test_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-cutflow-job.sh
+    - source coffea4bees/scripts/analysis-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_cutflow_job/test_dump_cutflow.yml
+      - output/analysis_cutflow/test_dump_cutflow.yml
 
-analysis-cutflow-job-Run3:    
+analysis_cutflow_Run3_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -19,13 +19,13 @@ analysis-cutflow-job-Run3:
     - setup_workspace
     - analysis_test_Run3_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-cutflow-job-Run3.sh
+    - source coffea4bees/scripts/analysis-cutflow-Run3.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_cutflow_job_Run3/test_dump_cutflow.yml
+      - output/analysis_cutflow_Run3/test_dump_cutflow.yml
 
 
-analysis-mixed-cutflow-job:    
+analysis_mixed_cutflow_coffea4bees:  
   stage: cutflow
   extends:
     - .base_analysis
@@ -33,13 +33,13 @@ analysis-mixed-cutflow-job:
     - setup_workspace
     - analysis_test_mixed_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-mixed-cutflow-job.sh
+    - source coffea4bees/scripts/analysis-mixed-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_mixed_cutflow_job/test_dump_cutflow_mixed_data.yml
-      - output/analysis_mixed_cutflow_job/test_dump_cutflow_mixed_bkg.yml
+      - output/analysis_mixed_cutflow/test_dump_cutflow_mixed_data.yml
+      - output/analysis_mixed_cutflow/test_dump_cutflow_mixed_bkg.yml
 
-skimmer-analysis-cutflow-job:    
+skimmer_analysis_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -47,13 +47,12 @@ skimmer-analysis-cutflow-job:
     - setup_workspace
     - skimmer_analysis_test_coffea4bees
   script:
-    - source coffea4bees/scripts/skimmer-analysis-cutflow-job.sh
+    - source coffea4bees/scripts/skimmer-analysis-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/skimmer_analysis_cutflow_job/test_dump_skimmer_cutflow.yml
-  # allow_failure: true
+      - output/skimmer_analysis_cutflow/test_dump_skimmer_cutflow.yml
 
-analysis-systematics-cutflow-job:    
+analysis_systematics_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -61,12 +60,12 @@ analysis-systematics-cutflow-job:
     - setup_workspace
     - analysis_systematics_test_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-systematics-cutflow-job.sh
+    - source coffea4bees/scripts/analysis-systematics-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_systematics_cutflow_job/test_dump_systematics_cutflow.yml
+      - output/analysis_systematics_cutflow/test_dump_systematics_cutflow.yml
 
-analysis-cutflow-job-unsup:    
+analysis_cutflow_unsup_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -74,12 +73,12 @@ analysis-cutflow-job-unsup:
     - setup_workspace
     - analysis_test_unsup_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-cutflow-job-unsup.sh
+    - source coffea4bees/scripts/analysis-cutflow-unsup.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_cutflow_job_unsup/test_dump_cutflow_job_unsup.yml
+      - output/analysis_cutflow_unsup/test_dump_cutflow_job_unsup.yml
 
-synthetic-dataset-analyze-cutflow:
+synthetic_dataset_analyze_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -87,12 +86,12 @@ synthetic-dataset-analyze-cutflow:
     - setup_workspace
     - synthetic_dataset_analyze_coffea4bees
   script:
-    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh
+    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
       - output/synthetic_dataset_analyze_cutflow/test_dump_cutflow_synthetic_datasets.yml
 
-synthetic-dataset-analyze-cutflow-Run3:
+synthetic_dataset_analyze_cutflow_Run3_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -100,13 +99,13 @@ synthetic-dataset-analyze-cutflow-Run3:
     - setup_workspace
     - synthetic_dataset_analyze_Run3_coffea4bees
   script:
-    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh
+    - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
       - output/synthetic_dataset_analyze_cutflow_Run3/test_dump_cutflow_synthetic_datasets.yml
 
 
-weights-trigger-cutflow:
+weights_trigger_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -114,12 +113,12 @@ weights-trigger-cutflow:
     - setup_workspace
     - weights_trigger_analysis_coffea4bees
   script:
-    - source coffea4bees/scripts/weights-trigger-cutflow-job.sh
+    - source coffea4bees/scripts/weights-trigger-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/weights_trigger_cutflow_job/test_dump_cutflow_trigWeight.yml
+      - output/weights_trigger_cutflow/test_dump_cutflow_trigWeight.yml
 
-SvB-friendtree-cutflow-job:
+SvB_friendtree_cutflow_coffea4bees:
   stage: cutflow
   extends:
     - .base_analysis
@@ -127,12 +126,12 @@ SvB-friendtree-cutflow-job:
     - setup_workspace
     - SvB_friendtree_analysis_coffea4bees
   script:
-    - source coffea4bees/scripts/SvB-friendtree-cutflow-job.sh
+    - source coffea4bees/scripts/SvB-friendtree-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/SvB_friendtree_cutflow_job/test_dump_cutflow_SvB_friend.yml
+      - output/SvB_friendtree_cutflow/test_dump_cutflow_SvB_friend.yml
 
-analysis-cutflow-dilepttbar-job:    
+analysis_dilepttbar_cutflow_coffea4bees: 
   stage: cutflow
   extends:
     - .base_analysis
@@ -140,7 +139,7 @@ analysis-cutflow-dilepttbar-job:
     - setup_workspace
     - analysis_test_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-cutflow-dilepttbar-job.sh
+    - source coffea4bees/scripts/analysis-dilepttbar-cutflow.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_cutflow_dilepttbar_job/test_dump_cutflow.yml
+      - output/analysis_dilepttbar_cutflow/test_dump_cutflow.yml

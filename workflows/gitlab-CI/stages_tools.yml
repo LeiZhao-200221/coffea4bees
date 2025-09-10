@@ -12,7 +12,7 @@ tools_merge_test_coffea4bees:
     paths:
       - output/tools_merge_test/test.coffea
 
-memory_test_coffea4bees:
+tools_memory_test_coffea4bees:
   stage: tools
   needs:
     - setup_workspace
@@ -24,7 +24,7 @@ memory_test_coffea4bees:
   allow_failure: true
   artifacts:
     paths:
-      - output/memory_test/mprofile_ci_test.png
+      - output/tools_memory_test/mprofile_ci_test.png
 
 tools_make_jcm_weights_coffea4bees:    
   stage: tools

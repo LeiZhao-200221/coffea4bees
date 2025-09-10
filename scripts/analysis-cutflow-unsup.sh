@@ -12,9 +12,9 @@ fi
 
 # Call the main analysis_test.sh script with Run3-specific parameters
 bash coffea4bees/scripts/run-cutflow.sh \
-    --input-file "test_synthetic_datasets.coffea" \
-    --input-subdir "synthetic_dataset_analyze" \
+    --input-file "test_unsup.coffea" \
+    --input-subdir "analysis_test_unsup" \
     --output-base "$OUTPUT_BASE_DIR" \
-    --output-filename "test_dump_cutflow_synthetic_datasets.yml" \
-    --output-subdir "synthetic_dataset_analyze_cutflow" \
-    --known-cutflow "coffea4bees/analysis/tests/known_counts_test_synthetic_datasets.yml" 
+    --output-filename "test_dump_cutflow_unsup.yml" \
+    --output-subdir "analysis_cutflow_unsup" \
+    --known-cutflow "coffea4bees/analysis/tests/known_Counts_unsup.yml" 

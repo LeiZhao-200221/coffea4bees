@@ -1,19 +1,22 @@
 #!/bin/bash
+
 # Source common functions
 source "src/scripts/common.sh"
 
-
-INPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_Run3"
-OUTPUT_DIR="${1:-"output"}/synthetic_dataset_analyze_cutflow_Run3"
-display_section_header "Checking and creating output directory"
-if [ ! -d $OUTPUT_DIR ]; then
-    mkdir -p $OUTPUT_DIR
+# Parse output base argument
+OUTPUT_BASE_DIR=$(parse_output_base_arg "output/" "$@")
+if [ $? -ne 0 ]; then
+    echo "Error parsing output base argument. Use --output-base DIR to specify the output directory. Default DIR=output/"
+    exit 1
 fi
 
-display_section_header "Running dump cutflow test"
-python coffea4bees/analysis/tests/dumpCutFlow.py --input $INPUT_DIR/test_synthetic_datasets.coffea -o $OUTPUT_DIR/test_dump_cutflow_synthetic_datasets.yml
-display_section_header "Running cutflow test"
-python coffea4bees/analysis/tests/cutflow_test.py   --inputFile $INPUT_DIR/test_synthetic_datasets.coffea --knownCounts coffea4bees/analysis/tests/known_counts_test_synthetic_datasets_Run3.yml --error_threshold 0.05
-ls $OUTPUT_DIR/test_dump_cutflow_synthetic_datasets.yml
-
+# Call the main analysis_test.sh script with Run3-specific parameters
+bash coffea4bees/scripts/run-cutflow.sh \
+    --input-file "test_synthetic_datasets.coffea" \
+    --input-subdir "synthetic_dataset_analyze_Run3" \
+    --output-base "$OUTPUT_BASE_DIR" \
+    --output-filename "test_dump_cutflow_synthetic_datasets.yml" \
+    --output-subdir "synthetic_dataset_analyze_cutflow_Run3" \
+    --known-cutflow "coffea4bees/analysis/tests/known_counts_test_synthetic_datasets_Run3.yml" \
+    --error-threshold 0.05
 

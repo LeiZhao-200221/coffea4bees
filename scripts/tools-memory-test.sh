@@ -12,7 +12,7 @@ fi
 setup_proxy
 
 # Create output directory
-OUTPUT_DIR="$OUTPUT_BASE_DIR/memory_test"
+OUTPUT_DIR="$OUTPUT_BASE_DIR/tools_memory_test"
 create_output_directory "$OUTPUT_DIR"
 
 display_section_header "Input Datasets"
