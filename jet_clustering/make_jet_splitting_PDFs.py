@@ -13,17 +13,18 @@ import yaml
 import re
 
 sys.path.insert(0, os.getcwd())
-from src.plotting.plots import makePlot, make2DPlot, load_config, load_hists, read_axes_and_cuts, init_arg_parser
+from coffea4bees.plots.plots import load_config_4b
+from src.plotting.plots import load_hists, read_axes_and_cuts, init_arg_parser
 import src.plotting.helpers as plot_helpers
 import src.plotting.iPlot_config as cfg
 from coffea4bees.jet_clustering.declustering import get_splitting_summary, get_splitting_name
 
 np.seterr(divide='ignore', invalid='ignore')
 
-def plot(var, **kwargs):
-    fig, ax = makePlot(cfg, var, outputFolder= args.outputFolder, **kwargs)
-    plt.close()
-    return fig, ax
+# def plot(var, **kwargs):
+#     fig, ax = makePlot(cfg, var, outputFolder= args.outputFolder, **kwargs)
+#     plt.close()
+#     return fig, ax
 
 
 def write_1D_pdf(output_file, varName, bin_centers, probs, total_counts, n_spaces=4):
@@ -408,7 +409,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(f" Doing years {args.years}")
 
-    cfg.plotConfig = load_config(args.metadata)
+    cfg.plotConfig = load_config_4b(args.metadata)
     cfg.outputFolder = args.outputFolder
 
     cfg.plotModifiers = yaml.safe_load(open(args.modifiers, 'r'))
