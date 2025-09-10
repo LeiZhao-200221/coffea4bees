@@ -151,7 +151,7 @@ SvB_friendtree_analysis_coffea4bees:
     - setup_workspace
     - SvB_friendtree_coffea4bees
   script:
-    - source coffea4bees/scripts/SvB-friendtree-analysis.sh
+    - source coffea4bees/scripts/SvB-friendtree-analysis.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
       - output/SvB_friendtree_analysis/test_SvB_friend.coffea

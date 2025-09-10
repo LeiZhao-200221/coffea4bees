@@ -143,7 +143,11 @@ create_output_directory "$OUTPUT_DIR"
 
 echo "############### Running cutflow analysis"
 # Run the Python script to dump cutflow
-cmd=(python coffea4bees/analysis/tests/dumpCutFlow.py --input "$INPUT_FILE" -o "$OUTPUT_FILE" -c "$CUTFLOW_LIST")
+IFS=',' read -ra cutflows <<< "$CUTFLOW_LIST"
+cmd=(python coffea4bees/analysis/tests/dumpCutFlow.py --input "$INPUT_FILE" -o "$OUTPUT_FILE" -c )
+for cf in "${cutflows[@]}"; do
+    cmd+=("$cf")
+done
 run_command "${cmd[@]}"
 
 if [ $? -ne 0 ]; then
