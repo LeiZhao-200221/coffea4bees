@@ -85,7 +85,7 @@ synthetic-dataset-analyze-cutflow:
     - .base_analysis
   needs: 
     - setup_workspace
-    - synthetic-dataset-analyze
+    - synthetic_dataset_analyze_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow.sh
   artifacts:
@@ -98,7 +98,7 @@ synthetic-dataset-analyze-cutflow-Run3:
     - .base_analysis
   needs: 
     - setup_workspace
-    - synthetic-dataset-analyze-Run3
+    - synthetic_dataset_analyze_Run3_coffea4bees
   script:
     - source coffea4bees/scripts/synthetic-dataset-analyze-cutflow-Run3.sh
   artifacts:
@@ -112,7 +112,7 @@ weights-trigger-cutflow:
     - .base_analysis
   needs: 
     - setup_workspace
-    - weights-trigger-analysis-job
+    - weights_trigger_analysis_coffea4bees
   script:
     - source coffea4bees/scripts/weights-trigger-cutflow-job.sh
   artifacts:
@@ -125,7 +125,7 @@ SvB-friendtree-cutflow-job:
     - .base_analysis
   needs:
     - setup_workspace
-    - SvB-friendtree-analysis-job
+    - SvB_friendtree_analysis_coffea4bees
   script:
     - source coffea4bees/scripts/SvB-friendtree-cutflow-job.sh
   artifacts:

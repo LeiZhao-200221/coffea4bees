@@ -12,7 +12,21 @@ tools_merge_test_coffea4bees:
     paths:
       - output/tools_merge_test/test.coffea
 
-analysis-make-jcm-weights-job:    
+memory_test_coffea4bees:
+  stage: tools
+  needs:
+    - setup_workspace
+    - analysis_systematics_test_coffea4bees
+  extends:
+    - .base_analysis
+  script:
+    - source coffea4bees/scripts/memory_test.sh
+  allow_failure: true
+  artifacts:
+    paths:
+      - output/memory_test/mprofile_ci_test.png
+
+tools_make_jcm_weights_coffea4bees:    
   stage: tools
   extends:
     - .base_analysis
@@ -20,10 +34,10 @@ analysis-make-jcm-weights-job:
     - setup_workspace
     - tools_merge_test_coffea4bees
   script:
-    - source coffea4bees/scripts/analysis-make-jcm-weights-job.sh
+    - source coffea4bees/scripts/tools-make-jcm-weights.sh --output-base /builds/$CI_PROJECT_PATH/output
   artifacts:
     paths:
-      - output/analysis_make_jcm_weights_job/testJCM_ROOT/jetCombinatoricModel_SB_.yml
+      - output/tools_make_jcm_weights/testJCM_ROOT/jetCombinatoricModel_SB_.yml
 
 twoStageClosure-test-job:   
   stage: tools

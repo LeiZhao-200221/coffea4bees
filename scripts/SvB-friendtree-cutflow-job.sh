@@ -3,7 +3,7 @@
 source "src/scripts/common.sh"
 
 
-INPUT_DIR="${1:-"output"}/SvB_friendtree_analysis_job"
+INPUT_DIR="${1:-"output"}/SvB_friendtree_analysis"
 OUTPUT_DIR="${1:-"output"}/SvB_friendtree_cutflow_job"
 display_section_header "Checking and creating output directory"
 if [ ! -d $OUTPUT_DIR ]; then
