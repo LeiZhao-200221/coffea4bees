@@ -46,6 +46,6 @@ bash coffea4bees/scripts/run-analysis-processor.sh \
     --output-filename "test_skimmer.coffea" \
     --output-subdir "$JOB" \
     --dataset-metadata $OUTPUT_DIR/datasets_HH4b.yml \
-    --config $OUTPUT_DIR/HH4b.yml \
+    --config $JOB_CONFIG \
     --no-test
     # --additional-flags "--debug"

@@ -108,16 +108,16 @@ rule make_combine_inputs:
         echo "[$(date)] Making combine inputs with full stats" | tee -a {log}
         {params.container_wrapper} \
             python3 coffea4bees/stats_analysis/make_combine_inputs.py \
-            --var {params.variable} \
-            -f {input.injson} \
-            --syst_file {input.injsonsyst} \
-            --bkg_syst_file {input.bkgsyst} \
-            --output_dir {params.output_dir} \
-            --rebin {params.rebin} \
-            {params.variable_binning} \
-            --metadata coffea4bees/stats_analysis/metadata/{params.signal}.yml \
-            {params.stat_only} 2>&1 | tee -a {log}
-            
+                --var {params.variable} \
+                -f {input.injson} \
+                --syst_file {input.injsonsyst} \
+                --bkg_syst_file {input.bkgsyst} \
+                --output_dir {params.output_dir} \
+                --rebin {params.rebin} \
+                {params.variable_binning} \
+                --metadata coffea4bees/stats_analysis/metadata/{params.signal}.yml \
+                {params.stat_only} 2>&1 | tee -a {log}
+                
         echo "[$(date)] Combining datacards" | tee -a {log}
         {params.container_wrapper} "cd {params.output_dir} && \
             combineCards.py {params.signal}_2016=datacard_{params.signal}_2016.txt \

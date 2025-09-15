@@ -101,6 +101,9 @@ setup_workspace:
   tags:
     - k8s-cvmfs
   before_script:
+    - echo "Checking output directory"
+    - ls $CI_PROJECT_DIR/output/ || true
+    - echo "Setting analysis framework"
     - cd barista_framework/
     - pwd && ls -la
     - ls -la coffea4bees/
@@ -111,6 +114,9 @@ setup_workspace:
   needs:
     - setup_workspace
   before_script:
+    - echo "Checking output directory"
+    - ls $CI_PROJECT_DIR/output/ || true
+    - echo "Setting combine framework"
     - source /cvmfs/cms.cern.ch/cmsset_default.sh
     - cd /home/cmsusr/CMSSW_11_3_4/
     - cmsenv || true

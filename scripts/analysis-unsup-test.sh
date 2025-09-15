@@ -10,7 +10,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Create output directory
-JOB="analysis_test_unsup"
+JOB="analysis_unsup_test"
 OUTPUT_DIR=$OUTPUT_BASE_DIR/$JOB
 create_output_directory "$OUTPUT_DIR"
 

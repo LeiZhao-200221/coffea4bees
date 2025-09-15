@@ -63,7 +63,7 @@ rule limits:
 
 rule significance:
     input: "{path}__{signallabel}.root"
-    output: "significance__{signallabel}.log"
+    output: "significance__{path}__{signallabel}.log"
     params:
         signallabel = "{signallabel}",
         set_parameters_zero = "",
