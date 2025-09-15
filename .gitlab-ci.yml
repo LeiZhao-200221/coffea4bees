@@ -102,7 +102,7 @@ setup_workspace:
     - k8s-cvmfs
   before_script:
     - echo "Checking output directory"
-    - ls $CI_PROJECT_DIR/output/ || true
+    - ls $CI_PROJECT_PATH/output/ || true
     - echo "Setting analysis framework"
     - cd barista_framework/
     - pwd && ls -la

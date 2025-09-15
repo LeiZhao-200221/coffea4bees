@@ -18,7 +18,7 @@ create_output_directory "$OUTPUT_DIR"
 display_section_header "Setting up picoaod dataset file"
 PICO_YAML=$OUTPUT_DIR/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml
 cp $INPUT_DIR/picoaod_datasets_GluGluToHHTo4B_cHHH0_UL18.yml $PICO_YAML
-[[ $(hostname) = *runner* ]] && sed -i "s|/builds/${CI_PROJECT_PATH}/||g" $PICO_YAML
+# [[ $(hostname) = *runner* ]] && sed -i "s|/builds/${CI_PROJECT_PATH}/||g" $PICO_YAML
 cat $PICO_YAML; echo 
 
 

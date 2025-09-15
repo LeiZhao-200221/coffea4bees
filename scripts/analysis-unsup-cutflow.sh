@@ -13,8 +13,8 @@ fi
 # Call the main analysis_test.sh script with Run3-specific parameters
 bash coffea4bees/scripts/run-cutflow.sh \
     --input-file "test_unsup.coffea" \
-    --input-subdir "analysis_test_unsup" \
+    --input-subdir "analysis_unsup_test" \
     --output-base "$OUTPUT_BASE_DIR" \
     --output-filename "test_dump_cutflow_unsup.yml" \
-    --output-subdir "analysis_cutflow_unsup" \
+    --output-subdir "analysis_unsup_cutflow" \
     --known-cutflow "coffea4bees/analysis/tests/known_Counts_unsup.yml" 
