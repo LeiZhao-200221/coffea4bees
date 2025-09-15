@@ -136,7 +136,7 @@ setup_workspace:
   image: registry.hub.docker.com/chuyuanliu/heptools:ml-cpu # TODO change to central repo
   before_script:
     - source /entrypoint.sh
-    - cd -
+    - cd $CI_PROJECT_DIR/
     - pwd && ls -la
     - cd barista_framework/
     - pwd && ls -la
