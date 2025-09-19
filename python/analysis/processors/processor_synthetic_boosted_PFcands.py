@@ -144,7 +144,7 @@ class analysis(processor.ProcessorABC):
 
         PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
 
-        fatjets = ak.zip({"p"  :4*sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
+        fatjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
                           "i0" : sorted_sub_jets[:, :, 0],
                           "i1" : sorted_sub_jets[:, :, 1],
                           "PFCands": PFCands_perFatJet,
