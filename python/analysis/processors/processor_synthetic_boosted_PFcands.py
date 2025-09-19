@@ -144,13 +144,50 @@ class analysis(processor.ProcessorABC):
 
         PFCands_perFatJet = ak.Array([[a, b] for a, b in zip(selev.PFCands[PFCandIndex_FatJet0], selev.PFCands[PFCandIndex_FatJet1])])
 
-        fatjets = ak.zip({"p"  : sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
+        fatjets = ak.zip({"p"  :sorted_sub_jets[:, :, 0] + sorted_sub_jets[:, :, 1],
                           "i0" : sorted_sub_jets[:, :, 0],
                           "i1" : sorted_sub_jets[:, :, 1],
                           "PFCands": PFCands_perFatJet,
                           },
                          depth_limit=1,
                          )
+        # --- Helpers ---
+        def _wrap_phi(phi):
+            return (phi + np.pi) % (2*np.pi) - np.pi
+
+        def _delta_phi(a, b):
+            return _wrap_phi(a - b)
+
+        # Old fatjet (from NanoAOD) and new fatjet (subjet sum)
+        old_fj = selev.selFatJet
+        new_fj = fatjets.p
+
+        def movePFCands_ratio(pf, old_fj, new_fj):
+            # relative offsets wrt old fatjet
+            dEta = pf.eta - old_fj.eta
+            dPhi = _delta_phi(pf.phi, old_fj.phi)
+
+            # broadcast to PF candidate shape
+            pf_pt_b, old_pt_b, new_pt_b, dEta_b, dPhi_b, new_eta_b, new_phi_b = ak.broadcast_arrays(
+                pf.pt, old_fj.pt, new_fj.pt, dEta, dPhi, new_fj.eta, new_fj.phi
+            )
+
+            # pt ratio wrt old fatjet, then scale by new fatjet pt
+            rPt = ak.where(old_pt_b > 0, pf_pt_b / old_pt_b, 0.0)
+            new_pt = rPt * new_pt_b
+
+            # eta/phi offsets applied additively
+            new_eta = new_eta_b + dEta_b
+            new_phi = _wrap_phi(new_phi_b + dPhi_b)
+
+            out = ak.with_field(pf, new_pt,  "pt")
+            out = ak.with_field(out, new_eta, "eta")
+            out = ak.with_field(out, new_phi, "phi")
+            return out
+
+        # Apply and attach moved PF candidates
+        movedPFCands = movePFCands_ratio(fatjets.PFCands, old_fj, new_fj)
+        fatjets = ak.with_field(fatjets, movedPFCands, "PFCands_moved")
 
         # Calculate di-jet variables
         fatjets["p", "st"]   = fatjets.i0.pt + fatjets.i1.pt
@@ -283,7 +320,9 @@ class analysis(processor.ProcessorABC):
             pf = PFCand.plot(('...', R'PFCands in selected fat jet'), "PFCands",   skip=[],
                              bins={"pt":   (50, 0, 10), "mass": (50, 0, 0.2)}
                              )
-
+            pf_moved = PFCand.plot(('...', R'Moved PFCands in selected fat jet'),
+                                   "PFCands_moved", skip=[],
+                                   bins={"pt": (50, 0, 10), "mass": (50, 0, 0.2)})
 
 
 
